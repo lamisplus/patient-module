@@ -1,0 +1,15 @@
+basePackage: org.lamisplus.modules.patient
+name: PatientModule
+store: true
+menus:
+  - icon: wc
+    disabled: false
+    name: patients
+    state: patients
+    url: /across/resources/static/patient/index.html
+umdLocation: /across/resources/static/patient/index.html
+webModules:
+  - breadcrumb: PATIENT
+    name: PatientModule
+    path: patient
+    position: 99

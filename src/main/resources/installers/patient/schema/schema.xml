@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <property name="autoIncrement" value="true"/>
+
+    <changeSet id="20222403110406-0001" author="datafiamos">
+        <sql>
+        CREATE SEQUENCE if NOT EXISTS person_id_seq
+        START WITH 1
+        INCREMENT BY 1
+        NO MINVALUE
+        NO MAXVALUE
+        CACHE 1;
+
+            CREATE TABLE IF NOT EXISTS person
+            (
+                id                 bigint  NOT NULL DEFAULT nextval('person_id_seq'::regclass),
+                active             boolean NOT NULL,
+                addresses          jsonb,
+                archived           integer,
+                contact_points     jsonb,
+                contacts           jsonb,
+                created_by         character varying(255) COLLATE pg_catalog."default",
+                date_created       timestamp without time zone,
+                date_modified      timestamp without time zone,
+                date_of_birth      date    NOT NULL,
+                deceased           boolean,
+                deceased_date_time timestamp without time zone,
+                first_name         character varying(255) COLLATE pg_catalog."default",
+                gender_id          bigint,
+                identifiers        jsonb,
+                other_name         character varying(255) COLLATE pg_catalog."default",
+                marital_status_id  bigint,
+                modified_by        character varying(255) COLLATE pg_catalog."default",
+                surname            character varying(255) COLLATE pg_catalog."default",
+                uuid               character varying(255) COLLATE pg_catalog."default",
+                CONSTRAINT person_pkey PRIMARY KEY (id)
+            )
+        </sql>
+    </changeSet>
+    <changeSet id="20222403110406-00002" author="datafiamos">
+        <sql>
+            ALTER TABLE person
+                OWNER to postgres;
+        </sql>
+    </changeSet>
+</databaseChangeLog>
