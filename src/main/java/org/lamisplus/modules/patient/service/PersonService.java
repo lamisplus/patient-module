@@ -66,7 +66,7 @@ public class PersonService {
 
 
         Person person = new Person ();
-        person.setFirstName (personDto.getFirstName ());
+        person.setFirstname (personDto.getFirstname ());
         person.setSurname (personDto.getSurname ());
         person.setOtherName (personDto.getOtherName ());
         person.setDateOfBirth (personDto.getDateOfBirth ());

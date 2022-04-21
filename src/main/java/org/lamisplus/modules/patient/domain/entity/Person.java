@@ -99,7 +99,7 @@ public class Person implements Serializable {
     private String uuid;
 
     @Column(name = "first_name")
-    private String firstName;
+    private String firstname;
 
     @Column(name = "surname")
     private String surname;
