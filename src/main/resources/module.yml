@@ -4,8 +4,8 @@ store: true
 menus:
   - icon:
     disabled: false
-    name: patients
-    state: patients
+    name: Patient
+    state: patient
     url: /across/resources/static/patient/index.html
 umdLocation: /across/resources/static/patient/index.html
 webModules:

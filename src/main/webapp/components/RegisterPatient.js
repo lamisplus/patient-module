@@ -147,7 +147,7 @@ const UserRegistration = (props) => {
             const education = JSON.parse(patient.education);
             const maritalStatus = JSON.parse(patient.maritalStatus);
             setValue('dateOfRegistration', patient.dateOfRegistration);
-            setValue('firstName', patient.firstName);
+            setValue('firstname', patient.firstname);
             setValue('middleName', patient.otherName);
             setValue('lastName', patient.surname);
             setValue('hospitalNumber', hospitalNumber ? hospitalNumber.value : '');

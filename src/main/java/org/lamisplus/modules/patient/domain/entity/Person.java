@@ -106,4 +106,6 @@ public class Person implements Serializable {
 
     @Column(name = "other_name")
     private String otherName;
+    @Column(name = "is_date_birth_estimated")
+    private Boolean isDateOfBirthEstimated;
 }

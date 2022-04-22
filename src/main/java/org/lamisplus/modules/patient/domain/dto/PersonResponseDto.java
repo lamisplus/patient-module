@@ -32,5 +32,5 @@ public class PersonResponseDto {
     private Object contactPoint;
     private Object address;
     private LocalDate dateOfRegistration;
-
+    private Boolean IsDateOfBirthEstimated;
 }

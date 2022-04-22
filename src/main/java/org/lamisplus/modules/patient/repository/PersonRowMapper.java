@@ -36,6 +36,7 @@ public class PersonRowMapper implements RowMapper<PersonResponseDto> {
         person.setDeceased (rs.getBoolean ("deceased"));
         person.setDateOfBirth (rs.getDate ("date_of_birth").toLocalDate ());
         person.setDateOfRegistration (rs.getDate ("date_of_registration").toLocalDate ());
+        person.setIsDateOfBirthEstimated(rs.getBoolean ("is_date_Of_birth_estimated"));
         return person;
     }
 }
