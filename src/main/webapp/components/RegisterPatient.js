@@ -6,13 +6,14 @@ import {
     FormGroup,
     Input,
     Label,
-    FormFeedback, Form,
+    Form,
 } from "reactstrap";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faCheckSquare, faCoffee, faEdit, faTrash } from '@fortawesome/free-solid-svg-icons'
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
+import * as moment from 'moment';
 import { makeStyles } from "@material-ui/core/styles";
 import { Card, CardContent } from "@material-ui/core";
 import SaveIcon from "@material-ui/icons/Save";
@@ -76,6 +77,8 @@ const schema = yup.object().shape({
     highestQualification: yup.number().required(),
     maritalStatus: yup.number().required(),
     dob: yup.date().required(),
+    dateOfBirth: yup.string().required(),
+    age: yup.number().required(),
     pnumber: yup.string().required(),
     altPhonenumber: yup.string().nullable(),
     email: yup.string().nullable(),
@@ -93,6 +96,7 @@ const UserRegistration = (props) => {
     const [today, setToday] = useState(new Date().toISOString().substr(0, 10).replace('T', ' '));
     const [contacts, setContacts] = useState([]);
     const [saving, setSaving] = useState(false);
+    const [ageDisabled, setAgeDisabled] = useState(true);
     const [showRelative, setShowRelative] = useState(false);
     const [editRelative, setEditRelative] = useState(null);
     const [genders, setGenders]= useState([]);
@@ -376,6 +380,40 @@ const UserRegistration = (props) => {
             setDistrictUnitOptions([]);
         }
     };
+    
+    const handleDobChange = (e) => {
+        if (e.target.value) {
+            const today = new Date();
+            const birthDate = new Date(e.target.value);
+            let age_now = today.getFullYear() - birthDate.getFullYear();
+            const m = today.getMonth() - birthDate.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                age_now--;
+            }
+            setValue('age', age_now);
+        } else {
+            setValue('age', null);
+        }
+    }
+
+    const handleDateOfBirthChange = (e) => {
+        if (e.target.value == "Actual") {
+            setAgeDisabled(true);
+        } else if (e.target.value == "Estimated") {
+            setAgeDisabled(false);
+        }
+    }
+
+    const handleAgeChange = (e) => {
+        if (!ageDisabled && e.target.value) {
+            const currentDate = new Date();
+            currentDate.setDate(15);
+            currentDate.setMonth(5);
+            const estDob = moment(currentDate.toISOString());
+            const dob = estDob.add((e.target.value * -1), 'years');
+            setValue('dob', format(new Date(dob.toDate()), 'yyyy-MM-dd'));
+        }
+    }
 
     useEffect(() => {
         loadGenders();
@@ -596,7 +634,7 @@ const UserRegistration = (props) => {
                                         </div>
 
                                         <div className={"row"}>
-                                            <div className="form-group mb-3 col-md-4">
+                                            <div className="form-group mb-3 col-md-3">
                                                 <FormGroup>
                                                     <Label>Marital Status</Label>
                                                     <select
@@ -612,9 +650,38 @@ const UserRegistration = (props) => {
                                                 </FormGroup>
                                             </div>
 
-                                            <div className="form-group mb-3 col-md-4">
+                                            <div className="form-group mb-2 col-md-2">
                                                 <FormGroup>
                                                     <Label>Date Of Birth</Label>
+                                                    <div className="radio">
+                                                        <label>
+                                                            <input
+                                                                type="radio"
+                                                                value="Actual"
+                                                                name="dateOfBirth"
+                                                                defaultChecked
+                                                                {...register("dateOfBirth")}
+                                                                onChange={(e) => handleDateOfBirthChange(e)}
+                                                            /> Actual
+                                                        </label>
+                                                    </div>
+                                                    <div className="radio">
+                                                        <label>
+                                                            <input
+                                                                type="radio"
+                                                                value="Estimated"
+                                                                name="dateOfBirth"
+                                                                {...register("dateOfBirth")}
+                                                                onChange={(e) => handleDateOfBirthChange(e)}
+                                                            /> Estimated
+                                                        </label>
+                                                    </div>
+                                                </FormGroup>
+                                            </div>
+
+                                            <div className="form-group mb-3 col-md-3">
+                                                <FormGroup>
+                                                    <Label>Date</Label>
                                                     <input
                                                         className="form-control"
                                                         type="date"
@@ -622,8 +689,24 @@ const UserRegistration = (props) => {
                                                         id="dob"
                                                         max={today}
                                                         {...register("dob")}
+                                                        onChange={(e) => handleDobChange(e)}
                                                     />
                                                     {errors.dob && <p>{errors.dob.message}</p>}
+                                                </FormGroup>
+                                            </div>
+
+                                            <div className="form-group mb-3 col-md-3">
+                                                <FormGroup>
+                                                    <Label>Age</Label>
+                                                    <input
+                                                        className="form-control"
+                                                        type="number"
+                                                        name="age"
+                                                        id="age"
+                                                        {...register("age")}
+                                                        disabled={ageDisabled}
+                                                        onChange={(e) => handleAgeChange(e)}
+                                                    />
                                                 </FormGroup>
                                             </div>
                                         </div>
