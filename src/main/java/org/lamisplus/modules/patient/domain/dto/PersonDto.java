@@ -36,5 +36,6 @@ public class PersonDto implements Serializable {
     private final List<IdentifierDto> identifier;
     private final List<ContactDto> contact;
     private final LocalDate dateOfRegistration;
+    private Boolean isDateOfBirthEstimated;
 }
 

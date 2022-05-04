@@ -51,4 +51,12 @@
                 OWNER to postgres;
         </sql>
     </changeSet>
+
+    <changeSet id="202220422-001" author="amos-data-fi">
+        <sql>
+               ALTER TABLE person
+                ADD COLUMN is_date_of_birth_estimated boolean;
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>
