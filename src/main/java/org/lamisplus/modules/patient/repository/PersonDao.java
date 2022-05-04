@@ -20,7 +20,7 @@ public class PersonDao {
     private final String INSERT_QUERY = String.format
             ("INSERT INTO person(active, address, archived, contact_point, contact, created_by, " +
                      "date_created, date_modified, date_of_birth,date_of_registration, deceased, deceased_date_time, first_name, " +
-                     "identifier, other_name, modified_by, surname, uuid, gender, marital_status,organization,education, employment_status, is_date_birth_estimated)" +
+                     "identifier, other_name, modified_by, surname, uuid, gender, marital_status,organization,education, employment_status, is_date_of_birth_estimated)" +
                      " VALUES (?, (to_json(?::jsonb)), ?,(to_json(?::jsonb)), (to_json(?::jsonb)), ?, ?, ?, ?,?, ?, ?, ?," +
                      "(to_json(?::jsonb)), ?, ?, ?, ?, (to_json(?::jsonb)), (to_json(?::jsonb))," +
                      "(to_json(?::jsonb)),(to_json(?::jsonb)),(to_json(?::jsonb)),?)");
@@ -31,7 +31,7 @@ public class PersonDao {
                      "contact_point=(to_json(?::jsonb)), contact=(to_json(?::jsonb)), date_modified=?, date_of_birth=?," +
                      " date_of_registration=?, deceased=?, deceased_date_time=?, first_name=?, identifier=(to_json(?::jsonb)), other_name=?, modified_by=?, surname=?," +
                      " gender=(to_json(?::jsonb)), marital_status=(to_json(?::jsonb)), organization=(to_json(?::jsonb))," +
-                     "education=(to_json(?::jsonb)), employment_status=(to_json(?::jsonb)), is_date_birth_estimated=? WHERE id=?");
+                     "education=(to_json(?::jsonb)), employment_status=(to_json(?::jsonb)), is_date_of_birth_estimated=? WHERE id=?");
 
 
     private final String GETALL_QUERY = String.format

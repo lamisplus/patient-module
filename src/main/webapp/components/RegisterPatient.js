@@ -151,7 +151,7 @@ const UserRegistration = (props) => {
             const education = JSON.parse(patient.education);
             const maritalStatus = JSON.parse(patient.maritalStatus);
             setValue('dateOfRegistration', patient.dateOfRegistration);
-            setValue('firstname', patient.firstname);
+            setValue('firstName', patient.firstname);
             setValue('middleName', patient.otherName);
             setValue('lastName', patient.surname);
             setValue('hospitalNumber', hospitalNumber ? hospitalNumber.value : '');
@@ -228,6 +228,7 @@ const UserRegistration = (props) => {
         setShowRelative(false);
     }
     const onSubmit = async (data) => {
+        console.log(data);
         try {
             const patientForm = {
                 active: true,
@@ -263,7 +264,8 @@ const UserRegistration = (props) => {
                 surname: data.lastName,
                 educationId: data.highestQualification,
                 employmentStatusId: data.employmentStatus,
-                dateOfRegistration: data.dateOfRegistration
+                dateOfRegistration: data.dateOfRegistration,
+                isDateOfBirthEstimated: data.dateOfBirth == "Actual" ? false : true
             };
             const phone = {
                 "type": "phone",
