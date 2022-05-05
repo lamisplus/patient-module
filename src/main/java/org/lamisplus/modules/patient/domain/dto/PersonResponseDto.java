@@ -15,7 +15,7 @@ public class PersonResponseDto {
     private Long id;
     private Boolean active;
     private String surname;
-    private String firstname;
+    private String firstName;
     private String otherName;
     private Object gender;
     private Boolean deceased;
@@ -33,4 +33,6 @@ public class PersonResponseDto {
     private Object address;
     private LocalDate dateOfRegistration;
     private Boolean IsDateOfBirthEstimated;
+
+
 }

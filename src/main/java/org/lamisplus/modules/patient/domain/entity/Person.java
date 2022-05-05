@@ -2,6 +2,7 @@ package org.lamisplus.modules.patient.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.foreach.across.modules.hibernate.business.AuditableEntity;
 import com.vladmihalcea.hibernate.type.array.IntArrayType;
 import com.vladmihalcea.hibernate.type.array.StringArrayType;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
@@ -15,6 +16,7 @@ import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.TypeDefs;
 import org.lamisplus.modules.patient.utility.SecurityUtils;
+import org.springframework.data.domain.Persistable;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -33,7 +35,7 @@ import java.time.LocalDateTime;
         @TypeDef(name = "jsonb-node", typeClass = JsonNodeBinaryType.class),
         @TypeDef(name = "json-node", typeClass = JsonNodeStringType.class),
 })
-public class Person implements Serializable {
+public class Person  implements Serializable, Persistable<Long>{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -99,13 +101,18 @@ public class Person implements Serializable {
     private String uuid;
 
     @Column(name = "first_name")
-    private String firstname;
+    private String firstName;
 
     @Column(name = "surname")
     private String surname;
 
     @Column(name = "other_name")
     private String otherName;
-    @Column(name = "is_date_birth_estimated")
+    @Column(name = "is_date_of_birth_estimated")
     private Boolean isDateOfBirthEstimated;
+
+    @Override
+    public boolean isNew() {
+        return false;
+    }
 }

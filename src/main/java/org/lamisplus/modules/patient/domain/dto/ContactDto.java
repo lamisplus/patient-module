@@ -10,7 +10,7 @@ import java.io.Serializable;
 public class ContactDto implements Serializable {
     private final Long relationshipId;
     private final String surname;
-    private final String firstname;
+    private final String firstName;
     private final String otherName;
     private final AddressDto address;
     private final Long genderId;

@@ -1,4 +1,4 @@
-package org.lamisplus.modules.patient.repository;
+package org.lamisplus.modules.patient.domain.repository;
 
 import org.lamisplus.modules.patient.domain.dto.PersonResponseDto;
 import org.springframework.jdbc.core.RowMapper;
@@ -25,7 +25,7 @@ public class PersonRowMapper implements RowMapper<PersonResponseDto> {
         person.setContactPoint (contactPoints);
         person.setIdentifier (identifiers);
         person.setSurname (rs.getString ("surname"));
-        person.setFirstname (rs.getString ("first_name"));
+        person.setFirstName (rs.getString ("first_name"));
         person.setOtherName (rs.getString ("other_name"));
         person.setActive (rs.getBoolean ("active"));
         person.setGender (gender);

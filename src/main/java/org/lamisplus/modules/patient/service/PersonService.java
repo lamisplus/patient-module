@@ -5,49 +5,68 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.lamisplus.modules.base.domain.entity.ApplicationCodeSet;
-import org.lamisplus.modules.base.domain.entity.OrganisationUnit;
-import org.lamisplus.modules.base.repository.ApplicationCodesetRepository;
-import org.lamisplus.modules.base.repository.OrganisationUnitRepository;
+import org.lamisplus.modules.base.domain.dto.ApplicationCodesetDTO;
+import org.lamisplus.modules.base.domain.entities.OrganisationUnit;
+import org.lamisplus.modules.base.service.ApplicationCodesetService;
+import org.lamisplus.modules.base.service.OrganisationUnitService;
 import org.lamisplus.modules.patient.domain.dto.*;
 import org.lamisplus.modules.patient.domain.entity.Person;
-import org.lamisplus.modules.patient.repository.PersonDao;
+import org.lamisplus.modules.patient.domain.repository.PersonRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PersonService {
-    private final PersonDao personDao;
-    //private final ApplicationCodesetRepository appCodeSetRepo;
-    //private final OrganisationUnitRepository orgUnitRepo;
+
+    private final PersonRepository personRepository;
+
+    private final ApplicationCodesetService applicationCodesetService;
+
+    private final OrganisationUnitService organisationUnitService;
 
     public PersonResponseDto createPerson(PersonDto personDto) throws Exception {
         Person person = getPersonFromDto (personDto);
-        Person personSave = personDao.savePerson (person);
-        return personDao.getPersonIdByUuid (personSave.getUuid ());
+        person.setUuid (UUID.randomUUID ().toString ());
+        return getDtoFromPerson (personRepository.save (person));
     }
 
     public PersonResponseDto updatePerson(Long id, PersonDto personDto) throws Exception {
-        personDao.getPersonById (id).orElseThrow (() -> new Exception ("person with Id " + id + " is not found"));
-        Person personFromDto = getPersonFromDto (personDto);
-        Person updatePerson = personDao.updatePerson (id, personFromDto);
-        return personDao.getPersonById (updatePerson.getId ()).orElseThrow (() -> new Exception ("person with Id " + id + " is not found"));
+        personRepository.findById (id).orElseThrow (() -> new Exception ("person with Id " + id + " is not found"));
+        Person person = getPersonFromDto (personDto);
+        person.setId (id);
+        return getDtoFromPerson (personRepository.save (person));
     }
+
 
     public List<PersonResponseDto> getAllPerson() {
-        return personDao.getAllPersons ();
+        return personRepository.getAllByArchived (0)
+                .stream ()
+                .map (person -> getDtoFromPerson (person))
+                .collect (Collectors.toList ());
     }
+
 
     public PersonResponseDto getPersonById(Long id) throws Exception {
-        return personDao.getPersonById (id).orElseThrow (() -> new Exception ("person with Id " + id + " is not found"));
+        Person person = personRepository
+                .findById (id)
+                .orElseThrow (() -> new Exception ("person with Id " + id + " is not found"));
+        return getDtoFromPerson (person);
     }
 
+
     public void deletePersonById(Long id) throws Exception {
-        PersonResponseDto personResponseDto = personDao.getPersonById (id).orElseThrow (() -> new Exception ("person with Id " + id + " is not found"));
-        personDao.deletePatientById (personResponseDto.getId ());
+        Person person = personRepository
+                .findById (id)
+                .orElseThrow (() -> new Exception ("person with Id " + id + " is not found"));
+        person.setArchived (1);
+        personRepository.save (person);
     }
 
 
@@ -66,7 +85,7 @@ public class PersonService {
 
 
         Person person = new Person ();
-        person.setFirstname (personDto.getFirstname ());
+        person.setFirstName (personDto.getFirstname ());
         person.setSurname (personDto.getSurname ());
         person.setOtherName (personDto.getOtherName ());
         person.setDateOfBirth (personDto.getDateOfBirth ());
@@ -75,11 +94,12 @@ public class PersonService {
         person.setArchived (0);
         person.setDeceasedDateTime (personDto.getDeceasedDateTime ());
         person.setDeceased (personDto.getDeceased ());
-
+        boolean isDateOfBirthEstimated = personDto.getIsDateOfBirthEstimated () == null ? false : true;
+        person.setIsDateOfBirthEstimated (isDateOfBirthEstimated);
 
         if (genderId != null) {
             ApplicationCodeDto genderDto = getAppCodeSet (genderId, "No Gender exist with id " + genderId);
-          //  ApplicationCodeDto genderDto = new ApplicationCodeDto (gender.getId (), gender.getDisplay ());
+            //  ApplicationCodeDto genderDto = new ApplicationCodeDto (gender.getId (), gender.getDisplay ());
             JsonNode genderJsonNode = mapper.valueToTree (genderDto);
             person.setGender (genderJsonNode);
         } else person.setGender (null);
@@ -93,14 +113,13 @@ public class PersonService {
 
         if (educationalId != null) {
             ApplicationCodeDto educationStatusDto = getAppCodeSet (educationalId, "No occupation exist with Id " + educationalId);
-           // ApplicationCodeDto educationStatusDto = new ApplicationCodeDto (education.getId (), education.getDisplay ());
+            // ApplicationCodeDto educationStatusDto = new ApplicationCodeDto (education.getId (), education.getDisplay ());
             JsonNode educationJsonNode = mapper.valueToTree (educationStatusDto);
             person.setEducation (educationJsonNode);
         } else person.setEducation (null);
 
         if (employmentStatusId != null) {
             ApplicationCodeDto employmentStatusDto = getAppCodeSet (employmentStatusId, "No employmentStatus exist with id " + employmentStatusId);
-            //ApplicationCodeDto employmentStatusDto = new ApplicationCodeDto (employmentStatus.getId (), employmentStatus.getDisplay ());
             JsonNode educationJsonNode = mapper.valueToTree (employmentStatusDto);
             person.setEmploymentStatus (educationJsonNode);
         } else person.setEmploymentStatus (null);
@@ -108,7 +127,6 @@ public class PersonService {
 
         if (organizationId != null) {
             OrgUnitDto organisationUnitDto = getOrgUnit (organizationId, "No organisationUnit exist with id " + organizationId);
-            // ApplicationCodeDto organisationUnitDto = new ApplicationCodeDto (organisationUnit.getId (), organisationUnit.getName ());
             JsonNode organisationUnitJsonNode = mapper.valueToTree (organisationUnitDto);
             person.setOrganization (organisationUnitJsonNode);
         } else person.setOrganization (null);
@@ -132,7 +150,7 @@ public class PersonService {
             ArrayNode identifierDtoArrayNode = mapper.valueToTree (identifier);
             JsonNode identifierDtoJsonNode = mapper.createObjectNode ().set ("identifier", identifierDtoArrayNode);
             person.setIdentifier (identifierDtoJsonNode);
-        } else person.setIdentifier(null);
+        } else person.setIdentifier (null);
 
 
         if (address != null && ! address.isEmpty ()) {
@@ -147,11 +165,43 @@ public class PersonService {
 
 
     private ApplicationCodeDto getAppCodeSet(Long id, String errorMessage) {
-        return  personDao.getApplicationCodeSetById (id).orElseThrow (() -> new RuntimeException (errorMessage));
+        ApplicationCodesetDTO applicationCodeset = applicationCodesetService.getApplicationCodeset (id);
+        if (applicationCodeset == null) {
+            throw new RuntimeException (errorMessage);
+        }
+        return new ApplicationCodeDto (applicationCodeset.getId (), applicationCodeset.getDisplay ());
     }
 
     private OrgUnitDto getOrgUnit(Long id, String errorMessage) {
-        return personDao.getOrgUnitById (id).orElseThrow (() -> new RuntimeException (errorMessage));
+        OrganisationUnit organizationUnit = organisationUnitService.getOrganizationUnit (id);
+        if (organizationUnit == null) throw new RuntimeException (errorMessage);
+        return new OrgUnitDto (organizationUnit.getId (), organizationUnit.getName ());
+    }
+
+
+    public PersonResponseDto getDtoFromPerson(Person person) {
+
+        PersonResponseDto personResponseDto = new PersonResponseDto ();
+        personResponseDto.setId (person.getId ());
+        personResponseDto.setIsDateOfBirthEstimated (person.getIsDateOfBirthEstimated ());
+        personResponseDto.setDateOfBirth (person.getDateOfBirth ());
+        personResponseDto.setFirstName (person.getFirstName ());
+        personResponseDto.setSurname (person.getSurname ());
+        personResponseDto.setOtherName (person.getOtherName ());
+        personResponseDto.setContactPoint (person.getContactPoint ());
+        personResponseDto.setAddress (person.getAddress ());
+        personResponseDto.setContact (person.getContact ());
+        personResponseDto.setIdentifier (person.getIdentifier ());
+        personResponseDto.setEducation (person.getEducation ());
+        personResponseDto.setEmploymentStatus (person.getEmploymentStatus ());
+        personResponseDto.setMaritalStatus (person.getMaritalStatus ());
+        personResponseDto.setGender (person);
+        personResponseDto.setDeceased (person.getDeceased ());
+        personResponseDto.setDateOfRegistration (person.getDateOfRegistration ());
+        personResponseDto.setActive (person.getActive ());
+        personResponseDto.setDeceasedDateTime (person.getDeceasedDateTime ());
+        personResponseDto.setOrganization (person.getOrganization ());
+        return personResponseDto;
     }
 
 

@@ -1,4 +1,4 @@
-package org.lamisplus.modules.patient.repository;
+package org.lamisplus.modules.patient.domain.repository;
 
 import org.lamisplus.modules.patient.domain.dto.ApplicationCodeDto;
 import org.lamisplus.modules.patient.domain.dto.OrgUnitDto;

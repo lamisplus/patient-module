@@ -1,8 +1,9 @@
 package org.lamisplus.modules.patient;
 
-import com.foreach.across.config.AcrossApplication;
 import com.foreach.across.core.AcrossModule;
+import com.foreach.across.core.annotations.AcrossDepends;
 import com.foreach.across.core.context.configurer.ComponentScanConfigurer;
+import com.foreach.across.core.transformers.BeanPrefixingTransformer;
 import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModule;
 import com.foreach.across.modules.web.AcrossWebModule;
 import org.lamisplus.modules.base.BaseModule;
@@ -18,32 +19,36 @@ import springfox.documentation.spring.web.plugins.Docket;
 import java.util.Arrays;
 import java.util.List;
 
-@AcrossApplication(
-        modules = {
+@AcrossDepends(
+        required = {
                 AcrossHibernateJpaModule.NAME,
-                AcrossWebModule.NAME
+                //AcrossWebModule.NAME,
         })
 public class PatientModule extends AcrossModule
 {
-    public final static String NAME = "PatientModule";
+    public static final  String NAME = "PatientModule";
 
 
     public PatientModule(){
         super();
         addApplicationContextConfigurer(new ComponentScanConfigurer(
-                getClass().getPackage().getName() +".controller",
-                getClass().getPackage().getName() +".service",
-                getClass().getPackage().getName() +".config",
                 getClass().getPackage().getName() +".domain",
-                getClass().getPackage().getName() +".installers",
-                getClass().getPackage().getName() +".domain.mapper",
-                getClass().getPackage().getName() +".utility",
-                getClass().getPackage().getName() +".component",
-                getClass().getPackage().getName() +".repository"));
+                getClass().getPackage().getName() +".repository",
+                getClass().getPackage().getName() +".config",
+                getClass().getPackage().getName() +".service",
+                getClass().getPackage().getName() +".controller"
+                //"com.blazebit.persistence.spring.data.webmvc"
+                //getClass().getPackage().getName() +".installers",
+               // getClass().getPackage().getName() +".domain.mapper",
+                //getClass().getPackage().getName() +".utility",
+                //getClass().getPackage().getName() +".component",
+                ));
+
     }
+
     @Override
     public String getName() {
-        return NAME;
+        return  NAME;
     }
 
     @Bean

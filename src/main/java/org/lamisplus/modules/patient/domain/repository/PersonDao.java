@@ -1,4 +1,4 @@
-package org.lamisplus.modules.patient.repository;
+package org.lamisplus.modules.patient.domain.repository;
 
 import lombok.RequiredArgsConstructor;
 import org.lamisplus.modules.patient.domain.dto.ApplicationCodeDto;
@@ -73,7 +73,7 @@ public class PersonDao {
                          person.getDateOfRegistration (),
                          person.getDeceased (),
                          person.getDeceasedDateTime (),
-                         person.getFirstname (),
+                         person.getFirstName (),
                          (person.getIdentifier () != null) ? person.getIdentifier ().toString () : null,
                          person.getOtherName (),
                          person.getModifiedBy (),
@@ -103,7 +103,7 @@ public class PersonDao {
                          person.getDateOfRegistration (),
                          person.getDeceased (),
                          person.getDeceasedDateTime (),
-                         person.getFirstname (),
+                         person.getFirstName(),
                          (person.getIdentifier () != null) ? person.getIdentifier ().toString () : null,
                          person.getOtherName (),
                          person.getModifiedBy (),

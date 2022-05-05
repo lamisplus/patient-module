@@ -114,7 +114,7 @@ const UserRegistration = (props) => {
 
     const getNames = (relationship) => {
         const surname = relationship.surname;
-        const firstname = relationship.firstname;
+        const firstname = relationship.firstName;
         const otherName = relationship.otherName ? relationship.otherName : '';
         return surname + ', ' + firstname + ' ' + otherName;
     }
@@ -147,7 +147,7 @@ const UserRegistration = (props) => {
             const education = JSON.parse(patient.education);
             const maritalStatus = JSON.parse(patient.maritalStatus);
             setValue('dateOfRegistration', patient.dateOfRegistration);
-            setValue('firstname', patient.firstname);
+            setValue('firstName', patient.firstName);
             setValue('middleName', patient.otherName);
             setValue('lastName', patient.surname);
             setValue('hospitalNumber', hospitalNumber ? hospitalNumber.value : '');
@@ -223,6 +223,7 @@ const UserRegistration = (props) => {
     const handleCancelSaveRelationship = () => {
         setShowRelative(false);
     }
+
     const onSubmit = async (data) => {
         try {
             const patientForm = {
@@ -295,7 +296,7 @@ const UserRegistration = (props) => {
     }
     const handleEditRelative = (relative, index) => {
         setValue("relationshipType", relative.relationshipId);
-        setValue("cfirstName", relative.firstname);
+        setValue("cfirstName", relative.firstName);
         setValue("cmiddleName", relative.otherName);
         setValue("clastName", relative.surname);
         setValue("contactPhoneNumber", relative.contactPoint ? relative.contactPoint.value : '');
