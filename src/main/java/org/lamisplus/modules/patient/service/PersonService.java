@@ -99,21 +99,18 @@ public class PersonService {
 
         if (genderId != null) {
             ApplicationCodeDto genderDto = getAppCodeSet (genderId, "No Gender exist with id " + genderId);
-            //  ApplicationCodeDto genderDto = new ApplicationCodeDto (gender.getId (), gender.getDisplay ());
             JsonNode genderJsonNode = mapper.valueToTree (genderDto);
             person.setGender (genderJsonNode);
         } else person.setGender (null);
 
         if (maritalStatusId != null) {
             ApplicationCodeDto maritalStatusDto = getAppCodeSet (maritalStatusId, "No marital status exist with id " + maritalStatusId);
-            //ApplicationCodeDto maritalStatusDto = new ApplicationCodeDto (maritalStatus.getId (), maritalStatus.getDisplay ());
             JsonNode maritalJsonNode = mapper.valueToTree (maritalStatusDto);
             person.setMaritalStatus (maritalJsonNode);
         } else person.setMaritalStatus (null);
 
         if (educationalId != null) {
             ApplicationCodeDto educationStatusDto = getAppCodeSet (educationalId, "No occupation exist with Id " + educationalId);
-            // ApplicationCodeDto educationStatusDto = new ApplicationCodeDto (education.getId (), education.getDisplay ());
             JsonNode educationJsonNode = mapper.valueToTree (educationStatusDto);
             person.setEducation (educationJsonNode);
         } else person.setEducation (null);
