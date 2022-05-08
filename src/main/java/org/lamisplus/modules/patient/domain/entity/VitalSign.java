@@ -15,7 +15,6 @@ import java.time.LocalDate;
 @Setter
 @Getter
 @AllArgsConstructor
-@ToString()
 public class VitalSign extends SettableIdAuditableEntity<VitalSign> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,4 +34,5 @@ public class VitalSign extends SettableIdAuditableEntity<VitalSign> {
     private Long serviceTypeId;
     @NotNull
     private Double systolic;
+    private  Integer archived;
 }
