@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.github.dockerjava.api.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -13,7 +14,7 @@ import org.lamisplus.modules.base.service.ApplicationCodesetService;
 import org.lamisplus.modules.base.service.OrganisationUnitService;
 import org.lamisplus.modules.patient.domain.dto.*;
 import org.lamisplus.modules.patient.domain.entity.Person;
-import org.lamisplus.modules.patient.domain.repository.PersonRepository;
+import org.lamisplus.modules.patient.repository.PersonRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,6 +28,7 @@ public class PersonService {
 
     private final PersonRepository personRepository;
 
+    static final  String PERSON_NOT_FOUND_MESSAGE = "No person is  found with id  ";
     private final ApplicationCodesetService applicationCodesetService;
 
     private final OrganisationUnitService organisationUnitService;
@@ -38,7 +40,7 @@ public class PersonService {
     }
 
     public PersonResponseDto updatePerson(Long id, PersonDto personDto) throws Exception {
-        personRepository.findById (id).orElseThrow (() -> new Exception ("person with Id " + id + " is not found"));
+        personRepository.findById (id).orElseThrow (() -> new Exception (PERSON_NOT_FOUND_MESSAGE + id));
         Person person = getPersonFromDto (personDto);
         person.setId (id);
         return getDtoFromPerson (personRepository.save (person));
@@ -56,7 +58,7 @@ public class PersonService {
     public PersonResponseDto getPersonById(Long id) throws Exception {
         Person person = personRepository
                 .findById (id)
-                .orElseThrow (() -> new Exception ("person with Id " + id + " is not found"));
+                .orElseThrow (() -> new Exception (PERSON_NOT_FOUND_MESSAGE + id));
         return getDtoFromPerson (person);
     }
 
@@ -64,14 +66,14 @@ public class PersonService {
     public void deletePersonById(Long id) throws Exception {
         Person person = personRepository
                 .findById (id)
-                .orElseThrow (() -> new Exception ("person with Id " + id + " is not found"));
+                .orElseThrow (() -> new Exception (PERSON_NOT_FOUND_MESSAGE + id));
         person.setArchived (1);
         personRepository.save (person);
     }
 
 
     @NotNull
-    private Person getPersonFromDto(PersonDto personDto) throws JsonProcessingException {
+    private Person getPersonFromDto(PersonDto personDto){
         Long genderId = personDto.getGenderId ();
         Long maritalStatusId = personDto.getMaritalStatusId ();
         Long educationalId = personDto.getEducationId ();
@@ -94,20 +96,23 @@ public class PersonService {
         person.setArchived (0);
         person.setDeceasedDateTime (personDto.getDeceasedDateTime ());
         person.setDeceased (personDto.getDeceased ());
-        boolean isDateOfBirthEstimated = personDto.getIsDateOfBirthEstimated () == null ? false : true;
+        boolean isDateOfBirthEstimated = personDto.getIsDateOfBirthEstimated () != null;
         person.setIsDateOfBirthEstimated (isDateOfBirthEstimated);
 
         if (genderId != null) {
             ApplicationCodeDto genderDto = getAppCodeSet (genderId, "No Gender exist with id " + genderId);
             JsonNode genderJsonNode = mapper.valueToTree (genderDto);
             person.setGender (genderJsonNode);
-        } else person.setGender (null);
+        } else {
+            person.setGender (null);
+        }
 
         if (maritalStatusId != null) {
             ApplicationCodeDto maritalStatusDto = getAppCodeSet (maritalStatusId, "No marital status exist with id " + maritalStatusId);
             JsonNode maritalJsonNode = mapper.valueToTree (maritalStatusDto);
             person.setMaritalStatus (maritalJsonNode);
-        } else person.setMaritalStatus (null);
+        }
+        else { person.setMaritalStatus (null);}
 
         if (educationalId != null) {
             ApplicationCodeDto educationStatusDto = getAppCodeSet (educationalId, "No occupation exist with Id " + educationalId);
@@ -164,14 +169,14 @@ public class PersonService {
     private ApplicationCodeDto getAppCodeSet(Long id, String errorMessage) {
         ApplicationCodesetDTO applicationCodeset = applicationCodesetService.getApplicationCodeset (id);
         if (applicationCodeset == null) {
-            throw new RuntimeException (errorMessage);
+            throw new NotFoundException (errorMessage);
         }
         return new ApplicationCodeDto (applicationCodeset.getId (), applicationCodeset.getDisplay ());
     }
 
     private OrgUnitDto getOrgUnit(Long id, String errorMessage) {
         OrganisationUnit organizationUnit = organisationUnitService.getOrganizationUnit (id);
-        if (organizationUnit == null) throw new RuntimeException (errorMessage);
+        if (organizationUnit == null) throw new NotFoundException (errorMessage);
         return new OrgUnitDto (organizationUnit.getId (), organizationUnit.getName ());
     }
 
