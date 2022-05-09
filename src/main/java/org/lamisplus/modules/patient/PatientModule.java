@@ -3,9 +3,7 @@ package org.lamisplus.modules.patient;
 import com.foreach.across.core.AcrossModule;
 import com.foreach.across.core.annotations.AcrossDepends;
 import com.foreach.across.core.context.configurer.ComponentScanConfigurer;
-import com.foreach.across.core.transformers.BeanPrefixingTransformer;
 import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModule;
-import com.foreach.across.modules.web.AcrossWebModule;
 import org.lamisplus.modules.base.BaseModule;
 import org.springframework.context.annotation.Bean;
 import springfox.documentation.builders.ApiInfoBuilder;
@@ -22,7 +20,7 @@ import java.util.List;
 @AcrossDepends(
         required = {
                 AcrossHibernateJpaModule.NAME,
-                //AcrossWebModule.NAME,
+                BaseModule.NAME,
         })
 public class PatientModule extends AcrossModule
 {

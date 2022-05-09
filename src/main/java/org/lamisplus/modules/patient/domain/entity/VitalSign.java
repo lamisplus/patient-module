@@ -2,6 +2,7 @@ package org.lamisplus.modules.patient.domain.entity;
 
 import com.foreach.across.modules.hibernate.business.SettableIdAuditableEntity;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -35,4 +36,5 @@ public class VitalSign extends SettableIdAuditableEntity<VitalSign> {
     @NotNull
     private Double systolic;
     private  Integer archived;
+
 }
