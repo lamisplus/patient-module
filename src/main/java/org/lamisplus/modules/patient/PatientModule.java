@@ -1,11 +1,9 @@
 package org.lamisplus.modules.patient;
 
-import com.foreach.across.config.AcrossApplication;
 import com.foreach.across.core.AcrossModule;
+import com.foreach.across.core.annotations.AcrossDepends;
 import com.foreach.across.core.context.configurer.ComponentScanConfigurer;
 import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModule;
-import com.foreach.across.modules.web.AcrossWebModule;
-import org.lamisplus.modules.base.BaseModule;
 import org.springframework.context.annotation.Bean;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
@@ -18,29 +16,28 @@ import springfox.documentation.spring.web.plugins.Docket;
 import java.util.Arrays;
 import java.util.List;
 
-@AcrossApplication(
-        modules = {
+@AcrossDepends(
+        required = {
                 AcrossHibernateJpaModule.NAME,
-                AcrossWebModule.NAME
         })
 public class PatientModule extends AcrossModule
 {
-    public final static String NAME = "PatientModule";
+    public static final String NAME = "PatientModule";
 
 
-    public PatientModule(){
-        super();
-        addApplicationContextConfigurer(new ComponentScanConfigurer(
-                getClass().getPackage().getName() +".controller",
-                getClass().getPackage().getName() +".service",
-                getClass().getPackage().getName() +".config",
-                getClass().getPackage().getName() +".domain",
-                getClass().getPackage().getName() +".installers",
-                getClass().getPackage().getName() +".domain.mapper",
-                getClass().getPackage().getName() +".utility",
-                getClass().getPackage().getName() +".component",
-                getClass().getPackage().getName() +".repository"));
+    public PatientModule() {
+        super ();
+        addApplicationContextConfigurer (new ComponentScanConfigurer (
+                getClass ().getPackage ().getName () + ".domain",
+                getClass ().getPackage ().getName () + ".repository",
+                getClass ().getPackage ().getName () + ".config",
+                getClass ().getPackage ().getName () + ".service",
+                getClass ().getPackage ().getName () + ".controller",
+                "org.lamisplus.modules.base.service"
+        ));
+
     }
+
     @Override
     public String getName() {
         return NAME;

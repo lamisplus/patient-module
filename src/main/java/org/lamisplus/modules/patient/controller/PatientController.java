@@ -19,39 +19,30 @@ public class PatientController {
 
     private final PersonService personService;
 
-    @RequestMapping(value = "/",
-            method = RequestMethod.POST,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<PersonResponseDto> createPatient(@RequestBody PersonDto patient) throws Exception {
-        return ResponseEntity.ok(personService.createPerson(patient));
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<PersonResponseDto> createPatient(@RequestBody PersonDto patient) {
+        return ResponseEntity.ok (personService.createPerson (patient));
     }
 
-    @RequestMapping(value = "/",
-            method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<PersonResponseDto>> getAllPatients() {
-        return ResponseEntity.ok(personService.getAllPerson());
+        return ResponseEntity.ok (personService.getAllPerson ());
     }
 
-    @RequestMapping(value = "/{id}",
-            method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<PersonResponseDto> getPatient(@PathVariable("id") Long id) throws Exception {
-        return ResponseEntity.ok(personService.getPersonById(id));
+    @GetMapping(value = "/{id}")
+    public ResponseEntity<PersonResponseDto> getPatient(@PathVariable("id") Long id) {
+        return ResponseEntity.ok (personService.getPersonById (id));
     }
 
-    @RequestMapping(value = "/{id}",
-            method = RequestMethod.PUT,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<PersonResponseDto> updatePatient(@PathVariable("id") Long id, @RequestBody PersonDto patient) throws Exception {
-        return ResponseEntity.ok(personService.updatePerson(id, patient));
+    @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<PersonResponseDto> updatePatient(@PathVariable("id") Long id, @RequestBody PersonDto patient) {
+        return ResponseEntity.ok (personService.updatePerson (id, patient));
     }
 
-    @RequestMapping(value = "/{id}",
-            method = RequestMethod.DELETE,
+    @DeleteMapping(value = "/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> deletePerson(@PathVariable("id") Long id) throws Exception {
-        personService.deletePersonById(id);
+    public ResponseEntity<String> deletePerson(@PathVariable("id") Long id) {
+        personService.deletePersonById (id);
         return ResponseEntity.accepted ().build ();
     }
 

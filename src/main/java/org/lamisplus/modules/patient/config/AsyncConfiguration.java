@@ -1,7 +1,6 @@
-package org.lamisplus.modules.patient.config;
+package com.mattae.simal.modules.ehr.config;
 
 import io.github.jhipster.async.ExceptionHandlingAsyncTaskExecutor;
-import io.github.jhipster.config.JHipsterProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
@@ -14,7 +13,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -22,22 +20,19 @@ import java.util.concurrent.Executors;
 @Configuration
 @EnableAsync
 @EnableScheduling
-@EnableTransactionManagement
 @RequiredArgsConstructor
 @Slf4j
 public class AsyncConfiguration implements AsyncConfigurer, SchedulingConfigurer {
-    private final JHipsterProperties properties;
 
     @Override
     @Bean(name = "taskExecutor")
     public Executor getAsyncExecutor() {
-        log.debug("Creating Async Task Executor");
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(properties.getAsync().getCorePoolSize());
-        executor.setMaxPoolSize(properties.getAsync().getMaxPoolSize());
-        executor.setQueueCapacity(properties.getAsync().getQueueCapacity());
-        executor.setThreadNamePrefix("patient-");
-        return new ExceptionHandlingAsyncTaskExecutor(executor);
+        log.debug ("Creating Async Task Executor");
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor ();
+        executor.setCorePoolSize (3);
+        executor.setMaxPoolSize (3);
+        executor.setQueueCapacity (3);
+        return new ExceptionHandlingAsyncTaskExecutor (executor);
     }
 
     @Override
@@ -52,6 +47,6 @@ public class AsyncConfiguration implements AsyncConfigurer, SchedulingConfigurer
 
     @Bean
     public Executor scheduledTaskExecutor() {
-        return Executors.newScheduledThreadPool(properties.getAsync().getCorePoolSize());
+        return Executors.newScheduledThreadPool (3);
     }
 }
