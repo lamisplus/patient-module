@@ -111,7 +111,7 @@ public class PersonService {
             person.setEducation (educationJsonNode);
         }
         if (employmentStatusId != null) {
-            ApplicationCodeDto employmentStatusDto = getAppCodeSet (employmentStatusId;
+            ApplicationCodeDto employmentStatusDto = getAppCodeSet (employmentStatusId);
             JsonNode educationJsonNode = mapper.valueToTree (employmentStatusDto);
             person.setEmploymentStatus (educationJsonNode);
         }
