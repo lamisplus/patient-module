@@ -1,6 +1,5 @@
 package org.lamisplus.modules.patient.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -8,10 +7,10 @@ import com.github.dockerjava.api.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.lamisplus.modules.base.domain.dto.ApplicationCodesetDTO;
+import org.lamisplus.modules.base.domain.entities.ApplicationCodeSet;
 import org.lamisplus.modules.base.domain.entities.OrganisationUnit;
-import org.lamisplus.modules.base.service.ApplicationCodesetService;
-import org.lamisplus.modules.base.service.OrganisationUnitService;
+import org.lamisplus.modules.base.domain.repositories.ApplicationCodesetRepository;
+import org.lamisplus.modules.base.domain.repositories.OrganisationUnitRepository;
 import org.lamisplus.modules.patient.domain.dto.*;
 import org.lamisplus.modules.patient.domain.entity.Person;
 import org.lamisplus.modules.patient.repository.PersonRepository;
@@ -28,19 +27,19 @@ public class PersonService {
 
     private final PersonRepository personRepository;
 
-    static final  String PERSON_NOT_FOUND_MESSAGE = "No person is  found with id  ";
-    private final ApplicationCodesetService applicationCodesetService;
+    static final String PERSON_NOT_FOUND_MESSAGE = "No person is  found with id  ";
+    private final ApplicationCodesetRepository applicationCodesetRepository;
 
-    private final OrganisationUnitService organisationUnitService;
+    private final OrganisationUnitRepository organisationUnitRepository;
 
-    public PersonResponseDto createPerson(PersonDto personDto) throws Exception {
+    public PersonResponseDto createPerson(PersonDto personDto) {
         Person person = getPersonFromDto (personDto);
         person.setUuid (UUID.randomUUID ().toString ());
         return getDtoFromPerson (personRepository.save (person));
     }
 
-    public PersonResponseDto updatePerson(Long id, PersonDto personDto) throws Exception {
-        personRepository.findById (id).orElseThrow (() -> new Exception (PERSON_NOT_FOUND_MESSAGE + id));
+    public PersonResponseDto updatePerson(Long id, PersonDto personDto) {
+        personRepository.findById (id).orElseThrow (() -> new NotFoundException (PERSON_NOT_FOUND_MESSAGE + id));
         Person person = getPersonFromDto (personDto);
         person.setId (id);
         return getDtoFromPerson (personRepository.save (person));
@@ -50,30 +49,30 @@ public class PersonService {
     public List<PersonResponseDto> getAllPerson() {
         return personRepository.getAllByArchived (0)
                 .stream ()
-                .map (person -> getDtoFromPerson (person))
+                .map (this::getDtoFromPerson)
                 .collect (Collectors.toList ());
     }
 
 
-    public PersonResponseDto getPersonById(Long id) throws Exception {
+    public PersonResponseDto getPersonById(Long id) {
         Person person = personRepository
                 .findById (id)
-                .orElseThrow (() -> new Exception (PERSON_NOT_FOUND_MESSAGE + id));
+                .orElseThrow (() -> new NotFoundException (PERSON_NOT_FOUND_MESSAGE + id));
         return getDtoFromPerson (person);
     }
 
 
-    public void deletePersonById(Long id) throws Exception {
+    public void deletePersonById(Long id)  {
         Person person = personRepository
                 .findById (id)
-                .orElseThrow (() -> new Exception (PERSON_NOT_FOUND_MESSAGE + id));
+                .orElseThrow (() -> new NotFoundException (PERSON_NOT_FOUND_MESSAGE + id));
         person.setArchived (1);
         personRepository.save (person);
     }
 
 
     @NotNull
-    private Person getPersonFromDto(PersonDto personDto){
+    private Person getPersonFromDto(PersonDto personDto) {
         Long genderId = personDto.getGenderId ();
         Long maritalStatusId = personDto.getMaritalStatusId ();
         Long educationalId = personDto.getEducationId ();
@@ -84,8 +83,6 @@ public class PersonService {
         List<IdentifierDto> identifier = personDto.getIdentifier ();
         List<AddressDto> address = personDto.getAddress ();
         ObjectMapper mapper = new ObjectMapper ();
-
-
         Person person = new Person ();
         person.setFirstName (personDto.getFirstname ());
         person.setSurname (personDto.getSurname ());
@@ -98,91 +95,68 @@ public class PersonService {
         person.setDeceased (personDto.getDeceased ());
         boolean isDateOfBirthEstimated = personDto.getIsDateOfBirthEstimated () != null;
         person.setIsDateOfBirthEstimated (isDateOfBirthEstimated);
-
         if (genderId != null) {
-            ApplicationCodeDto genderDto = getAppCodeSet (genderId, "No Gender exist with id " + genderId);
+            ApplicationCodeDto genderDto = getAppCodeSet (genderId);
             JsonNode genderJsonNode = mapper.valueToTree (genderDto);
             person.setGender (genderJsonNode);
-        } else {
-            person.setGender (null);
         }
-
         if (maritalStatusId != null) {
-            ApplicationCodeDto maritalStatusDto = getAppCodeSet (maritalStatusId, "No marital status exist with id " + maritalStatusId);
+            ApplicationCodeDto maritalStatusDto = getAppCodeSet (maritalStatusId);
             JsonNode maritalJsonNode = mapper.valueToTree (maritalStatusDto);
             person.setMaritalStatus (maritalJsonNode);
         }
-        else { person.setMaritalStatus (null);}
-
         if (educationalId != null) {
-            ApplicationCodeDto educationStatusDto = getAppCodeSet (educationalId, "No occupation exist with Id " + educationalId);
+            ApplicationCodeDto educationStatusDto = getAppCodeSet (educationalId);
             JsonNode educationJsonNode = mapper.valueToTree (educationStatusDto);
             person.setEducation (educationJsonNode);
-        } else person.setEducation (null);
-
+        }
         if (employmentStatusId != null) {
-            ApplicationCodeDto employmentStatusDto = getAppCodeSet (employmentStatusId, "No employmentStatus exist with id " + employmentStatusId);
+            ApplicationCodeDto employmentStatusDto = getAppCodeSet (employmentStatusId;
             JsonNode educationJsonNode = mapper.valueToTree (employmentStatusDto);
             person.setEmploymentStatus (educationJsonNode);
-        } else person.setEmploymentStatus (null);
-
-
+        }
         if (organizationId != null) {
-            OrgUnitDto organisationUnitDto = getOrgUnit (organizationId, "No organisationUnit exist with id " + organizationId);
+            OrgUnitDto organisationUnitDto = getOrgUnit (organizationId);
             JsonNode organisationUnitJsonNode = mapper.valueToTree (organisationUnitDto);
             person.setOrganization (organisationUnitJsonNode);
-        } else person.setOrganization (null);
-
-
+        }
         if (contactPointDtos != null && ! contactPointDtos.isEmpty ()) {
             ArrayNode contactPointDtoArrayNode = mapper.valueToTree (contactPointDtos);
             JsonNode contactPointDtoJsonNode = mapper.createObjectNode ().set ("contactPoint", contactPointDtoArrayNode);
             person.setContactPoint (contactPointDtoJsonNode);
-        } else person.setContactPoint (null);
-
-
+        }
         if (contact != null && ! contact.isEmpty ()) {
             ArrayNode contactsDtoArrayNode = mapper.valueToTree (contact);
             JsonNode contactDtoJsonNode = mapper.createObjectNode ().set ("contact", contactsDtoArrayNode);
             person.setContact (contactDtoJsonNode);
-        } else person.setContact (null);
-
-
+        }
         if (identifier != null && ! identifier.isEmpty ()) {
             ArrayNode identifierDtoArrayNode = mapper.valueToTree (identifier);
             JsonNode identifierDtoJsonNode = mapper.createObjectNode ().set ("identifier", identifierDtoArrayNode);
             person.setIdentifier (identifierDtoJsonNode);
-        } else person.setIdentifier (null);
-
+        }
 
         if (address != null && ! address.isEmpty ()) {
             ArrayNode addressesDtoArrayNode = mapper.valueToTree (address);
             JsonNode addressesDtoJsonNode = mapper.createObjectNode ().set ("address", addressesDtoArrayNode);
             person.setAddress (addressesDtoJsonNode);
-        } else person.setAddress (null);
-
-
+        }
         return person;
     }
 
 
-    private ApplicationCodeDto getAppCodeSet(Long id, String errorMessage) {
-        ApplicationCodesetDTO applicationCodeset = applicationCodesetService.getApplicationCodeset (id);
-        if (applicationCodeset == null) {
-            throw new NotFoundException (errorMessage);
-        }
-        return new ApplicationCodeDto (applicationCodeset.getId (), applicationCodeset.getDisplay ());
+    private ApplicationCodeDto getAppCodeSet(Long id) {
+        ApplicationCodeSet applicationCodeSet = applicationCodesetRepository.getOne (id);
+        return new ApplicationCodeDto (applicationCodeSet.getId (), applicationCodeSet.getDisplay ());
     }
 
-    private OrgUnitDto getOrgUnit(Long id, String errorMessage) {
-        OrganisationUnit organizationUnit = organisationUnitService.getOrganizationUnit (id);
-        if (organizationUnit == null) throw new NotFoundException (errorMessage);
+    private OrgUnitDto getOrgUnit(Long id) {
+        OrganisationUnit organizationUnit = organisationUnitRepository.getOne (id);
         return new OrgUnitDto (organizationUnit.getId (), organizationUnit.getName ());
     }
 
 
     public PersonResponseDto getDtoFromPerson(Person person) {
-
         PersonResponseDto personResponseDto = new PersonResponseDto ();
         personResponseDto.setId (person.getId ());
         personResponseDto.setIsDateOfBirthEstimated (person.getIsDateOfBirthEstimated ());
@@ -197,7 +171,7 @@ public class PersonService {
         personResponseDto.setEducation (person.getEducation ());
         personResponseDto.setEmploymentStatus (person.getEmploymentStatus ());
         personResponseDto.setMaritalStatus (person.getMaritalStatus ());
-        personResponseDto.setGender (person);
+        personResponseDto.setGender (person.getGender ());
         personResponseDto.setDeceased (person.getDeceased ());
         personResponseDto.setDateOfRegistration (person.getDateOfRegistration ());
         personResponseDto.setActive (person.getActive ());

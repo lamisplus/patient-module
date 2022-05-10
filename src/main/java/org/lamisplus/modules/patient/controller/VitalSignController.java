@@ -2,8 +2,7 @@ package org.lamisplus.modules.patient.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.lamisplus.modules.patient.domain.entity.VitalSign;
-import org.lamisplus.modules.patient.domain.entity.VitalSignDto;
+import org.lamisplus.modules.patient.domain.dto.VitalSignDto;
 import org.lamisplus.modules.patient.service.VitalSignService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -34,7 +33,7 @@ public class VitalSignController {
     }
 
     @PutMapping(value = "/{id}")
-    public ResponseEntity<VitalSign> updateVitalSign(
+    public ResponseEntity<VitalSignDto> updateVitalSign(
             @PathVariable("id") Long id,
             @RequestBody VitalSignDto vitalSignDto) {
         return ResponseEntity.ok (vitalSignService.updateVitalSign (id, vitalSignDto));

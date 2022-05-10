@@ -10,6 +10,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @RequiredArgsConstructor
 @Slf4j
-@EnableAcrossJpaRepositories(basePackages = "org.lamisplus.modules.patient.repository")
+@EnableAcrossJpaRepositories(basePackages = {
+        "org.lamisplus.modules.patient.repository",
+        "org.lamisplus.modules.base.domain.repositories"})
 public class DomainConfiguration {
 }

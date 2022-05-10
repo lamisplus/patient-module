@@ -1,21 +1,9 @@
 package org.lamisplus.modules.patient.domain.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.foreach.across.modules.hibernate.business.AuditableEntity;
-import com.vladmihalcea.hibernate.type.array.IntArrayType;
-import com.vladmihalcea.hibernate.type.array.StringArrayType;
-import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
-import com.vladmihalcea.hibernate.type.json.JsonNodeBinaryType;
-import com.vladmihalcea.hibernate.type.json.JsonNodeStringType;
-import com.vladmihalcea.hibernate.type.json.JsonStringType;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
-import org.hibernate.annotations.TypeDefs;
-import org.lamisplus.modules.patient.utility.SecurityUtils;
 import org.springframework.data.domain.Persistable;
 
 import javax.persistence.*;
@@ -27,15 +15,7 @@ import java.time.LocalDateTime;
 @Table(name = "person")
 @Data
 @NoArgsConstructor
-@TypeDefs({
-        @TypeDef(name = "string-array", typeClass = StringArrayType.class),
-        @TypeDef(name = "int-array", typeClass = IntArrayType.class),
-        @TypeDef(name = "json", typeClass = JsonStringType.class),
-        @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class),
-        @TypeDef(name = "jsonb-node", typeClass = JsonNodeBinaryType.class),
-        @TypeDef(name = "json-node", typeClass = JsonNodeStringType.class),
-})
-public class Person  implements Serializable, Persistable<Long>{
+public class Person extends  PatientAuditEntity implements Serializable, Persistable<Long>{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -79,21 +59,6 @@ public class Person  implements Serializable, Persistable<Long>{
     @Column(name = "date_of_registration", nullable = false)
     private LocalDate dateOfRegistration;
     @Basic
-    @Column(name = "date_created", nullable = true)
-    private LocalDateTime dateCreated = LocalDateTime.now();
-    @Column(name = "created_by", updatable = false)
-    @JsonIgnore
-    @ToString.Exclude
-    private String createdBy = SecurityUtils.getCurrentUserLogin().orElse("");
-    @Basic
-    @Column(name = "date_modified")
-    private LocalDateTime dateModified = LocalDateTime.now();
-    @Basic
-    @Column(name = "modified_by", updatable = false)
-    @JsonIgnore
-    @ToString.Exclude
-    private String modifiedBy = SecurityUtils.getCurrentUserLogin().orElse("");
-    @Basic
     @Column(name = "archived")
     private Integer archived;
 
@@ -113,6 +78,6 @@ public class Person  implements Serializable, Persistable<Long>{
 
     @Override
     public boolean isNew() {
-        return false;
+        return true;
     }
 }

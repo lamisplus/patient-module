@@ -1,13 +1,15 @@
 package org.lamisplus.modules.patient.domain.entity;
 
-import com.foreach.across.modules.hibernate.business.SettableIdAuditableEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
+import org.lamisplus.modules.patient.utility.SecurityUtils;
+import org.springframework.data.domain.Persistable;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Builder
 @Entity
@@ -16,7 +18,8 @@ import java.time.LocalDate;
 @Setter
 @Getter
 @AllArgsConstructor
-public class VitalSign extends SettableIdAuditableEntity<VitalSign> {
+@EqualsAndHashCode
+public class VitalSign extends  PatientAuditEntity implements Persistable<Long> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -36,5 +39,10 @@ public class VitalSign extends SettableIdAuditableEntity<VitalSign> {
     @NotNull
     private Double systolic;
     private  Integer archived;
-
+    @NotNull
+    private String uuid;
+    @Override
+    public boolean isNew() {
+        return true;
+    }
 }

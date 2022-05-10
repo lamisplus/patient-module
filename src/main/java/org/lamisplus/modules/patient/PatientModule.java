@@ -4,7 +4,6 @@ import com.foreach.across.core.AcrossModule;
 import com.foreach.across.core.annotations.AcrossDepends;
 import com.foreach.across.core.context.configurer.ComponentScanConfigurer;
 import com.foreach.across.modules.hibernate.jpa.AcrossHibernateJpaModule;
-import org.lamisplus.modules.base.BaseModule;
 import org.springframework.context.annotation.Bean;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
@@ -20,7 +19,6 @@ import java.util.List;
 @AcrossDepends(
         required = {
                 AcrossHibernateJpaModule.NAME,
-                BaseModule.NAME,
         })
 public class PatientModule extends AcrossModule
 {
@@ -34,12 +32,8 @@ public class PatientModule extends AcrossModule
                 getClass().getPackage().getName() +".repository",
                 getClass().getPackage().getName() +".config",
                 getClass().getPackage().getName() +".service",
-                getClass().getPackage().getName() +".controller"
-                //"com.blazebit.persistence.spring.data.webmvc"
-                //getClass().getPackage().getName() +".installers",
-               // getClass().getPackage().getName() +".domain.mapper",
-                //getClass().getPackage().getName() +".utility",
-                //getClass().getPackage().getName() +".component",
+                getClass().getPackage().getName() +".controller",
+                "org.lamisplus.modules.base.service"
                 ));
 
     }
