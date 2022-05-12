@@ -3,7 +3,6 @@ package org.lamisplus.modules.patient.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.github.dockerjava.api.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -11,6 +10,7 @@ import org.lamisplus.modules.base.domain.entities.ApplicationCodeSet;
 import org.lamisplus.modules.base.domain.entities.OrganisationUnit;
 import org.lamisplus.modules.base.domain.repositories.ApplicationCodesetRepository;
 import org.lamisplus.modules.base.domain.repositories.OrganisationUnitRepository;
+import org.lamisplus.modules.patient.controller.exception.NoRecordFoundException;
 import org.lamisplus.modules.patient.domain.dto.*;
 import org.lamisplus.modules.patient.domain.entity.Person;
 import org.lamisplus.modules.patient.repository.PersonRepository;
@@ -38,7 +38,7 @@ public class PersonService {
     }
 
     public PersonResponseDto updatePerson(Long id, PersonDto personDto) {
-        personRepository.findById (id).orElseThrow (() -> new NotFoundException (PERSON_NOT_FOUND_MESSAGE + id));
+        personRepository.findById (id).orElseThrow (() -> new NoRecordFoundException (PERSON_NOT_FOUND_MESSAGE + id));
         Person person = getPersonFromDto (personDto);
         person.setId (id);
         return getDtoFromPerson (personRepository.save (person));
@@ -56,7 +56,7 @@ public class PersonService {
     public PersonResponseDto getPersonById(Long id) {
         Person person = personRepository
                 .findById (id)
-                .orElseThrow (() -> new NotFoundException (PERSON_NOT_FOUND_MESSAGE + id));
+                .orElseThrow (() -> new NoRecordFoundException (PERSON_NOT_FOUND_MESSAGE + id));
         return getDtoFromPerson (person);
     }
 
@@ -64,7 +64,7 @@ public class PersonService {
     public void deletePersonById(Long id) {
         Person person = personRepository
                 .findById (id)
-                .orElseThrow (() -> new NotFoundException (PERSON_NOT_FOUND_MESSAGE + id));
+                .orElseThrow (() -> new NoRecordFoundException (PERSON_NOT_FOUND_MESSAGE + id));
         person.setArchived (1);
         personRepository.save (person);
     }
@@ -83,12 +83,13 @@ public class PersonService {
         List<AddressDto> address = personDto.getAddress ();
         ObjectMapper mapper = new ObjectMapper ();
         Person person = new Person ();
-        person.setFirstName (personDto.getFirstname ());
+        person.setFirstName (personDto.getFirstName ());
         person.setSurname (personDto.getSurname ());
         person.setOtherName (personDto.getOtherName ());
         person.setDateOfBirth (personDto.getDateOfBirth ());
         person.setDateOfRegistration (personDto.getDateOfRegistration ());
         person.setActive (personDto.getActive ());
+        person.setFacilityId (personDto.getFacilityId());
         person.setArchived (0);
         person.setDeceasedDateTime (personDto.getDeceasedDateTime ());
         person.setDeceased (personDto.getDeceased ());

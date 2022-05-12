@@ -19,7 +19,7 @@ public class PersonDto implements Serializable {
     private final Long id;
     private final Boolean active;
     private final String surname;
-    private final String firstname;
+    private final String firstName;
     private final String otherName;
     @Convert(converter = LocalDateConverter.class)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
@@ -37,5 +37,6 @@ public class PersonDto implements Serializable {
     private final List<ContactDto> contact;
     private final LocalDate dateOfRegistration;
     private Boolean isDateOfBirthEstimated;
+    private final long facilityId;
 }
 

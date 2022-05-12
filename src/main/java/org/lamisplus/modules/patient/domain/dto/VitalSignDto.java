@@ -40,4 +40,7 @@ public class VitalSignDto implements Serializable {
     private final String uuid;
 
     private final Integer archived;
+
+    @NotNull
+    private  final  Long facilityId;
 }

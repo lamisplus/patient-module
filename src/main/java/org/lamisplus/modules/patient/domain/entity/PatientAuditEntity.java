@@ -11,6 +11,7 @@ import lombok.Data;
 import lombok.ToString;
 import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.TypeDefs;
+import org.jetbrains.annotations.NotNull;
 import org.lamisplus.modules.patient.utility.SecurityUtils;
 
 import javax.persistence.Column;
@@ -43,4 +44,5 @@ public class PatientAuditEntity {
     @JsonIgnore
     @ToString.Exclude
     private String lastModifiedBy = SecurityUtils.getCurrentUserLogin ().orElse ("");
+    private  Long facilityId;
 }

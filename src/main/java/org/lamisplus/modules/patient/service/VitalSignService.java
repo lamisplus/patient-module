@@ -83,6 +83,7 @@ public class VitalSignService {
         vitalSign.setHeight (vitalSignDto.getHeight ());
         vitalSign.setPersonId (vitalSignDto.getPersonId ());
         vitalSign.setSystolic (vitalSignDto.getSystolic ());
+        vitalSign.setFacilityId (vitalSign.getFacilityId ());
         vitalSign.setArchived (0);
         return vitalSign;
     }
@@ -105,6 +106,7 @@ public class VitalSignService {
                 .systolic (vitalSign.getSystolic ())
                 .archived (vitalSign.getArchived ())
                 .uuid (vitalSign.getUuid ())
+                .facilityId (vitalSign.getFacilityId ())
                 .build ();
     }
 }
