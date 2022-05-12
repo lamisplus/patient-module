@@ -57,8 +57,7 @@ function PatientCard(props) {
     const patientObj = props.patientObj ? props.patientObj : {};
 
     const getHospitalNumber = (identifier) => {
-        const identifiers = JSON.parse(identifier);
-        const hospitalNumber = identifiers.identifier.find(obj => obj.type == 'HospitalNumber');
+        const hospitalNumber = identifier.identifier.find(obj => obj.type == 'HospitalNumber');
         return hospitalNumber ? hospitalNumber.value : '';
     };
 
@@ -78,14 +77,12 @@ function PatientCard(props) {
     };
 
     const getPhone = (contactPoint) => {
-        const contactPoints = JSON.parse(contactPoint);
-        const phoneContact = contactPoints.contactPoint.find(obj => obj.type == 'phone');
+        const phoneContact = contactPoint.contactPoint.find(obj => obj.type == 'phone');
         return phoneContact ? phoneContact.value : '';
     };
 
     const getAddress = (address) => {
-        const addresses = JSON.parse(address);
-        const city = addresses && addresses.address && addresses.address.length > 0 ? addresses.address[0].city : null;
+        const city = address && address.address && address.address.length > 0 ? address.address[0].city : null;
         return city;
     };
 
@@ -126,7 +123,7 @@ function PatientCard(props) {
                     <span>
                         {" "}
                         Gender :{" "}
-                        <b>{JSON.parse(patientObj.gender).value }</b>
+                        <b>{patientObj.gender.display }</b>
                     </span>
                                 </Col>
                                 <Col md={4} className={classes.root2}>
