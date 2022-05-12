@@ -112,20 +112,17 @@ const SyncList = (props) => {
     };
     
     const getHospitalNumber = (identifier) => {
-        const identifiers = JSON.parse(identifier);
-        const hospitalNumber = identifiers.identifier.find(obj => obj.type == 'HospitalNumber');
+        const hospitalNumber = identifier.identifier.find(obj => obj.type == 'HospitalNumber');
         return hospitalNumber ? hospitalNumber.value : '';
     };
 
     const getAddress = (address) => {
-        const addresses = JSON.parse(address);
-        const city = addresses && addresses.address && addresses.address.length > 0 ? addresses.address[0].city : null;
+        const city = address && address.address && address.address.length > 0 ? address.address[0].city : null;
         return city;
     };
 
     const getGender = (gender) => {
-        const genderVal = JSON.parse(gender);
-        return genderVal.value;
+        return gender.display;
     };
 
     useEffect(() => {

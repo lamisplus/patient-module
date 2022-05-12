@@ -78,7 +78,7 @@ const schema = yup.object().shape({
     maritalStatus: yup.number().required(),
     dob: yup.date().required(),
     dateOfBirth: yup.string().required(),
-    age: yup.number().required(),
+    age: yup.number(),
     pnumber: yup.string().required(),
     altPhonenumber: yup.string().nullable(),
     email: yup.string().nullable(),
@@ -136,20 +136,20 @@ const UserRegistration = (props) => {
         if (patientId) {
             const response = await axios.get(`${baseUrl}patient/${patientId}`, { headers: {"Authorization" : `Bearer ${token}`} });
             const patient = response.data;
-            const contacts = patient.contact ? JSON.parse(patient.contact) : [];
+            const contacts = patient.contact ? patient.contact : [];
             setContacts(contacts.contact);
-            const identifiers = JSON.parse(patient.identifier);
-            const address = JSON.parse(patient.address);
-            const contactPoint = JSON.parse(patient.contactPoint);
+            const identifiers = patient.identifier;
+            const address = patient.address;
+            const contactPoint = patient.contactPoint;
             const hospitalNumber = identifiers.identifier.find(obj => obj.type == 'HospitalNumber');
             const phone = contactPoint.contactPoint.find(obj => obj.type == 'phone');
             const email = contactPoint.contactPoint.find(obj => obj.type == 'email');
             const altphone = contactPoint.contactPoint.find(obj => obj.type == 'altphone');
             const country = address && address.address && address.address.length > 0 ? address.address[0] : null;
-            const gender = JSON.parse(patient.gender);
-            const employmentStatus = JSON.parse(patient.employmentStatus);
-            const education = JSON.parse(patient.education);
-            const maritalStatus = JSON.parse(patient.maritalStatus);
+            const gender = patient.gender;
+            const employmentStatus = patient.employmentStatus;
+            const education = patient.education;
+            const maritalStatus = patient.maritalStatus;
             setValue('dateOfRegistration', patient.dateOfRegistration);
             setValue('firstName', patient.firstname);
             setValue('middleName', patient.otherName);
@@ -228,7 +228,6 @@ const UserRegistration = (props) => {
         setShowRelative(false);
     }
     const onSubmit = async (data) => {
-        console.log(data);
         try {
             const patientForm = {
                 active: true,
@@ -250,7 +249,7 @@ const UserRegistration = (props) => {
                 dateOfBirth: new Date(data.dob),
                 deceased: false,
                 deceasedDateTime: null,
-                firstname: data.firstName,
+                firstName: data.firstName,
                 genderId: data.sex,
                 identifier: [
                     {
@@ -287,6 +286,7 @@ const UserRegistration = (props) => {
             }
             patientForm.contactPoint.push(phone);
             if (patientId) {
+                patientForm.id = null;
                 const response = await axios.put(`${baseUrl}patient/${patientId}`, patientForm, { headers: {"Authorization" : `Bearer ${token}`} });
             } else {
                 const response = await axios.post(`${baseUrl}patient/`, patientForm, { headers: {"Authorization" : `Bearer ${token}`} });
