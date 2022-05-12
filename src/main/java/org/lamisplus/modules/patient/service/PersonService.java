@@ -14,7 +14,6 @@ import org.lamisplus.modules.patient.controller.exception.NoRecordFoundException
 import org.lamisplus.modules.patient.domain.dto.*;
 import org.lamisplus.modules.patient.domain.entity.Person;
 import org.lamisplus.modules.patient.repository.PersonRepository;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -39,13 +38,14 @@ public class PersonService {
     }
 
     public PersonResponseDto updatePerson(Long id, PersonDto personDto) {
-        Person existPerson = personRepository.findById (id).orElseThrow (() -> new NoRecordFoundException (PERSON_NOT_FOUND_MESSAGE + id));
+        Person existPerson = personRepository
+                .findById (id).orElseThrow (() -> new NoRecordFoundException (PERSON_NOT_FOUND_MESSAGE + id));
         Person person = getPersonFromDto (personDto);
         person.setId (existPerson.getId ());
         person.setUuid (existPerson.getUuid ());
         person.setCreatedBy (existPerson.getCreatedBy ());
         person.setCreatedDate (existPerson.getCreatedDate ());
-        return getDtoFromPerson (personRepository.save(person));
+        return getDtoFromPerson (personRepository.save (person));
     }
 
 
@@ -93,7 +93,7 @@ public class PersonService {
         person.setDateOfBirth (personDto.getDateOfBirth ());
         person.setDateOfRegistration (personDto.getDateOfRegistration ());
         person.setActive (personDto.getActive ());
-        person.setFacilityId (personDto.getFacilityId());
+        person.setFacilityId (personDto.getFacilityId ());
         person.setArchived (0);
         person.setDeceasedDateTime (personDto.getDeceasedDateTime ());
         person.setDeceased (personDto.getDeceased ());

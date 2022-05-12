@@ -78,6 +78,6 @@ public class Person extends PatientAuditEntity implements Serializable, Persista
 
     @Override
     public boolean isNew() {
-        return true;
+      return id == null;
     }
 }

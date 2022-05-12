@@ -8,7 +8,7 @@ import org.lamisplus.modules.patient.domain.entity.Person;
 import org.lamisplus.modules.patient.domain.entity.VitalSign;
 import org.lamisplus.modules.patient.repository.PersonRepository;
 import org.lamisplus.modules.patient.repository.VitalSignRepository;
-import org.lamisplus.modules.patient.utility.SecurityUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,7 +32,6 @@ public class VitalSignService {
         log.info ("I am in service {}", vitalSignDto.getEncounterDate ());
         Long personId = vitalSignDto.getPersonId ();
         getExistingPerson (personId);
-        log.info ("current user : {}", getCurrentLoginUser ());
         VitalSign vitalSign = convertVitalSignDtoToVitalSignEntity (vitalSignDto);
         vitalSign.setUuid (UUID.randomUUID ().toString ());
         VitalSign saveVitalSign = vitalSignRepository.save (vitalSign);
@@ -43,7 +42,8 @@ public class VitalSignService {
     public VitalSignDto updateVitalSign(Long id, VitalSignDto vitalSignDto) {
         VitalSign existingVitalSign = getExistingVitalSign (id);
         VitalSign vitalSign = convertVitalSignDtoToVitalSignEntity (vitalSignDto);
-        vitalSign.setId (existingVitalSign.getId ());
+        vitalSign.setId (id);
+        vitalSign.setUuid (existingVitalSign.getUuid ());
         vitalSign.setCreatedDate (existingVitalSign.getCreatedDate ());
         vitalSign.setCreatedBy (existingVitalSign.getCreatedBy ());
         VitalSign updateVitalSign = vitalSignRepository.save (vitalSign);
@@ -76,37 +76,15 @@ public class VitalSignService {
 
     private VitalSign convertVitalSignDtoToVitalSignEntity(VitalSignDto vitalSignDto) {
         VitalSign vitalSign = new VitalSign ();
-        vitalSign.setDiastolic (vitalSignDto.getDiastolic ());
-        vitalSign.setBodyWeight (vitalSignDto.getBodyWeight ());
-        vitalSign.setServiceTypeId (vitalSignDto.getServiceTypeId ());
-        vitalSign.setEncounterDate (vitalSignDto.getEncounterDate ());
-        vitalSign.setHeight (vitalSignDto.getHeight ());
-        vitalSign.setPersonId (vitalSignDto.getPersonId ());
-        vitalSign.setSystolic (vitalSignDto.getSystolic ());
-        vitalSign.setFacilityId (vitalSign.getFacilityId ());
-        vitalSign.setArchived (0);
+        BeanUtils.copyProperties (vitalSignDto, vitalSign);
         return vitalSign;
     }
 
-    private String getCurrentLoginUser() {
-        return SecurityUtils.getCurrentUserLogin ().orElse ("");
 
-    }
 
     private VitalSignDto convertVitalSignEntityToVitalSignDto(VitalSign vitalSign) {
-        return VitalSignDto
-                .builder ()
-                .id (vitalSign.getId ())
-                .diastolic (vitalSign.getDiastolic ())
-                .bodyWeight (vitalSign.getBodyWeight ())
-                .serviceTypeId (vitalSign.getServiceTypeId ())
-                .encounterDate (vitalSign.getEncounterDate ())
-                .height (vitalSign.getHeight ())
-                .personId (vitalSign.getPersonId ())
-                .systolic (vitalSign.getSystolic ())
-                .archived (vitalSign.getArchived ())
-                .uuid (vitalSign.getUuid ())
-                .facilityId (vitalSign.getFacilityId ())
-                .build ();
+        VitalSignDto vitalSignDto = new VitalSignDto ();
+        BeanUtils.copyProperties (vitalSign, vitalSignDto);
+        return vitalSignDto;
     }
 }

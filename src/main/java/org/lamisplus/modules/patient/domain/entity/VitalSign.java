@@ -41,6 +41,6 @@ public class VitalSign extends PatientAuditEntity implements Persistable<Long> {
 
     @Override
     public boolean isNew() {
-        return true;
+        return id == null;
     }
 }

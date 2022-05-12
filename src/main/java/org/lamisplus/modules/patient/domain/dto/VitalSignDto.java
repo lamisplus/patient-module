@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.lamisplus.modules.patient.utility.LocalDateConverter;
 
 import javax.persistence.Convert;
@@ -16,31 +17,32 @@ import java.time.LocalDate;
 @Data
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class VitalSignDto implements Serializable {
-    private final Long id;
+    private Long id;
     @NotNull
-    private final Double bodyWeight;
+    private Double bodyWeight;
     @NotNull
-    private final Double diastolic;
+    private Double diastolic;
     @PastOrPresent
     @NotNull
     @Convert(converter = LocalDateConverter.class)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private final LocalDate encounterDate;
+    private LocalDate encounterDate;
     @NotNull
-    private final Double height;
+    private Double height;
     @NotNull
-    private final Long personId;
-    private final Long serviceTypeId;
+    private Long personId;
+    private Long serviceTypeId;
     @NotNull
-    private final Double systolic;
+    private Double systolic;
 
     @NotNull
     @JsonIgnore
-    private final String uuid;
+    private String uuid;
 
-    private final Integer archived;
+    private Integer archived;
 
     @NotNull
-    private  final  Long facilityId;
+    private Long facilityId;
 }
