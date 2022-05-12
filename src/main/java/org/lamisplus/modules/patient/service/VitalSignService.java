@@ -46,6 +46,7 @@ public class VitalSignService {
         vitalSign.setUuid (existingVitalSign.getUuid ());
         vitalSign.setCreatedDate (existingVitalSign.getCreatedDate ());
         vitalSign.setCreatedBy (existingVitalSign.getCreatedBy ());
+        vitalSign.setArchived (0);
         VitalSign updateVitalSign = vitalSignRepository.save (vitalSign);
         return convertVitalSignEntityToVitalSignDto (updateVitalSign);
     }
