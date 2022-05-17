@@ -11,8 +11,9 @@ import lombok.Data;
 import lombok.ToString;
 import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.TypeDefs;
-import org.jetbrains.annotations.NotNull;
 import org.lamisplus.modules.patient.utility.SecurityUtils;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
@@ -29,20 +30,25 @@ import java.time.LocalDateTime;
         @TypeDef(name = "json-node", typeClass = JsonNodeStringType.class),
 })
 public class PatientAuditEntity {
-    @Column(name = "created_date")
+
+    @Column(name = "created_date", updatable = false)
+    @CreatedDate
     private LocalDateTime createdDate = LocalDateTime.now ();
 
-    @Column(name = "created_by")
     @JsonIgnore
     @ToString.Exclude
+    @Column(name = "created_by", updatable = false)
     private String createdBy = SecurityUtils.getCurrentUserLogin ().orElse ("");
 
-    @Column(name = "last_modified_date")
+
+    @Column(name = "last_modified_date", insertable = false)
+    @LastModifiedDate
     private LocalDateTime lastModifiedDate = LocalDateTime.now ();
 
-    @Column(name = "last_modified_by", updatable = false)
+
+    @Column(name = "last_modified_by", insertable = false)
     @JsonIgnore
     @ToString.Exclude
     private String lastModifiedBy = SecurityUtils.getCurrentUserLogin ().orElse ("");
-    private  Long facilityId;
+    private Long facilityId;
 }

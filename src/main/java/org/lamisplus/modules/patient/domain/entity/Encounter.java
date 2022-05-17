@@ -4,41 +4,45 @@ import lombok.*;
 import org.springframework.data.domain.Persistable;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDate;
 
-@Builder
 @Entity
-@Table(name = "vital_sign")
+@Table(name = "encounter")
 @NoArgsConstructor
 @Setter
 @Getter
 @AllArgsConstructor
 @EqualsAndHashCode
-public class VitalSign extends PatientAuditEntity implements Persistable<Long> {
+@Builder
+public class Encounter extends PatientAuditEntity implements Persistable<Long> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
-    @NotNull
-    private Double bodyWeight;
-    @NotNull
-    private Double diastolic;
+
     @PastOrPresent
-    @NotNull
+    @Column(name = "encounter_date", nullable = false)
     private LocalDate encounterDate;
-    @NotNull
-    private Double height;
-    @NotNull
-    private Long personId;
-    private Long serviceTypeId;
-    @NotNull
-    private Double systolic;
-    private Integer archived;
-    @NotNull
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "person_id", nullable = false)
+    private Person person;
+
     @Column(name = "uuid", updatable = false, nullable = false)
     private String uuid;
+
+    @OneToOne(optional = false, orphanRemoval = true)
+    @JoinColumn(name = "visit_id", nullable = false)
+    private Visit visit;
+
+    @Column(name = "service_code", nullable = false)
+    private String serviceCode;
+
+    @Column(name = "status", nullable = false)
+    private String status;
+
+    private Integer archived;
 
     @Override
     public boolean isNew() {

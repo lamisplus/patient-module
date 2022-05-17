@@ -1,21 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
+import {withStyles} from '@material-ui/core/styles';
 import classNames from 'classnames';
-import {
-    Accordion,
-    AccordionSummary,
-    AccordionDetails,
-    AccordionActions
-} from '@material-ui/core';
+import {Accordion, AccordionActions, AccordionDetails, AccordionSummary} from '@material-ui/core';
 import Typography from '@material-ui/core/Typography';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-//import Chip from '@material-ui/core/Chip';
 import Divider from '@material-ui/core/Divider';
-import { Button } from 'semantic-ui-react';
-import { Grid, Step, Label, Segment, Icon } from "semantic-ui-react";
+import {Button, Label} from 'semantic-ui-react';
 import 'semantic-ui-css/semantic.min.css';
-import { Col, Row } from "reactstrap";
+import {Col, Row} from "reactstrap";
 
 const styles = theme => ({
     root: {
@@ -97,7 +89,7 @@ function PatientCard(props) {
                             <Row className={"mt-1"}>
                                 <Col md={12} className={classes.root2}>
                                     <b style={{fontSize: "25px"}}>
-                                        { patientObj.surname + ", " + patientObj.firstname + " " + patientObj.otherName }
+                                        {patientObj.surname + ", " + patientObj.firstName + " " + patientObj.otherName}
                                     </b>
 
                                 </Col>

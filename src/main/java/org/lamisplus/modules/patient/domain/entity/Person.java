@@ -62,7 +62,8 @@ public class Person extends PatientAuditEntity implements Serializable, Persista
     @Column(name = "archived")
     private Integer archived;
 
-    @Column(name = "uuid")
+
+    @Column(name = "uuid", updatable = false, nullable = false)
     private String uuid;
 
     @Column(name = "first_name")

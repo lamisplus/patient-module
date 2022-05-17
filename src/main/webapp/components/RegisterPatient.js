@@ -1,33 +1,28 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import axios from "axios";
-import { format } from 'date-fns';
+import {format} from 'date-fns';
 import MatButton from "@material-ui/core/Button";
-import {
-    FormGroup,
-    Input,
-    Label,
-    Form,
-} from "reactstrap";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { faCheckSquare, faCoffee, faEdit, faTrash } from '@fortawesome/free-solid-svg-icons'
-import { yupResolver } from '@hookform/resolvers/yup';
+import Button from "@material-ui/core/Button";
+import {Form, FormGroup, Label, Spinner,} from "reactstrap";
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {library} from '@fortawesome/fontawesome-svg-core'
+import {faCheckSquare, faCoffee, faEdit, faTrash} from '@fortawesome/free-solid-svg-icons'
+import {yupResolver} from '@hookform/resolvers/yup';
 import * as yup from "yup";
 import * as moment from 'moment';
-import { makeStyles } from "@material-ui/core/styles";
-import { Card, CardContent } from "@material-ui/core";
+import {makeStyles} from "@material-ui/core/styles";
+import {Card, CardContent} from "@material-ui/core";
 import SaveIcon from "@material-ui/icons/Save";
 import AddIcon from "@material-ui/icons/Add";
 import CancelIcon from "@material-ui/icons/Cancel";
-import { ToastContainer, toast} from "react-toastify";
+import {ToastContainer} from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "react-widgets/dist/css/react-widgets.css";
-import { Spinner } from "reactstrap";
-import {Link, useHistory, useLocation } from "react-router-dom";
-import Button from "@material-ui/core/Button";
-import { TiArrowBack } from 'react-icons/ti'
+import {Link, useHistory, useLocation} from "react-router-dom";
+import {TiArrowBack} from 'react-icons/ti'
 import {useForm} from "react-hook-form";
 import {token, url as baseUrl} from "../../../api";
+
 library.add(faCheckSquare, faCoffee, faEdit, faTrash);
 
 const useStyles = makeStyles((theme) => ({
@@ -118,9 +113,9 @@ const UserRegistration = (props) => {
 
     const getNames = (relationship) => {
         const surname = relationship.surname;
-        const firstname = relationship.firstname;
+        const firstName = relationship.firstname;
         const otherName = relationship.otherName ? relationship.otherName : '';
-        return surname + ', ' + firstname + ' ' + otherName;
+        return surname + ', ' + firstName + ' ' + otherName;
     }
     const getRelationship = (relationshipId) => {
         const relationship = relationshipOptions.find(obj => obj.id == relationshipId);
@@ -151,7 +146,7 @@ const UserRegistration = (props) => {
             const education = patient.education;
             const maritalStatus = patient.maritalStatus;
             setValue('dateOfRegistration', patient.dateOfRegistration);
-            setValue('firstName', patient.firstname);
+            setValue('firstName', patient.firstName);
             setValue('middleName', patient.otherName);
             setValue('lastName', patient.surname);
             setValue('hospitalNumber', hospitalNumber ? hospitalNumber.value : '');
