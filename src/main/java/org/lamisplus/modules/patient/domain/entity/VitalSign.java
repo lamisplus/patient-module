@@ -30,6 +30,9 @@ public class VitalSign extends PatientAuditEntity implements Persistable<Long> {
     private LocalDate encounterDate;
     @NotNull
     private Double height;
+    private Double temperature;
+    private Double pulse;
+    private Double respiratoryRate;
     @NotNull
     private Long personId;
     private Long serviceTypeId;

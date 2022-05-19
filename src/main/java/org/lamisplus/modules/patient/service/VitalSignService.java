@@ -42,10 +42,7 @@ public class VitalSignService {
     public VitalSignDto updateVitalSign(Long id, VitalSignDto vitalSignDto) {
         VitalSign existingVitalSign = getExistingVitalSign (id);
         VitalSign vitalSign = convertVitalSignDtoToVitalSignEntity (vitalSignDto);
-        vitalSign.setId (id);
-        vitalSign.setUuid (existingVitalSign.getUuid ());
-        vitalSign.setCreatedDate (existingVitalSign.getCreatedDate ());
-        vitalSign.setCreatedBy (existingVitalSign.getCreatedBy ());
+        vitalSign.setId (existingVitalSign.getId ());
         vitalSign.setArchived (0);
         VitalSign updateVitalSign = vitalSignRepository.save (vitalSign);
         return convertVitalSignEntityToVitalSignDto (updateVitalSign);

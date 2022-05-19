@@ -33,6 +33,7 @@ public class VitalSignDto implements Serializable {
     private Double height;
     @NotNull
     private Long personId;
+
     private Long serviceTypeId;
     @NotNull
     private Double systolic;
@@ -40,9 +41,10 @@ public class VitalSignDto implements Serializable {
     @NotNull
     @JsonIgnore
     private String uuid;
-
+    private Double temperature;
+    private Double pulse;
+    private Double respiratoryRate;
     private Integer archived;
-
     @NotNull
     private Long facilityId;
 }
