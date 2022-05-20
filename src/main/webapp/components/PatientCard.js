@@ -94,10 +94,10 @@ function PatientCard(props) {
 
                                 </Col>
                                 <Col md={4} className={classes.root2}>
-                    <span>
-                        {" "}
-                        Hospital Number : <b>{getHospitalNumber(patientObj.identifier) }</b>
-                    </span>
+                                    <span>
+                                        {" "}
+                                        Hospital Number : <b>{getHospitalNumber(patientObj.identifier) }</b>
+                                    </span>
                                 </Col>
 
                                 <Col md={4} className={classes.root2}>
