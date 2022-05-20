@@ -16,6 +16,7 @@ import java.util.List;
 public class VisitController {
     private final VisitService visitService;
 
+
     @PostMapping
     public ResponseEntity<VisitDto> createVisit(@RequestBody VisitDto visitDto) {
         return ResponseEntity.ok (visitService.createVisit (visitDto));
@@ -43,4 +44,6 @@ public class VisitController {
         visitService.archivedVisit (id);
         return ResponseEntity.accepted ().build ();
     }
+
+
 }
