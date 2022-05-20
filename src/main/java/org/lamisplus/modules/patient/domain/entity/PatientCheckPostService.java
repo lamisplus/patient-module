@@ -13,7 +13,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @EqualsAndHashCode
 @Builder
-public class PatientCheckPostService extends PatientAuditEntity implements Persistable<Long> {
+public class PatientCheckPostService implements Persistable<Long> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)

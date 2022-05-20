@@ -32,7 +32,7 @@ public class Encounter extends PatientAuditEntity implements Persistable<Long> {
     @Column(name = "uuid", updatable = false, nullable = false)
     private String uuid;
 
-    @OneToOne(optional = false, orphanRemoval = true)
+    @ManyToOne(optional = false)
     @JoinColumn(name = "visit_id", nullable = false)
     private Visit visit;
 
