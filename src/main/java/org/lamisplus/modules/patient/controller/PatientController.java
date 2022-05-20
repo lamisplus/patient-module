@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.lamisplus.modules.patient.domain.dto.PersonDto;
 import org.lamisplus.modules.patient.domain.dto.PersonResponseDto;
+import org.lamisplus.modules.patient.domain.entity.PatientCheckPostService;
+import org.lamisplus.modules.patient.repository.PatientCheckPostServiceRepository;
 import org.lamisplus.modules.patient.service.PersonService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +20,7 @@ import java.util.List;
 public class PatientController {
 
     private final PersonService personService;
-
+    private final PatientCheckPostServiceRepository patientCheckPostServiceRepository;
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PersonResponseDto> createPatient(@RequestBody PersonDto patient) {
         return ResponseEntity.ok (personService.createPerson (patient));
@@ -44,6 +46,11 @@ public class PatientController {
     public ResponseEntity<String> deletePerson(@PathVariable("id") Long id) {
         personService.deletePersonById (id);
         return ResponseEntity.accepted ().build ();
+    }
+
+    @GetMapping(value = "/post-service")
+    public ResponseEntity<List<PatientCheckPostService>> getPatientService() {
+        return ResponseEntity.ok (patientCheckPostServiceRepository.findAll ());
     }
 
 }
