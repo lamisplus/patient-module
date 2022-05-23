@@ -210,14 +210,13 @@ function PatientDashboard(props) {
                 "personId": patientObj.id,
                 "visitStartDate": today
             }, { headers: {"Authorization" : `Bearer ${token}`} });
-            console.log(visit);
             await axios.post(`${baseUrl}patient/encounter`, {
                 "encounterDate": today,
                 "personId": patientObj.id,
                 "serviceCode": data.VisitType,
-                "status": "Pending",
+                "status": "PENDING",
                 "visitId": visit.id
-            })
+            }, { headers: {"Authorization" : `Bearer ${token}`} });
             await Swal.fire({
                 icon: 'success',
                 text: 'CheckedIn successfully',
@@ -231,8 +230,12 @@ function PatientDashboard(props) {
             });
         }
     };
-    const onError = () => {
-
+    const onError = async () => {
+        await Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'An error occurred while checking in Patient!',
+        });
     };
 
     return (
