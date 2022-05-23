@@ -3,6 +3,7 @@ package org.lamisplus.modules.patient.service;
 import lombok.RequiredArgsConstructor;
 import org.lamisplus.modules.patient.controller.exception.NoRecordFoundException;
 import org.lamisplus.modules.patient.domain.dto.VisitDto;
+import org.lamisplus.modules.patient.domain.entity.Person;
 import org.lamisplus.modules.patient.domain.entity.Visit;
 import org.lamisplus.modules.patient.repository.PersonRepository;
 import org.lamisplus.modules.patient.repository.VisitRepository;
@@ -61,14 +62,17 @@ public class VisitService {
 
 
     private Visit convertDtoToEntity(VisitDto visitDto) {
+        Person person = personRepository.findById (visitDto.getPersonId ()).orElseThrow (() -> new NoRecordFoundException ("No patient found with id " + visitDto.getPersonId ()));
         Visit visit = new Visit ();
         BeanUtils.copyProperties (visitDto, visit);
+        visit.setPerson (person);
         return visit;
     }
 
     private VisitDto convertEntityToDto(Visit visit) {
         VisitDto visitDto = new VisitDto ();
         BeanUtils.copyProperties (visit, visitDto);
+        visitDto.setPersonId (visit.getPerson ().getId ());
         return visitDto;
     }
 }

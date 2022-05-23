@@ -12,11 +12,16 @@ import org.lamisplus.modules.base.domain.repositories.ApplicationCodesetReposito
 import org.lamisplus.modules.base.domain.repositories.OrganisationUnitRepository;
 import org.lamisplus.modules.patient.controller.exception.NoRecordFoundException;
 import org.lamisplus.modules.patient.domain.dto.*;
+import org.lamisplus.modules.patient.domain.entity.Encounter;
 import org.lamisplus.modules.patient.domain.entity.Person;
+import org.lamisplus.modules.patient.domain.entity.Visit;
+import org.lamisplus.modules.patient.repository.EncounterRepository;
 import org.lamisplus.modules.patient.repository.PersonRepository;
+import org.lamisplus.modules.patient.repository.VisitRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -30,6 +35,10 @@ public class PersonService {
     private final ApplicationCodesetRepository applicationCodesetRepository;
 
     private final OrganisationUnitRepository organisationUnitRepository;
+
+    private final VisitRepository visitRepository;
+
+    private final EncounterRepository encounterRepository;
 
     public PersonResponseDto createPerson(PersonDto personDto) {
         Person person = getPersonFromDto (personDto);
@@ -56,6 +65,15 @@ public class PersonService {
                 .collect (Collectors.toList ());
     }
 
+    public List<PersonResponseDto> getCheckedInPersonsByServiceCodeAndVisitId(String serviceCode) {
+        List<Encounter> patientEncounters = encounterRepository.findAllByServiceCodeAndStatus (serviceCode, "PENDING");
+        return patientEncounters.stream ()
+                .map (encounter -> encounter.getPerson ())
+                .map (this::getDtoFromPerson)
+                .collect (Collectors.toList ());
+
+
+    }
 
     public PersonResponseDto getPersonById(Long id) {
         Person person = personRepository
@@ -161,7 +179,11 @@ public class PersonService {
 
 
     public PersonResponseDto getDtoFromPerson(Person person) {
+        Optional<Visit> visit = visitRepository.findVisitByPersonAndVisitStartDateNotNullAndVisitEndDateIsNull (person);
         PersonResponseDto personResponseDto = new PersonResponseDto ();
+        if (visit.isPresent ()) {
+            personResponseDto.setVisitId (visit.get ().getId ());
+        }
         personResponseDto.setId (person.getId ());
         personResponseDto.setIsDateOfBirthEstimated (person.getIsDateOfBirthEstimated ());
         personResponseDto.setDateOfBirth (person.getDateOfBirth ());

@@ -53,4 +53,9 @@ public class PatientController {
         return ResponseEntity.ok (patientCheckPostServiceRepository.findAll ());
     }
 
+    @GetMapping(value = "/checked-in-by-service/{serviceCode}")
+    public ResponseEntity<List<PersonResponseDto>> getCheckedInPatientByService(@PathVariable("serviceCode") String serviceCode) {
+        return ResponseEntity.ok (personService.getCheckedInPersonsByServiceCodeAndVisitId (serviceCode));
+    }
+
 }

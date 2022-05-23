@@ -4,7 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.lamisplus.modules.patient.controller.exception.NoRecordFoundException;
 import org.lamisplus.modules.patient.domain.dto.EncounterDto;
 import org.lamisplus.modules.patient.domain.entity.Encounter;
+import org.lamisplus.modules.patient.domain.entity.Person;
+import org.lamisplus.modules.patient.domain.entity.Visit;
 import org.lamisplus.modules.patient.repository.EncounterRepository;
+import org.lamisplus.modules.patient.repository.PersonRepository;
 import org.lamisplus.modules.patient.repository.VisitRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -19,6 +22,8 @@ public class EncounterService {
 
     private final VisitRepository visitRepository;
     private final EncounterRepository encounterRepository;
+
+    private final PersonRepository personRepository;
 
 
     public EncounterDto registerEncounter(EncounterDto encounterDto) {
@@ -66,12 +71,22 @@ public class EncounterService {
     private EncounterDto convertEntityToDto(Encounter encounter) {
         EncounterDto encounterDto = new EncounterDto ();
         BeanUtils.copyProperties (encounter, encounterDto);
+        encounterDto.setPersonId (encounter.getPerson ().getId ());
+        encounterDto.setVisitId (encounter.getVisit ().getId ());
         return encounterDto;
     }
 
     private Encounter convertDtoToEntity(EncounterDto encounterDto) {
+        Person person = personRepository
+                .findById (encounterDto.getPersonId ())
+                .orElseThrow (() -> new NoRecordFoundException ("No patient found with id " + encounterDto.getPersonId ()));
+        Visit visit = visitRepository
+                .findById (encounterDto.getVisitId ())
+                .orElseThrow (() -> new NoRecordFoundException ("No visit found with id " + encounterDto.getVisitId ()));
         Encounter encounter = new Encounter ();
         BeanUtils.copyProperties (encounterDto, encounter);
+        encounter.setPerson (person);
+        encounter.setVisit (visit);
         return encounter;
     }
 }
