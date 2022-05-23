@@ -1,6 +1,7 @@
 package org.lamisplus.modules.patient.service;
 
 import lombok.RequiredArgsConstructor;
+import org.lamisplus.modules.patient.controller.exception.AlreadyExistException;
 import org.lamisplus.modules.patient.controller.exception.NoRecordFoundException;
 import org.lamisplus.modules.patient.domain.dto.VisitDetailDto;
 import org.lamisplus.modules.patient.domain.dto.VisitDto;
@@ -29,7 +30,10 @@ public class VisitService {
 
 
     public VisitDto createVisit(VisitDto visitDto) {
-        personRepository.findById (visitDto.getPersonId ()).orElseThrow (() -> new NoRecordFoundException ("No person found with id " + visitDto.getPersonId ()));
+        Person person = personRepository.findById (visitDto.getPersonId ()).orElseThrow (() -> new NoRecordFoundException ("No person found with id " + visitDto.getPersonId ()));
+        Optional<Visit> currentVisit = visitRepository.findVisitByPersonAndVisitStartDateNotNullAndVisitEndDateIsNull (person);
+        if (currentVisit.isPresent ())
+            throw new AlreadyExistException ("Visit Already exist for this patient " + person.getId ());
         Visit visit = convertDtoToEntity (visitDto);
         visit.setUuid (UUID.randomUUID ().toString ());
         visit.setArchived (0);

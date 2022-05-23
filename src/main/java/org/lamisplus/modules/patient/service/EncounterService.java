@@ -1,6 +1,7 @@
 package org.lamisplus.modules.patient.service;
 
 import lombok.RequiredArgsConstructor;
+import org.lamisplus.modules.patient.controller.exception.AlreadyExistException;
 import org.lamisplus.modules.patient.controller.exception.NoRecordFoundException;
 import org.lamisplus.modules.patient.domain.dto.EncounterDto;
 import org.lamisplus.modules.patient.domain.entity.Encounter;
@@ -13,6 +14,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -28,7 +30,12 @@ public class EncounterService {
 
     public EncounterDto registerEncounter(EncounterDto encounterDto) {
         Long visitId = encounterDto.getVisitId ();
-        visitRepository.findById (visitId).orElseThrow (() -> new NoRecordFoundException ("No visit found with Id " + visitId));
+        Visit visit = visitRepository.findById (visitId).orElseThrow (() -> new NoRecordFoundException ("No visit found with Id " + visitId));
+        // set Pending by default
+        Optional<Encounter> existingEncounter =
+                encounterRepository.getEncounterByVisitAndStatusAndServiceCode (visit, encounterDto.getStatus (), encounterDto.getServiceCode ());
+        if (existingEncounter.isPresent ())
+            throw new AlreadyExistException ("Pending Encounter found for this Visit " + visit.getId ());
         Encounter encounter = convertDtoToEntity (encounterDto);
         encounter.setUuid (UUID.randomUUID ().toString ());
         encounter.setArchived (0);
