@@ -7,6 +7,8 @@ import {
 import RegisterPatient from './main/webapp/components/RegisterPatient';
 import PatientDashboard from './main/webapp/components/PatientDashboard';
 import Dashboard from './main/webapp/components/Dashboard';
+import PatientVitals from './main/webapp/components/PatientVitals';
+import AddPatientVitals from './main/webapp/components/Add-Patient-Vitals';
 import { ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -25,6 +27,12 @@ export default function App() {
           <Route path="/patient-dashboard">
             <PatientDashboardPage />
           </Route>
+          <Route path="/patient-vitals">
+            <PatientVitalsPage />
+          </Route>
+          <Route path="/add-patient-vital">
+            <AddPatientVitalsPage />
+          </Route>
           <Route path="/">
             <Dashboard />
           </Route>
@@ -40,6 +48,12 @@ function PatientDashboardPage() {
 }
 function RegisterPatientPage() {
   return <RegisterPatient />;
+}
+function PatientVitalsPage() {
+  return <PatientVitals />
+}
+function AddPatientVitalsPage() {
+  return <AddPatientVitals />
 }
 
 

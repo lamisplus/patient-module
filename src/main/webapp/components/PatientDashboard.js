@@ -1,7 +1,7 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router-dom';
 import ButtonMui from "@material-ui/core/Button";
 import 'semantic-ui-css/semantic.min.css';
 import { Col} from "reactstrap";
@@ -80,6 +80,14 @@ const columns = [
         headerName: 'Status',
         width: 200,
         editable: false,
+    },
+    {
+        field: "actions",
+        headerName: "ACTIONS",
+        width: 300,
+        renderCell: (params) => (
+            <Link to={`/patient-vitals/${params.value}`}>Patient Vitals</Link>
+        )
     }
 ];
 
@@ -134,7 +142,7 @@ function PatientDashboard(props) {
     const { handleSubmit, control } = useForm();
     const [modal, setModal] = useState(false);
     const [services, setServices]= useState([]);
-    console.log(patientObj);
+    const [patientVisits, setPatientVisits]= useState([]);
 
     const loadServices = useCallback(async () => {
         try {
@@ -148,10 +156,23 @@ function PatientDashboard(props) {
             });
         }
     }, []);
+    const loadPatientVisits = useCallback(async () => {
+        try {
+            const response = await axios.get(`${baseUrl}patient/visit/visit-detail/${patientObj.id}`, { headers: {"Authorization" : `Bearer ${token}`} });
+            setPatientVisits(response.data);
+        } catch (e) {
+            await Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'An error occurred fetching services!',
+            });
+        }
+    }, []);
 
     useEffect(() => {
         loadServices();
-    }, [loadServices]);
+        loadPatientVisits();
+    }, [loadServices, loadPatientVisits]);
 
     let visitTypesRows = null;
     if (services && services.length > 0) {
@@ -161,10 +182,20 @@ function PatientDashboard(props) {
     }
 
     const rows = [];
+    for (const patientVisit of patientVisits) {
+        rows.push({
+            id: patientVisit.id,
+            checkedInDate: patientVisit.checkInDate,
+            checkOutDate: null,
+            service: services.find(obj => obj.moduleServiceCode == patientVisit.service).moduleServiceName,
+            status: patientVisit.status,
+            actions: patientVisit.id
+        });
+    }
     const panes = [
         { menuItem: 'Patient Visit', render: () =>
                 <Tab.Pane>
-                    <div style={{ height: 400, width: '100%' }}>
+                    <div style={{ height: 200, width: '100%' }}>
                         <DataGrid
                             rows={rows}
                             columns={columns}
