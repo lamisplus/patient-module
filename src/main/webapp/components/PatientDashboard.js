@@ -80,14 +80,6 @@ const columns = [
         headerName: 'Status',
         width: 200,
         editable: false,
-    },
-    {
-        field: "actions",
-        headerName: "ACTIONS",
-        width: 300,
-        renderCell: (params) => (
-            <Link to={`/patient-vitals/${params.value}`}>Patient Vitals</Link>
-        )
     }
 ];
 
@@ -188,8 +180,7 @@ function PatientDashboard(props) {
             checkedInDate: patientVisit.checkInDate,
             checkOutDate: null,
             service: services.find(obj => obj.moduleServiceCode == patientVisit.service).moduleServiceName,
-            status: patientVisit.status,
-            actions: patientVisit.id
+            status: patientVisit.status
         });
     }
     const panes = [
