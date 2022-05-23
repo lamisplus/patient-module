@@ -210,12 +210,13 @@ function PatientDashboard(props) {
                 "personId": patientObj.id,
                 "visitStartDate": today
             }, { headers: {"Authorization" : `Bearer ${token}`} });
+            console.log(visit);
             await axios.post(`${baseUrl}patient/encounter`, {
                 "encounterDate": today,
                 "personId": patientObj.id,
                 "serviceCode": data.VisitType,
                 "status": "PENDING",
-                "visitId": visit.id
+                "visitId": visit.data.id
             }, { headers: {"Authorization" : `Bearer ${token}`} });
             await Swal.fire({
                 icon: 'success',
