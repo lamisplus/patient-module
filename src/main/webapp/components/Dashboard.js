@@ -7,7 +7,6 @@ import { Link } from 'react-router-dom'
 import { Card,CardBody,} from 'reactstrap';
 import { Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import Button from "@material-ui/core/Button";
-import CheckInPatient from '../components/check-in-patient';
 import 'react-toastify/dist/ReactToastify.css';
 import 'react-widgets/dist/css/react-widgets.css';
 import { FaUserPlus } from "react-icons/fa";
@@ -66,16 +65,11 @@ const SyncList = (props) => {
     const [loading, setLoading] = useState('');
     const [modal, setModal] = useState(false);
     const [patient, setPatient] = useState(false);
-    const [checkIn, setCheckIn] = useState(false);
 
     const toggle = (id) => {
         const patient = patients.find(obj => obj.id == id);
         setPatient(patient);
         setModal(!modal);
-    }
-    
-    const doCheckInPatient = (id) => {
-        setCheckIn(!checkIn);
     }
 
     const loadPatients = useCallback(async () => {
@@ -100,9 +94,6 @@ const SyncList = (props) => {
 
     const onCancelDelete = () => {
         setModal(false);
-    }
-    const onCancelCheckIn = () => {
-        setCheckIn(false);
     }
 
     const calculate_age = dob => {
@@ -197,13 +188,12 @@ const SyncList = (props) => {
                                     <MenuList className={'menuClass'} >
                                         <MenuItem  style={{ color:"#000 !important"}}>
                                             <Link
-                                                onClick={(e) => doCheckInPatient(row.id)}
                                                 to={{
-                                                    pathname: "/#",
-                                                    currentId: row
+                                                    pathname: "/patient-dashboard",
+                                                    state: { patientObj: row }
                                                 }}
                                             >
-                                                <MdDashboard size="15" />{" "}<span style={{color: '#000'}}>CheckIn Patient</span>
+                                                <MdDashboard size="15" />{" "}<span style={{color: '#000'}}>Patient Dashboard</span>
                                             </Link>
                                         </MenuItem>
                                         <MenuItem style={{ color:"#000 !important"}}>
@@ -262,12 +252,6 @@ const SyncList = (props) => {
                 <Button color="primary" type="button" onClick={(e) => onDelete(patient.id)}>Yes</Button>{' '}
                 <Button color="secondary" type="button" onClick={(e) => onCancelDelete()}>No</Button>
             </ModalFooter>
-        </Modal>
-        <Modal size="lg" isOpen={checkIn} toggle={onCancelCheckIn}>
-            <ModalHeader toggle={onCancelCheckIn}>Check In Patient</ModalHeader>
-            <ModalBody>
-                <CheckInPatient />
-            </ModalBody>
         </Modal>
     </div>
   );
