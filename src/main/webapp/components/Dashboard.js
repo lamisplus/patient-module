@@ -74,7 +74,7 @@ const SyncList = (props) => {
 
     const loadPatients = useCallback(async () => {
         try {
-            const response = await axios.get(`${baseUrl}patient/`, { headers: {"Authorization" : `Bearer ${token}`} });
+            const response = await axios.get(`${baseUrl}patient`, { headers: {"Authorization" : `Bearer ${token}`} });
             setPatients(response.data);
         } catch (e) {
             console.log(e);
