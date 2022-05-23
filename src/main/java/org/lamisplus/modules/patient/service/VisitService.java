@@ -2,15 +2,20 @@ package org.lamisplus.modules.patient.service;
 
 import lombok.RequiredArgsConstructor;
 import org.lamisplus.modules.patient.controller.exception.NoRecordFoundException;
+import org.lamisplus.modules.patient.domain.dto.VisitDetailDto;
 import org.lamisplus.modules.patient.domain.dto.VisitDto;
+import org.lamisplus.modules.patient.domain.entity.Encounter;
 import org.lamisplus.modules.patient.domain.entity.Person;
 import org.lamisplus.modules.patient.domain.entity.Visit;
+import org.lamisplus.modules.patient.repository.EncounterRepository;
 import org.lamisplus.modules.patient.repository.PersonRepository;
 import org.lamisplus.modules.patient.repository.VisitRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -19,6 +24,8 @@ import java.util.stream.Collectors;
 public class VisitService {
     private final PersonRepository personRepository;
     private final VisitRepository visitRepository;
+
+    private final EncounterRepository encounterRepository;
 
 
     public VisitDto createVisit(VisitDto visitDto) {
@@ -54,6 +61,30 @@ public class VisitService {
         Visit existVisit = getExistVisit (id);
         existVisit.setArchived (1);
         visitRepository.save (existVisit);
+    }
+
+    public List<VisitDetailDto> getVisitWithEncounterDetails(Long personId) {
+        Optional<Person> person = personRepository.findById (personId);
+        if (person.isPresent ()) {
+            return encounterRepository.getEncounterByPersonAndArchived (person.get (), 0)
+                    .stream ()
+                    .map (encounter -> getVisitDetailDto (personId, encounter)).collect (Collectors.toList ());
+
+        }
+
+        return new ArrayList<> ();
+    }
+
+    private VisitDetailDto getVisitDetailDto(Long personId, Encounter encounter) {
+        VisitDetailDto visitDetailDto = VisitDetailDto.builder ()
+                .status (encounter.getStatus ())
+                .id (encounter.getVisit ().getId ())
+                .personId (personId)
+                .checkInDate (encounter.getVisit ().getVisitStartDate ())
+                .checkOutDate (encounter.getVisit ().getVisitEndDate ())
+                .service (encounter.getServiceCode ())
+                .build ();
+        return visitDetailDto;
     }
 
     private Visit getExistVisit(Long id) {
