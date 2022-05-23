@@ -2,6 +2,7 @@ package org.lamisplus.modules.patient.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.lamisplus.modules.patient.domain.dto.VisitDetailDto;
 import org.lamisplus.modules.patient.domain.dto.VisitDto;
 import org.lamisplus.modules.patient.service.VisitService;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +31,11 @@ public class VisitController {
     @GetMapping("/{id}")
     public ResponseEntity<VisitDto> getVisit(@PathVariable("id") Long id) {
         return ResponseEntity.ok (visitService.getVisitById (id));
+    }
+
+    @GetMapping("visit-detail/{personId}")
+    public ResponseEntity<List<VisitDetailDto>> getPersonVisitDetail(@PathVariable("personId") Long personId) {
+        return ResponseEntity.ok (visitService.getVisitWithEncounterDetails (personId));
     }
 
     @PutMapping(value = "/{id}")
