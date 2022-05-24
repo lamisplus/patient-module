@@ -56,33 +56,6 @@ const styles = theme => ({
     },
 });
 
-const columns = [
-    {
-        field: 'checkedInDate',
-        headerName: 'Checked In Date',
-        width: 200,
-        editable: false,
-    },
-    {
-        field: 'checkOutDate',
-        headerName: 'Check Out Date',
-        width: 200,
-        editable: false,
-    },
-    {
-        field: 'service',
-        headerName: 'Service',
-        width: 200,
-        editable: false,
-    },
-    {
-        field: 'status',
-        headerName: 'Status',
-        width: 200,
-        editable: false,
-    }
-];
-
 const appointmentColumns = [
     { field: 'id', headerName: 'ID', width: 90 },
     {
@@ -173,22 +146,39 @@ function PatientDashboard(props) {
         ));
     }
 
-    const rows = [];
-    for (const patientVisit of patientVisits) {
-        rows.push({
-            id: patientVisit.id,
-            checkedInDate: patientVisit.checkInDate,
-            checkOutDate: null,
-            service: services.find(obj => obj.moduleServiceCode == patientVisit.service).moduleServiceName,
-            status: patientVisit.status
-        });
-    }
+    const columns = [
+        {
+            field: 'checkInDate',
+            headerName: 'Checked In Date',
+            width: 200,
+            editable: false,
+        },
+        {
+            field: 'checkOutDate',
+            headerName: 'Check Out Date',
+            width: 200,
+            editable: false,
+        },
+        {
+            field: 'service',
+            headerName: 'Service',
+            width: 200,
+            editable: false,
+        },
+        {
+            field: 'status',
+            headerName: 'Status',
+            width: 200,
+            editable: false,
+        }
+    ];
+
     const panes = [
         { menuItem: 'Patient Visit', render: () =>
                 <Tab.Pane>
                     <div style={{ height: 200, width: '100%' }}>
                         <DataGrid
-                            rows={rows}
+                            rows={patientVisits}
                             columns={columns}
                             pageSize={5}
                             rowsPerPageOptions={[5]}
@@ -228,18 +218,27 @@ function PatientDashboard(props) {
     const onSubmit = async (data) => {
         try {
             const today = new Date();
-            const visit = await axios.post(`${baseUrl}patient/visit`, {
-                "personId": patientObj.id,
-                "visitStartDate": today
-            }, { headers: {"Authorization" : `Bearer ${token}`} });
-            console.log(visit);
+            const visitDetails = await axios.get(`${baseUrl}patient/visit/visit-detail/${patientObj.id}`, { headers: {"Authorization" : `Bearer ${token}`} });
+            const visitDetail = visitDetails.data;
+            const pendingVisit = visitDetail.find(obj => obj.status == "PENDING");
+            let visit = null;
+            if (!pendingVisit) {
+                const visitResponse = await axios.post(`${baseUrl}patient/visit`, {
+                    "personId": patientObj.id,
+                    "visitStartDate": today
+                }, { headers: {"Authorization" : `Bearer ${token}`} });
+                visit = visitResponse.data;
+            } else {
+                visit = pendingVisit;
+            }
             await axios.post(`${baseUrl}patient/encounter`, {
                 "encounterDate": today,
                 "personId": patientObj.id,
                 "serviceCode": data.VisitType,
                 "status": "PENDING",
-                "visitId": visit.data.id
+                "visitId": visit.id
             }, { headers: {"Authorization" : `Bearer ${token}`} });
+            setModal(false);
             await Swal.fire({
                 icon: 'success',
                 text: 'CheckedIn successfully',
