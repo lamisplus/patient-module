@@ -2,6 +2,7 @@ package org.lamisplus.modules.patient.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.lamisplus.modules.patient.domain.dto.CheckInDto;
 import org.lamisplus.modules.patient.domain.dto.VisitDetailDto;
 import org.lamisplus.modules.patient.domain.dto.VisitDto;
 import org.lamisplus.modules.patient.service.VisitService;
@@ -23,6 +24,7 @@ public class VisitController {
         return ResponseEntity.ok (visitService.createVisit (visitDto));
     }
 
+
     @GetMapping
     public ResponseEntity<List<VisitDto>> getAllVisit() {
         return ResponseEntity.ok (visitService.getAllVisit ());
@@ -33,15 +35,24 @@ public class VisitController {
         return ResponseEntity.ok (visitService.getVisitById (id));
     }
 
-    @GetMapping("visit-detail/{personId}")
+    @GetMapping("/visit-detail/{personId}")
     public ResponseEntity<List<VisitDetailDto>> getPersonVisitDetail(@PathVariable("personId") Long personId) {
         return ResponseEntity.ok (visitService.getVisitWithEncounterDetails (personId));
     }
 
+    @PutMapping("/checkout/{visitId}")
+    public ResponseEntity<String> checkoutVisitByVisitId(@PathVariable("visitId") Long visitId) {
+        visitService.checkOutVisitById (visitId);
+        return ResponseEntity.accepted ().build ();
+    }
+
+    @PostMapping("/checkin")
+    public ResponseEntity<VisitDto> checkInVisitByPersonId(@RequestBody CheckInDto checkInDto) {
+        return ResponseEntity.ok (visitService.checkInPerson (checkInDto));
+    }
+
     @PutMapping(value = "/{id}")
-    public ResponseEntity<VisitDto> updateVisit(
-            @PathVariable("id") Long id,
-            @RequestBody VisitDto visitDto) {
+    public ResponseEntity<VisitDto> updateVisit(@PathVariable("id") Long id, @RequestBody VisitDto visitDto) {
         return ResponseEntity.ok (visitService.updateVisit (id, visitDto));
     }
 

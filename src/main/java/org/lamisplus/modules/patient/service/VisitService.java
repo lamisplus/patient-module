@@ -3,17 +3,20 @@ package org.lamisplus.modules.patient.service;
 import lombok.RequiredArgsConstructor;
 import org.lamisplus.modules.patient.controller.exception.AlreadyExistException;
 import org.lamisplus.modules.patient.controller.exception.NoRecordFoundException;
+import org.lamisplus.modules.patient.domain.dto.CheckInDto;
 import org.lamisplus.modules.patient.domain.dto.VisitDetailDto;
 import org.lamisplus.modules.patient.domain.dto.VisitDto;
 import org.lamisplus.modules.patient.domain.entity.Encounter;
 import org.lamisplus.modules.patient.domain.entity.Person;
 import org.lamisplus.modules.patient.domain.entity.Visit;
 import org.lamisplus.modules.patient.repository.EncounterRepository;
+import org.lamisplus.modules.patient.repository.PatientCheckPostServiceRepository;
 import org.lamisplus.modules.patient.repository.PersonRepository;
 import org.lamisplus.modules.patient.repository.VisitRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -27,6 +30,8 @@ public class VisitService {
     private final VisitRepository visitRepository;
 
     private final EncounterRepository encounterRepository;
+
+    private final PatientCheckPostServiceRepository patientCheckPostServiceRepository;
 
 
     public VisitDto createVisit(VisitDto visitDto) {
@@ -49,6 +54,21 @@ public class VisitService {
 
     }
 
+    public void checkOutVisitById(Long visitId) {
+        Visit visit = getExistVisit (visitId);
+        List<Encounter> encounters = encounterRepository.getEncounterByVisit (visit);
+        encounters.forEach (this::checkoutFromAllService);
+        visit.setVisitEndDate (LocalDate.now ());
+        visitRepository.save (visit);
+    }
+
+    private void checkoutFromAllService(Encounter encounter) {
+        if (encounter.getStatus ().equals ("PENDING")) {
+            encounter.setStatus ("COMPLETED");
+        }
+        encounterRepository.save (encounter);
+    }
+
     public VisitDto getVisitById(Long id) {
         return convertEntityToDto (getExistVisit (id));
     }
@@ -67,6 +87,35 @@ public class VisitService {
         visitRepository.save (existVisit);
     }
 
+    public VisitDto checkInPerson(CheckInDto checkInDto) {
+        Long personId = checkInDto.getVisitDto ().getPersonId ();
+        Person person = personRepository.findById (personId).orElseThrow (() -> new NoRecordFoundException ("No person found with id " + personId));
+        VisitDto visitDto = createVisit (checkInDto.getVisitDto ());
+        Visit visit = getExistVisit (visitDto.getId ());
+        checkInDto.getServiceIds ()
+                .stream ()
+                .map (id -> patientCheckPostServiceRepository.findById (id).orElseThrow (() -> new NoRecordFoundException ("No service found with Id " + id)))
+                .forEach (patientCheckPostService -> createEncounter (person, visit, patientCheckPostService.getModuleServiceCode ()));
+        return visitDto;
+    }
+
+    private void createEncounter(Person person, Visit visit, String serviceCode) {
+        Encounter encounter = getEncounter (person, visit);
+        encounter.setServiceCode (serviceCode);
+        encounterRepository.save (encounter);
+    }
+
+    private Encounter getEncounter(Person person, Visit visit) {
+        return Encounter.builder ()
+                .person (person)
+                .archived (0)
+                .visit (visit)
+                .encounterDate (visit.getVisitStartDate ())
+                .uuid (UUID.randomUUID ().toString ())
+                .status ("PENDING")
+                .build ();
+    }
+
     public List<VisitDetailDto> getVisitWithEncounterDetails(Long personId) {
         Optional<Person> person = personRepository.findById (personId);
         if (person.isPresent ()) {
@@ -80,15 +129,15 @@ public class VisitService {
     }
 
     private VisitDetailDto getVisitDetailDto(Long personId, Encounter encounter) {
-        VisitDetailDto visitDetailDto = VisitDetailDto.builder ()
+        return VisitDetailDto.builder ()
                 .status (encounter.getStatus ())
                 .id (encounter.getVisit ().getId ())
                 .personId (personId)
                 .checkInDate (encounter.getVisit ().getVisitStartDate ())
                 .checkOutDate (encounter.getVisit ().getVisitEndDate ())
+                .encounterId (encounter.getId ())
                 .service (encounter.getServiceCode ())
                 .build ();
-        return visitDetailDto;
     }
 
     private Visit getExistVisit(Long id) {
@@ -110,4 +159,5 @@ public class VisitService {
         visitDto.setPersonId (visit.getPerson ().getId ());
         return visitDto;
     }
+
 }

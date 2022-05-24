@@ -13,6 +13,7 @@ public class VisitDetailDto implements Serializable {
     private final Long facilityId;
     private final Long id;
     private final Long personId;
+    private final Long encounterId;
     @PastOrPresent
     private final LocalDate checkInDate;
     @PastOrPresent
