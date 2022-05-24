@@ -55,7 +55,7 @@ public class VisitService {
     }
 
     public void checkOutVisitById(Long visitId) {
-        Visit visit = visitRepository.getOne (visitId);
+        Visit visit = getExistVisit (visitId);
         List<Encounter> encounters = encounterRepository.getEncounterByVisit (visit);
         encounters.forEach (this::checkoutFromAllService);
         visit.setVisitEndDate (LocalDate.now ());
@@ -87,7 +87,8 @@ public class VisitService {
         visitRepository.save (existVisit);
     }
 
-    public VisitDto checkInPerson(Long personId, CheckInDto checkInDto) {
+    public VisitDto checkInPerson(CheckInDto checkInDto) {
+        Long personId = checkInDto.getVisitDto ().getPersonId ();
         Person person = personRepository.findById (personId).orElseThrow (() -> new NoRecordFoundException ("No person found with id " + personId));
         VisitDto visitDto = createVisit (checkInDto.getVisitDto ());
         Visit visit = getExistVisit (visitDto.getId ());

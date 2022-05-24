@@ -46,9 +46,9 @@ public class VisitController {
         return ResponseEntity.accepted ().build ();
     }
 
-    @PostMapping("/checkin/personId")
-    public ResponseEntity<VisitDto> checkInVisitByPersonId(@PathVariable("personId") Long personId, @RequestBody CheckInDto checkInDto) {
-        return ResponseEntity.ok (visitService.checkInPerson (personId, checkInDto));
+    @PostMapping("/checkin")
+    public ResponseEntity<VisitDto> checkInVisitByPersonId(@RequestBody CheckInDto checkInDto) {
+        return ResponseEntity.ok (visitService.checkInPerson (checkInDto));
     }
 
     @PutMapping(value = "/{id}")
