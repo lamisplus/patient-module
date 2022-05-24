@@ -86,6 +86,7 @@ public class VisitService {
                 .personId (personId)
                 .checkInDate (encounter.getVisit ().getVisitStartDate ())
                 .checkOutDate (encounter.getVisit ().getVisitEndDate ())
+                .encounterId (encounter.getId ())
                 .service (encounter.getServiceCode ())
                 .build ();
         return visitDetailDto;

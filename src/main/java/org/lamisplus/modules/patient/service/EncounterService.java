@@ -58,6 +58,17 @@ public class EncounterService {
 
     }
 
+    public List<EncounterDto> getAllEncounterByPerson(Long personId) {
+        Person person = personRepository
+                .findById (personId)
+                .orElseThrow (() -> new NoRecordFoundException ("No Person with given Id " + personId));
+        List<Encounter> personEncounters = encounterRepository.getEncounterByPersonAndArchived (person, 0);
+        return personEncounters
+                .stream ()
+                .map (this::convertEntityToDto)
+                .collect (Collectors.toList ());
+    }
+
     public EncounterDto getEncounterById(Long id) {
         return convertEntityToDto (getExistEncounter (id));
     }
