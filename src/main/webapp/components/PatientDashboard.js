@@ -20,6 +20,19 @@ import {token, url as baseUrl} from "../../../api";
 import Swal from "sweetalert2";
 import {Controller, useForm} from "react-hook-form";
 import {Button, Card, CardContent, FormControl, Grid, MenuItem, Paper, TextField, Typography} from "@mui/material";
+import {format} from 'date-fns';
+import { toast} from "react-toastify";
+// import Autocomplete from "@material-ui/lab/Autocomplete";
+import Chip from "@material-ui/core/Chip";
+// import Checkbox from '@mui/material/Checkbox';
+// import TextField from '@mui/material/TextField';
+import Autocomplete from '@mui/material/Autocomplete';
+import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
+import CheckBoxIcon from '@mui/icons-material/CheckBox';
+
+
+const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
+const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
 const styles = theme => ({
     root: {
@@ -100,14 +113,24 @@ const appointments = [
     { id: 9, lastName: 'Roxie', firstName: 'Harvey', age: 65 },
 ];
 
+let checkinStatus=false;
+let newDate = new Date()
 function PatientDashboard(props) {
+    
     let history = useHistory();
     const { classes } = props;
     const patientObj = history.location && history.location.state ? history.location.state.patientObj : {};
     const { handleSubmit, control } = useForm();
     const [modal, setModal] = useState(false);
+    const [modalCheckOut, setModalCheckOut] = useState(false);
     const [services, setServices]= useState([]);
     const [patientVisits, setPatientVisits]= useState([]);
+    const [checkOutObj, setCheckOutObj] = useState({
+                                                    facilityId: 1,
+                                                    personId: "",
+                                                    visitEndDate:format(new Date(newDate), 'yyyy-MM-dd'),
+                                                    visitStartDate:"" 
+                                                })
 
     const loadServices = useCallback(async () => {
         try {
@@ -145,6 +168,14 @@ function PatientDashboard(props) {
             <MenuItem key={service.moduleServiceCode} value={service.moduleServiceCode}>{service.moduleServiceName}</MenuItem>
         ));
     }
+
+    const patientVisitsStatus= patientVisits.map((visits)=> {       
+        if(visits.checkOutDate===null){
+            checkinStatus=true
+        }
+    })
+
+    console.log(visitTypesRows)
 
     const columns = [
         {
@@ -206,11 +237,16 @@ function PatientDashboard(props) {
     const handleCheckIn = () => {
         setModal(true);
     };
+    const handleCheckOut = () => {
+        setModalCheckOut(true);
+    };
 
     const onCancelCheckIn = () => {
         setModal(false);
     };
-
+    const onCancelCheckOut = () => {
+        setModalCheckOut(false);
+    };
     const onDelete = () => {
 
     };
@@ -259,20 +295,33 @@ function PatientDashboard(props) {
             text: 'An error occurred while checking in Patient!',
         });
     };
-
+    /**** Submit Button Processing  */
+    const handleSubmitCheckOut = (e) => {        
+        e.preventDefault();  
+        
+        checkOutObj.personId= patientObj.id
+        checkOutObj.visitEndDate= format(new Date(newDate), 'yyyy-MM-dd')  
+        axios.put(`${baseUrl}patient/visit/${patientObj.id}`, checkOutObj,
+        { headers: {"Authorization" : `Bearer ${token}`}},
+        
+        )
+        .then(response => {
+            toast.success("Record save successful");
+            checkinStatus=false
+            onCancelCheckOut()
+        })
+        .catch(error => {
+            console.log(error)
+            toast.error("Something went wrong");
+            onCancelCheckOut()        
+        });  
+    }
+console.log(checkinStatus)
     return (
         <div className={classes.root}>
             <Card>
                 <CardContent>
-                    <Link to={"/"} >
-                        <ButtonMui
-                            variant="contained"
-                            color="primary"
-                            className=" float-right mr-1">
-                            <span style={{ textTransform: "capitalize" }}>Back</span>
-                        </ButtonMui>
-                    </Link>
-                    <br/><br/>
+                    
                     <PatientCardDetail patientObj={patientObj}/>
                     <Card>
                         <CardContent>
@@ -287,20 +336,36 @@ function PatientDashboard(props) {
                                     &nbsp;
                                 </div>
                                 <div className="mb-3 col-md-3">
-                                    <Box
-                                        m={1}
-                                        display="flex"
-                                        justifyContent="center"
-                                        alignItems="center"
-                                    >
+                                <Link to={"/"} >
+                                        <ButtonMui
+                                            variant="contained"
+                                            color="primary"
+                                            className=" float-right mr-1">
+                                            <span style={{ textTransform: "capitalize" }}>Back</span>
+                                        </ButtonMui>
+                                    </Link>
+                                    {checkinStatus===false ? (
                                         <Button
                                             variant="contained"
                                             style={{ backgroundColor: "black" }}
                                             onClick={handleCheckIn}
+                                            className=" float-right mr-1"
                                         >
-                                            CheckIn
+                                            <span style={{ textTransform: "capitalize" }}>CheckIn</span>
                                         </Button>
-                                    </Box>
+                                    )
+                                    :
+                                    (
+                                        <Button
+                                            variant="contained"
+                                            style={{ backgroundColor: "black" }}
+                                            onClick={handleCheckOut}
+                                            className=" float-right mr-1"
+                                        >
+                                            <span style={{ textTransform: "capitalize" }}>CheckOut</span>
+                                        </Button>
+                                    )
+                                    }
                                 </div>
                             </div>
                             <Tab panes={panes} />
@@ -320,9 +385,9 @@ function PatientDashboard(props) {
                                 margin: "10px 10px",
                             }}>
                             <Grid container spacing={2}>
-                                <Grid item xs={4}>
-                                    <FormControl fullWidth>
-                                        <Controller
+                                <Grid item xs={8}>
+                                    <FormControl >
+                                        {/* <Controller
                                             name="VisitType"
                                             control={control}
                                             defaultValue=""
@@ -341,7 +406,57 @@ function PatientDashboard(props) {
                                                 </TextField>
                                             )}
                                             rules={{ required: 'Visit Type is Required' }}
-                                        />
+                                        /> */}
+                                         <Autocomplete
+                                            multiple
+                                            id="checkboxes-tags-demo"
+                                            options={services}
+                                            //disableCloseOnSelect
+                                            getOptionLabel={(option) => option.moduleServiceName}
+                                            renderOption={(props, option, { selected }) => (
+                                                <li {...props}>
+                                                <Checkbox
+                                                    icon={icon}
+                                                    checkedIcon={checkedIcon}
+                                                    style={{ marginRight: 8 }}
+                                                    checked={selected}
+                                                />
+                                                {option.moduleServiceName}
+                                                </li>
+                                            )}
+                                            style={{ width: 400 }}
+                                            renderInput={(params) => (
+                                                <TextField {...params} label="Services" />
+                                            )}
+                                            />
+                                        {/* <Autocomplete
+                                            multiple="true"
+                                            
+                                            id="VisitType"
+                                            size="small"
+                                            options={services}
+                                            getOptionLabel={(option) => option.moduleServiceName}
+                                            //onChange={(e, i) => { setSamples({ ...samples, sample_type: i }); }}
+                                            renderTags={(value, getTagProps) =>
+                                                value.map((option, index) => (
+                                                    <Checkbox
+                                                        label={option.moduleServiceName}
+                                                        {...getTagProps({ index })}
+                                                        disabled={index === 0}
+                                                    />
+                                                ))
+                                            }
+                                            style={{ width: "auto", marginTop: "-1rem" }}
+                                            s
+                                            renderInput={(params) => (
+                                                <TextField
+                                                    {...params}
+                                                    variant="outlined"
+                                                    margin="normal"
+                                                />
+                                            )}
+                                            required
+                                        /> */}
                                     </FormControl>
                                 </Grid>
                             </Grid>
@@ -354,6 +469,33 @@ function PatientDashboard(props) {
                     </form>
                 </ModalBody>
             </Modal>
+            {/* Modal for CheckOut Patient */}
+            <Modal isOpen={modalCheckOut} toggle={onCancelCheckOut}>
+                <ModalHeader toggle={onCancelCheckOut}>CheckOut </ModalHeader>
+                <ModalBody>
+                    <form onSubmit={handleSubmitCheckOut}>
+                        <Paper
+                            style={{
+                                display: "grid",
+                                gridRowGap: "20px",
+                                padding: "20px",
+                                margin: "10px 10px",
+                            }}>
+                            <Grid container spacing={2}>
+                                <Grid item xs={12}>
+                                   <h5>Are you sure you want to check-out patient?</h5>
+                                </Grid>
+                            </Grid>
+                            <Grid container spacing={2}>
+                                <Grid item xs={12}>
+                                    <Button type={"submit"} variant="contained" color={"primary"}>Yes</Button>
+                                </Grid>
+                            </Grid>
+                        </Paper>
+                    </form>
+                </ModalBody>
+            </Modal>
+            {/* End of Checkout Modal */}
         </div>
     );
 }

@@ -12,6 +12,7 @@ import 'react-widgets/dist/css/react-widgets.css';
 import { FaUserPlus } from "react-icons/fa";
 import { MdDashboard, MdDeleteForever, MdModeEdit } from "react-icons/md";
 import {Menu,MenuList,MenuButton,MenuItem,} from "@reach/menu-button";
+import "@reach/menu-button/styles.css";
 import { ToastContainer } from "react-toastify";
 import { Label } from 'semantic-ui-react';
 import { makeStyles } from '@material-ui/core/styles';
