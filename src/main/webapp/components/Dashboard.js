@@ -164,7 +164,7 @@ const SyncList = (props) => {
                     ]}
                     isLoading={loading}
                     data={patients.map((row) => ({
-                        name: row.firstname +  ' ' + row.otherName +  ' ' + row.surname,
+                        name: row.firstName +  ' ' + row.otherName +  ' ' + row.surname,
                         id: getHospitalNumber(row.identifier),
                         gender: getGender(row.gender),
                         dateOfBirth: row.dateOfBirth,

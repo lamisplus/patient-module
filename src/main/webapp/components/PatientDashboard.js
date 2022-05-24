@@ -1,7 +1,7 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router-dom';
 import ButtonMui from "@material-ui/core/Button";
 import 'semantic-ui-css/semantic.min.css';
 import { Col} from "reactstrap";
@@ -56,33 +56,6 @@ const styles = theme => ({
     },
 });
 
-const columns = [
-    {
-        field: 'checkedInDate',
-        headerName: 'Checked In Date',
-        width: 200,
-        editable: false,
-    },
-    {
-        field: 'checkOutDate',
-        headerName: 'Check Out Date',
-        width: 200,
-        editable: false,
-    },
-    {
-        field: 'service',
-        headerName: 'Service',
-        width: 200,
-        editable: false,
-    },
-    {
-        field: 'status',
-        headerName: 'Status',
-        width: 200,
-        editable: false,
-    }
-];
-
 const appointmentColumns = [
     { field: 'id', headerName: 'ID', width: 90 },
     {
@@ -134,7 +107,7 @@ function PatientDashboard(props) {
     const { handleSubmit, control } = useForm();
     const [modal, setModal] = useState(false);
     const [services, setServices]= useState([]);
-    console.log(patientObj);
+    const [patientVisits, setPatientVisits]= useState([]);
 
     const loadServices = useCallback(async () => {
         try {
@@ -148,10 +121,23 @@ function PatientDashboard(props) {
             });
         }
     }, []);
+    const loadPatientVisits = useCallback(async () => {
+        try {
+            const response = await axios.get(`${baseUrl}patient/visit/visit-detail/${patientObj.id}`, { headers: {"Authorization" : `Bearer ${token}`} });
+            setPatientVisits(response.data);
+        } catch (e) {
+            await Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'An error occurred fetching services!',
+            });
+        }
+    }, []);
 
     useEffect(() => {
         loadServices();
-    }, [loadServices]);
+        loadPatientVisits();
+    }, [loadServices, loadPatientVisits]);
 
     let visitTypesRows = null;
     if (services && services.length > 0) {
@@ -160,13 +146,39 @@ function PatientDashboard(props) {
         ));
     }
 
-    const rows = [];
+    const columns = [
+        {
+            field: 'checkInDate',
+            headerName: 'Checked In Date',
+            width: 200,
+            editable: false,
+        },
+        {
+            field: 'checkOutDate',
+            headerName: 'Check Out Date',
+            width: 200,
+            editable: false,
+        },
+        {
+            field: 'service',
+            headerName: 'Service',
+            width: 200,
+            editable: false,
+        },
+        {
+            field: 'status',
+            headerName: 'Status',
+            width: 200,
+            editable: false,
+        }
+    ];
+
     const panes = [
         { menuItem: 'Patient Visit', render: () =>
                 <Tab.Pane>
-                    <div style={{ height: 400, width: '100%' }}>
+                    <div style={{ height: 200, width: '100%' }}>
                         <DataGrid
-                            rows={rows}
+                            rows={patientVisits}
                             columns={columns}
                             pageSize={5}
                             rowsPerPageOptions={[5]}
@@ -206,18 +218,27 @@ function PatientDashboard(props) {
     const onSubmit = async (data) => {
         try {
             const today = new Date();
-            const visit = await axios.post(`${baseUrl}patient/visit`, {
-                "personId": patientObj.id,
-                "visitStartDate": today
-            }, { headers: {"Authorization" : `Bearer ${token}`} });
-            console.log(visit);
+            const visitDetails = await axios.get(`${baseUrl}patient/visit/visit-detail/${patientObj.id}`, { headers: {"Authorization" : `Bearer ${token}`} });
+            const visitDetail = visitDetails.data;
+            const pendingVisit = visitDetail.find(obj => obj.status == "PENDING");
+            let visit = null;
+            if (!pendingVisit) {
+                const visitResponse = await axios.post(`${baseUrl}patient/visit`, {
+                    "personId": patientObj.id,
+                    "visitStartDate": today
+                }, { headers: {"Authorization" : `Bearer ${token}`} });
+                visit = visitResponse.data;
+            } else {
+                visit = pendingVisit;
+            }
             await axios.post(`${baseUrl}patient/encounter`, {
                 "encounterDate": today,
                 "personId": patientObj.id,
                 "serviceCode": data.VisitType,
                 "status": "PENDING",
-                "visitId": visit.data.id
+                "visitId": visit.id
             }, { headers: {"Authorization" : `Bearer ${token}`} });
+            setModal(false);
             await Swal.fire({
                 icon: 'success',
                 text: 'CheckedIn successfully',
