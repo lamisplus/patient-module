@@ -124,6 +124,7 @@ function PatientDashboard(props) {
     const [modal, setModal] = useState(false);
     const [modalCheckOut, setModalCheckOut] = useState(false);
     const [services, setServices]= useState([]);
+    const [selectedServices, setSelectedServices]= useState({checkInServices:""});
     const [patientVisits, setPatientVisits]= useState([]);
     const [checkOutObj, setCheckOutObj] = useState({
                                                     facilityId: 1,
@@ -131,6 +132,15 @@ function PatientDashboard(props) {
                                                     visitEndDate:format(new Date(newDate), 'yyyy-MM-dd'),
                                                     visitStartDate:"" 
                                                 })
+    const [checkInObj, setCheckInObj] = useState({
+        serviceIds:"",
+          visitDto: {
+            facilityId: 1,
+            personId: patientObj.id,
+            visitEndDate: "",
+            visitStartDate: format(new Date(newDate), 'yyyy-MM-dd')
+          }
+    })
 
     const loadServices = useCallback(async () => {
         try {
@@ -148,6 +158,12 @@ function PatientDashboard(props) {
         try {
             const response = await axios.get(`${baseUrl}patient/visit/visit-detail/${patientObj.id}`, { headers: {"Authorization" : `Bearer ${token}`} });
             setPatientVisits(response.data);
+            response.data.map((visits)=> {
+                if(visits.checkOutDate===null){
+                    checkinStatus=true
+                }
+            })
+
         } catch (e) {
             await Swal.fire({
                 icon: 'error',
@@ -169,13 +185,13 @@ function PatientDashboard(props) {
         ));
     }
 
-    const patientVisitsStatus= patientVisits.map((visits)=> {       
+    const patientVisitsStatus= patientVisits.legth > 0 && patientVisits.map((visits)=> {       
         if(visits.checkOutDate===null){
             checkinStatus=true
         }
     })
 
-    console.log(visitTypesRows)
+
 
     const columns = [
         {
@@ -250,6 +266,10 @@ function PatientDashboard(props) {
     const onDelete = () => {
 
     };
+    const handleInputChangeService = (e) => {
+        setSelectedServices({ ...selectedServices, [e.target.name]: e.target.value });
+    };
+    //console.lo(selectedServices)
 
     const onSubmit = async (data) => {
         try {
@@ -295,13 +315,42 @@ function PatientDashboard(props) {
             text: 'An error occurred while checking in Patient!',
         });
     };
+
+    let checkInServicesID = [];
+    /**** Submit Button For CheckIN  */
+    const handleSubmitCheckIn = (e) => {        
+        e.preventDefault();              
+        selectedServices.checkInServices.length > 0 && selectedServices.checkInServices.map((service)=> { 
+
+            if(service.id!==null){
+                checkInServicesID.push(service.id)
+                console.log(service) 
+            }
+        })
+        checkInObj.serviceIds= checkInServicesID 
+        console.log(checkInObj)  
+        axios.post(`${baseUrl}patient/visit/checkin`, checkInObj,
+        { headers: {"Authorization" : `Bearer ${token}`}},
+        
+        )
+        .then(response => {
+            toast.success("Patient Check-In successful");
+            checkinStatus=true
+            //onCancelCheckOut()
+        })
+        .catch(error => {
+            console.log(error)
+            toast.error("Something went wrong");
+            onCancelCheckOut()        
+        });  
+    }
     /**** Submit Button Processing  */
     const handleSubmitCheckOut = (e) => {        
         e.preventDefault();  
         
         checkOutObj.personId= patientObj.id
         checkOutObj.visitEndDate= format(new Date(newDate), 'yyyy-MM-dd')  
-        axios.put(`${baseUrl}patient/visit/${patientObj.id}`, checkOutObj,
+        axios.put(`${baseUrl}patient/visit/checkout/${patientObj.id}`, checkOutObj,
         { headers: {"Authorization" : `Bearer ${token}`}},
         
         )
@@ -316,7 +365,8 @@ function PatientDashboard(props) {
             onCancelCheckOut()        
         });  
     }
-console.log(checkinStatus)
+
+
     return (
         <div className={classes.root}>
             <Card>
@@ -376,7 +426,7 @@ console.log(checkinStatus)
             <Modal isOpen={modal} toggle={onCancelCheckIn}>
                 <ModalHeader toggle={onCancelCheckIn}>Select a Service Area</ModalHeader>
                 <ModalBody>
-                    <form onSubmit={handleSubmit(onSubmit, onError)}>
+                    <form onSubmit={handleSubmitCheckIn}>
                         <Paper
                             style={{
                                 display: "grid",
@@ -387,32 +437,17 @@ console.log(checkinStatus)
                             <Grid container spacing={2}>
                                 <Grid item xs={8}>
                                     <FormControl >
-                                        {/* <Controller
-                                            name="VisitType"
-                                            control={control}
-                                            defaultValue=""
-                                            render={({ field, fieldState: { error}}) => (
-                                                <TextField
-                                                    {...field}
-                                                    label="Visit Type"
-                                                    id="VisitType"
-                                                    variant="outlined"
-                                                    select
-                                                    error={!!error}
-                                                    helperText={error ? error.message : null}
-                                                >
-                                                    <MenuItem></MenuItem>
-                                                    {visitTypesRows}
-                                                </TextField>
-                                            )}
-                                            rules={{ required: 'Visit Type is Required' }}
-                                        /> */}
+                                       
                                          <Autocomplete
                                             multiple
                                             id="checkboxes-tags-demo"
                                             options={services}
                                             //disableCloseOnSelect
                                             getOptionLabel={(option) => option.moduleServiceName}
+                                            onChange={(e, i) => {
+                                                console.log(i)
+                                                setSelectedServices({ ...selectedServices, checkInServices: i });
+                                            }}
                                             renderOption={(props, option, { selected }) => (
                                                 <li {...props}>
                                                 <Checkbox
@@ -429,34 +464,7 @@ console.log(checkinStatus)
                                                 <TextField {...params} label="Services" />
                                             )}
                                             />
-                                        {/* <Autocomplete
-                                            multiple="true"
-                                            
-                                            id="VisitType"
-                                            size="small"
-                                            options={services}
-                                            getOptionLabel={(option) => option.moduleServiceName}
-                                            //onChange={(e, i) => { setSamples({ ...samples, sample_type: i }); }}
-                                            renderTags={(value, getTagProps) =>
-                                                value.map((option, index) => (
-                                                    <Checkbox
-                                                        label={option.moduleServiceName}
-                                                        {...getTagProps({ index })}
-                                                        disabled={index === 0}
-                                                    />
-                                                ))
-                                            }
-                                            style={{ width: "auto", marginTop: "-1rem" }}
-                                            s
-                                            renderInput={(params) => (
-                                                <TextField
-                                                    {...params}
-                                                    variant="outlined"
-                                                    margin="normal"
-                                                />
-                                            )}
-                                            required
-                                        /> */}
+                                       
                                     </FormControl>
                                 </Grid>
                             </Grid>
