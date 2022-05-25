@@ -8,12 +8,13 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.PastOrPresent;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
-public class EncounterDto implements Serializable {
+public class EncounterRequestDto implements Serializable {
     private Long facilityId;
     private Long id;
     @PastOrPresent
@@ -21,6 +22,6 @@ public class EncounterDto implements Serializable {
     private Long personId;
     private String uuid;
     private Long visitId;
-    private String serviceCode;
+    private Set<String> serviceCode;
     private String status;
 }
