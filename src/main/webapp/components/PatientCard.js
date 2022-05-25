@@ -131,17 +131,7 @@ function PatientCard(props) {
                     </span>
                                 </Col>
 
-                                <Col md={12}>
-                                    <Label.Group >
-
-                                        <Label color={"blue"} size={"mini"}>
-                                            Transfer
-
-                                        </Label>
-
-                                    </Label.Group>
-
-                                </Col>
+                               
                             </Row>
                         </Col>
                     </Row>
