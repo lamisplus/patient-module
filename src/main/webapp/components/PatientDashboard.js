@@ -22,10 +22,7 @@ import {Controller, useForm} from "react-hook-form";
 import {Button, Card, CardContent, FormControl, Grid, MenuItem, Paper, TextField, Typography} from "@mui/material";
 import {format} from 'date-fns';
 import { toast} from "react-toastify";
-// import Autocomplete from "@material-ui/lab/Autocomplete";
-import Chip from "@material-ui/core/Chip";
-// import Checkbox from '@mui/material/Checkbox';
-// import TextField from '@mui/material/TextField';
+import MaterialTable from 'material-table';
 import Autocomplete from '@mui/material/Autocomplete';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
@@ -103,25 +100,19 @@ const appointmentColumns = [
 
 const appointments = [
     { id: 1, lastName: 'Snow', firstName: 'Jon', age: 35 },
-    { id: 2, lastName: 'Lannister', firstName: 'Cersei', age: 42 },
-    { id: 3, lastName: 'Lannister', firstName: 'Jaime', age: 45 },
-    { id: 4, lastName: 'Stark', firstName: 'Arya', age: 16 },
-    { id: 5, lastName: 'Targaryen', firstName: 'Daenerys', age: null },
-    { id: 6, lastName: 'Melisandre', firstName: null, age: 150 },
-    { id: 7, lastName: 'Clifford', firstName: 'Ferrara', age: 44 },
-    { id: 8, lastName: 'Frances', firstName: 'Rossini', age: 36 },
-    { id: 9, lastName: 'Roxie', firstName: 'Harvey', age: 65 },
+
 ];
 
-let checkinStatus=false;
+
 let newDate = new Date()
 function PatientDashboard(props) {
-    
+    const [loading, setLoading] = useState('');
     let history = useHistory();
     const { classes } = props;
     const patientObj = history.location && history.location.state ? history.location.state.patientObj : {};
     const { handleSubmit, control } = useForm();
     const [modal, setModal] = useState(false);
+    const [checkinStatus, setCheckinStatus]= useState(false)
     const [modalCheckOut, setModalCheckOut] = useState(false);
     const [services, setServices]= useState([]);
     const [selectedServices, setSelectedServices]= useState({checkInServices:""});
@@ -158,11 +149,13 @@ function PatientDashboard(props) {
         try {
             const response = await axios.get(`${baseUrl}patient/visit/visit-detail/${patientObj.id}`, { headers: {"Authorization" : `Bearer ${token}`} });
             setPatientVisits(response.data);
+            console.log(response.data)
             response.data.map((visits)=> {
                 if(visits.checkOutDate===null){
-                    checkinStatus=true
+                    setCheckinStatus(true)
                 }
             })
+
 
         } catch (e) {
             await Swal.fire({
@@ -185,11 +178,6 @@ function PatientDashboard(props) {
         ));
     }
 
-    const patientVisitsStatus= patientVisits.legth > 0 && patientVisits.map((visits)=> {       
-        if(visits.checkOutDate===null){
-            checkinStatus=true
-        }
-    })
 
 
 
@@ -223,15 +211,45 @@ function PatientDashboard(props) {
     const panes = [
         { menuItem: 'Patient Visit', render: () =>
                 <Tab.Pane>
-                    <div style={{ height: 200, width: '100%' }}>
-                        <DataGrid
-                            rows={patientVisits}
-                            columns={columns}
-                            pageSize={5}
-                            rowsPerPageOptions={[5]}
-                            disableSelectionOnClick
-                        />
-                    </div>
+                   
+                    <MaterialTable
+                    title=""
+                    columns={[
+                        {
+                            title: "Checked In Date",
+                            field: "checkInDate", filtering: false 
+                        },
+                        { title: "Check Out Date", field: "checkOutDate", filtering: false  },
+                        { title: "Service", field: "service", filtering: false  },
+                        { title: "Status", field: "status", filtering: false },
+                    ]}
+                    isLoading={loading}
+                    data={patientVisits.map((row) => ({
+                        checkInDate: row.checkInDate,
+                        checkOutDate: row.checkOutDate,
+                        service:row.service,
+                        status:(<Label color={row.status ==='COMPLETED' ? 'green' : 'red'} size="mini">{row.status}</Label>),
+
+                    }))}
+
+                    options={{
+                        headerStyle: {
+                            backgroundColor: "#000",
+                            color: "#ffffff",
+                        },
+                        search: true,
+                        // searchFieldStyle: {
+                        //     width : '200%',
+                        //     margingLeft: '250px',
+                        // },
+                        filtering: false,
+                        exportButton: false,
+                        searchFieldAlignment: 'left',
+                        pageSizeOptions:[10,20,100],
+                        pageSize:10,
+                        debounceInterval: 400
+                    }}
+                />
                 </Tab.Pane>
         },
         { menuItem: 'Appointments', render: () =>
@@ -327,37 +345,35 @@ function PatientDashboard(props) {
                 console.log(service) 
             }
         })
-        checkInObj.serviceIds= checkInServicesID 
-        console.log(checkInObj)  
+        checkInObj.serviceIds= checkInServicesID  
         axios.post(`${baseUrl}patient/visit/checkin`, checkInObj,
         { headers: {"Authorization" : `Bearer ${token}`}},
         
         )
         .then(response => {
             toast.success("Patient Check-In successful");
-            checkinStatus=true
-            //onCancelCheckOut()
+            setCheckinStatus(true)
+            onCancelCheckIn()
+            loadPatientVisits()
         })
         .catch(error => {
             console.log(error)
             toast.error("Something went wrong");
-            onCancelCheckOut()        
+            onCancelCheckIn()        
         });  
     }
     /**** Submit Button Processing  */
     const handleSubmitCheckOut = (e) => {        
-        e.preventDefault();  
-        
-        checkOutObj.personId= patientObj.id
-        checkOutObj.visitEndDate= format(new Date(newDate), 'yyyy-MM-dd')  
-        axios.put(`${baseUrl}patient/visit/checkout/${patientObj.id}`, checkOutObj,
+        e.preventDefault();   
+        axios.post(`${baseUrl}patient/visit/checkin/100`,
         { headers: {"Authorization" : `Bearer ${token}`}},
         
         )
         .then(response => {
             toast.success("Record save successful");
-            checkinStatus=false
+            setCheckinStatus(false)
             onCancelCheckOut()
+            loadPatientVisits()
         })
         .catch(error => {
             console.log(error)
@@ -405,7 +421,9 @@ function PatientDashboard(props) {
                                         </Button>
                                     )
                                     :
-                                    (
+                                    ""
+                                    }
+                                    {checkinStatus===true ? (
                                         <Button
                                             variant="contained"
                                             style={{ backgroundColor: "black" }}
@@ -415,7 +433,10 @@ function PatientDashboard(props) {
                                             <span style={{ textTransform: "capitalize" }}>CheckOut</span>
                                         </Button>
                                     )
+                                    :
+                                    ""
                                     }
+                                    
                                 </div>
                             </div>
                             <Tab panes={panes} />
@@ -481,7 +502,7 @@ function PatientDashboard(props) {
             <Modal isOpen={modalCheckOut} toggle={onCancelCheckOut}>
                 <ModalHeader toggle={onCancelCheckOut}>CheckOut </ModalHeader>
                 <ModalBody>
-                    <form onSubmit={handleSubmitCheckOut}>
+                    <form >
                         <Paper
                             style={{
                                 display: "grid",
@@ -496,7 +517,7 @@ function PatientDashboard(props) {
                             </Grid>
                             <Grid container spacing={2}>
                                 <Grid item xs={12}>
-                                    <Button type={"submit"} variant="contained" color={"primary"}>Yes</Button>
+                                    <Button type={"submit"} onClick={handleSubmitCheckOut} variant="contained" color={"primary"}>Yes</Button>
                                 </Grid>
                             </Grid>
                         </Paper>
