@@ -41,12 +41,12 @@ public class PatientAuditEntity {
     private String createdBy = SecurityUtils.getCurrentUserLogin ().orElse ("");
 
 
-    @Column(name = "last_modified_date", insertable = false)
+    @Column(name = "last_modified_date")
     @LastModifiedDate
     private LocalDateTime lastModifiedDate = LocalDateTime.now ();
 
 
-    @Column(name = "last_modified_by", insertable = false)
+    @Column(name = "last_modified_by")
     @JsonIgnore
     @ToString.Exclude
     private String lastModifiedBy = SecurityUtils.getCurrentUserLogin ().orElse ("");
