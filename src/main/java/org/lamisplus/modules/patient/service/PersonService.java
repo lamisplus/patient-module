@@ -6,11 +6,11 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.lamisplus.modules.base.controller.apierror.EntityNotFoundException;
 import org.lamisplus.modules.base.domain.entities.ApplicationCodeSet;
 import org.lamisplus.modules.base.domain.entities.OrganisationUnit;
 import org.lamisplus.modules.base.domain.repositories.ApplicationCodesetRepository;
 import org.lamisplus.modules.base.domain.repositories.OrganisationUnitRepository;
-import org.lamisplus.modules.patient.controller.exception.NoRecordFoundException;
 import org.lamisplus.modules.patient.domain.dto.*;
 import org.lamisplus.modules.patient.domain.entity.Encounter;
 import org.lamisplus.modules.patient.domain.entity.Person;
@@ -48,7 +48,7 @@ public class PersonService {
 
     public PersonResponseDto updatePerson(Long id, PersonDto personDto) {
         Person existPerson = personRepository
-                .findById (id).orElseThrow (() -> new NoRecordFoundException (PERSON_NOT_FOUND_MESSAGE + id));
+                .findById (id).orElseThrow (() -> new EntityNotFoundException (PersonService.class, PERSON_NOT_FOUND_MESSAGE + id));
         Person person = getPersonFromDto (personDto);
         person.setId (existPerson.getId ());
         person.setUuid (existPerson.getUuid ());
@@ -78,7 +78,7 @@ public class PersonService {
     public PersonResponseDto getPersonById(Long id) {
         Person person = personRepository
                 .findById (id)
-                .orElseThrow (() -> new NoRecordFoundException (PERSON_NOT_FOUND_MESSAGE + id));
+                .orElseThrow (() -> new EntityNotFoundException (PersonService.class, PERSON_NOT_FOUND_MESSAGE + id));
         return getDtoFromPerson (person);
     }
 
@@ -86,7 +86,7 @@ public class PersonService {
     public void deletePersonById(Long id) {
         Person person = personRepository
                 .findById (id)
-                .orElseThrow (() -> new NoRecordFoundException (PERSON_NOT_FOUND_MESSAGE + id));
+                .orElseThrow (() -> new EntityNotFoundException (PersonService.class, PERSON_NOT_FOUND_MESSAGE + id));
         person.setArchived (1);
         personRepository.save (person);
     }
