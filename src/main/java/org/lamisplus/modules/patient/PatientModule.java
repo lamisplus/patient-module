@@ -18,7 +18,7 @@ import java.util.List;
 
 @AcrossDepends(
         required = {
-                AcrossHibernateJpaModule.NAME,
+                AcrossHibernateJpaModule.NAME
         })
 public class PatientModule extends AcrossModule
 {

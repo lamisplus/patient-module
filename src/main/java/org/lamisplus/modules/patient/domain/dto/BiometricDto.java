@@ -8,23 +8,20 @@ import lombok.NoArgsConstructor;
 import org.lamisplus.modules.patient.utility.LocalDateConverter;
 
 import javax.persistence.Convert;
-import javax.validation.constraints.PastOrPresent;
+import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.time.LocalDate;
 
 @Data
-@NoArgsConstructor
 @Builder
+@NoArgsConstructor
 @AllArgsConstructor
-public class EncounterResponseDto {
-    private Long facilityId;
-    private Long id;
-    @PastOrPresent
+public class BiometricDto implements Serializable {
+    private Long personId;
+    private Integer numberOfFingers;
+    @NotNull
     @Convert(converter = LocalDateConverter.class)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private LocalDate encounterDate;
-    private Long personId;
-    private String uuid;
-    private Long visitId;
-    private String serviceCode;
-    private String status;
+    private LocalDate date;
+    private Boolean iso;
 }
