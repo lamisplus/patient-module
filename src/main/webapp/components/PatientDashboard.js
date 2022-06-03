@@ -149,7 +149,6 @@ function PatientDashboard(props) {
         try {
             const response = await axios.get(`${baseUrl}patient/visit/visit-detail/${patientObj.id}`, { headers: {"Authorization" : `Bearer ${token}`} });
             setPatientVisits(response.data);
-            console.log(response.data)
             response.data.map((visits)=> {
                 if(visits.checkOutDate===null){
                     setCheckinStatus(true)
@@ -364,8 +363,10 @@ function PatientDashboard(props) {
     }
     /**** Submit Button Processing  */
     const handleSubmitCheckOut = (e) => {        
-        e.preventDefault();   
-        axios.post(`${baseUrl}patient/visit/checkin/100`,
+        e.preventDefault();
+        const getVisitID= patientVisits.find((visits)=> visits.status==='PENDING')   
+
+        axios.put(`${baseUrl}patient/visit/checkout/${getVisitID.id}`,getVisitID.id,
         { headers: {"Authorization" : `Bearer ${token}`}},
         
         )
