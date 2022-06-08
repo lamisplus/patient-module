@@ -58,4 +58,5 @@ public class PatientController {
         return ResponseEntity.ok (personService.getCheckedInPersonsByServiceCodeAndVisitId (serviceCode));
     }
 
+
 }
