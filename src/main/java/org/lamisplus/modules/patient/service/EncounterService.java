@@ -28,7 +28,7 @@ public class EncounterService {
 
     public List<EncounterResponseDto> registerEncounter(EncounterRequestDto encounterRequestDto) {
         Long visitId = encounterRequestDto.getVisitId ();
-        Visit visit = visitRepository.findById (visitId).orElseThrow (() -> new EntityNotFoundException (EncounterService.class, "No visit found with Id " + visitId));
+        Visit visit = visitRepository.findById (visitId).orElseThrow (() -> new EntityNotFoundException (EncounterService.class, "errorMessage", "No visit found with Id " + visitId));
         List<EncounterResponseDto> encounterRequestDtos = new ArrayList<> ();
         Set<String> serviceCodes = encounterRequestDto.getServiceCode ();
         serviceCodes
@@ -78,7 +78,7 @@ public class EncounterService {
     public List<EncounterResponseDto> getAllEncounterByPerson(Long personId) {
         Person person = personRepository
                 .findById (personId)
-                .orElseThrow (() -> new EntityNotFoundException (EncounterService.class, "No Person with given Id " + personId));
+                .orElseThrow (() -> new EntityNotFoundException (EncounterService.class, "errorMessage", "No Person with given Id " + personId));
         List<Encounter> personEncounters = encounterRepository.getEncounterByPersonAndArchived (person, 0);
         return personEncounters
                 .stream ()
@@ -99,7 +99,7 @@ public class EncounterService {
 
 
     private Encounter getExistEncounter(Long id) {
-        return encounterRepository.findById (id).orElseThrow (() -> new EntityNotFoundException (EncounterService.class, "No encounter found with Id " + id));
+        return encounterRepository.findById (id).orElseThrow (() -> new EntityNotFoundException (EncounterService.class, "errorMessage", "No encounter found with Id " + id));
     }
 
 
@@ -115,10 +115,10 @@ public class EncounterService {
     private Encounter convertDtoToEntity(EncounterRequestDto encounterRequestDto) {
         Person person = personRepository
                 .findById (encounterRequestDto.getPersonId ())
-                .orElseThrow (() -> new EntityNotFoundException (EncounterService.class, "No patient found with id " + encounterRequestDto.getPersonId ()));
+                .orElseThrow (() -> new EntityNotFoundException (EncounterService.class, "errorMessage", "No patient found with id " + encounterRequestDto.getPersonId ()));
         Visit visit = visitRepository
                 .findById (encounterRequestDto.getVisitId ())
-                .orElseThrow (() -> new EntityNotFoundException (EncounterService.class, "No visit found with id " + encounterRequestDto.getVisitId ()));
+                .orElseThrow (() -> new EntityNotFoundException (EncounterService.class, "errorMessage", "No visit found with id " + encounterRequestDto.getVisitId ()));
         Encounter encounter = new Encounter ();
         BeanUtils.copyProperties (encounterRequestDto, encounter);
         encounter.setPerson (person);

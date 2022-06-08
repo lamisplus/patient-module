@@ -31,13 +31,15 @@
                 date_of_registration       date                                    NOT NULL,
                 archived                   INTEGER,
                 facility_id                BIGINT,
-                uuid                       VARCHAR(255),
+                uuid                       VARCHAR(255)                            NOT NULL,
                 first_name                 VARCHAR(255),
                 surname                    VARCHAR(255),
                 other_name                 VARCHAR(255),
                 is_date_of_birth_estimated BOOLEAN,
                 CONSTRAINT pk_person PRIMARY KEY (id)
             );
+            ALTER TABLE person
+                ADD CONSTRAINT uc_person_uuid UNIQUE (uuid);
         </sql>
     </changeSet>
 
@@ -103,31 +105,6 @@
                 encounter_type      VARCHAR(255),
                 CONSTRAINT pk_patient_check_post_service PRIMARY KEY (id)
             );
-        </sql>
-    </changeSet>
-    <changeSet id="20220306-006" author="amos-data-fi">
-        <sql>
-            CREATE TABLE biometric
-            (
-                id                 VARCHAR(255) NOT NULL,
-                created_date       TIMESTAMP WITHOUT TIME ZONE,
-                created_by         VARCHAR(255),
-                last_modified_date TIMESTAMP WITHOUT TIME ZONE,
-                last_modified_by   VARCHAR(255),
-                facility_id        BIGINT,
-                person_id          BIGINT       NOT NULL,
-                template           OID,
-                biometric_type     VARCHAR(255),
-                template_type      VARCHAR(255),
-                enrollment_date    date,
-                archived           BOOLEAN,
-                iso                BOOLEAN,
-                extra              JSONB,
-                CONSTRAINT pk_biometric PRIMARY KEY (id)
-            );
-
-            ALTER TABLE biometric
-                ADD CONSTRAINT FK_BIOMETRIC_ON_PERSON FOREIGN KEY (person_id) REFERENCES person (id);
         </sql>
     </changeSet>
 </databaseChangeLog>
