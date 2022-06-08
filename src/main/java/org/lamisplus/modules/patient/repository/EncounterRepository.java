@@ -13,8 +13,10 @@ public interface EncounterRepository extends JpaRepository<Encounter, Long> {
 
     List<Encounter> findAllByServiceCodeAndStatus(String serviceCode, String status);
 
-    Optional<Encounter> getEncounterByVisitAndStatusAndServiceCode(Visit visit, String Status, String serviceCode);
+    Optional<Encounter> getEncounterByVisitAndStatusAndServiceCode(Visit visit, String status, String serviceCode);
 
     List<Encounter> getEncounterByPersonAndArchived(Person person, Integer archived);
+
+    List<Encounter> getEncounterByVisit(Visit visit);
 
 }

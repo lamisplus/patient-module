@@ -12,8 +12,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @RequiredArgsConstructor
 @Slf4j
 @EnableAcrossJpaRepositories(basePackages = {
-        "org.lamisplus.modules.patient.repository",
-        "org.lamisplus.modules.base.domain.repositories"})
+        "org.lamisplus.modules.patient.repository"
+})
 @EnableTransactionManagement
 public class DomainConfiguration {
 }
