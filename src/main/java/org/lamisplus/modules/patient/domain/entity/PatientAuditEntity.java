@@ -17,6 +17,8 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import java.time.LocalDateTime;
 
 @MappedSuperclass
@@ -50,5 +52,13 @@ public class PatientAuditEntity {
     @JsonIgnore
     @ToString.Exclude
     private String lastModifiedBy = SecurityUtils.getCurrentUserLogin ().orElse ("");
+
     private Long facilityId;
+
+    @PrePersist
+    @PreUpdate
+    public void update() {
+        lastModifiedDate = LocalDateTime.now ();
+        lastModifiedBy = SecurityUtils.getCurrentUserLogin ().orElse ("");
+    }
 }
