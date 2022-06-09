@@ -13,7 +13,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/patient/")
+@RequestMapping("api/v1/patient")
 public class EncounterController {
 
     private final EncounterService encounterService;
@@ -23,29 +23,29 @@ public class EncounterController {
         return ResponseEntity.ok (encounterService.registerEncounter (encounterRequestDto));
     }
 
-    @GetMapping("encounter")
+    @GetMapping("/encounter")
     public ResponseEntity<List<EncounterResponseDto>> getAllEncounter() {
         return ResponseEntity.ok (encounterService.getAllEncounters ());
     }
 
-    @GetMapping("encounter/{id}")
+    @GetMapping("/encounter/{id}")
     public ResponseEntity<EncounterResponseDto> getEncounter(@PathVariable("id") Long id) {
         return ResponseEntity.ok (encounterService.getEncounterById (id));
     }
 
-    @GetMapping("encounter/person/{personId}")
+    @GetMapping("/encounter/person/{personId}")
     public ResponseEntity<List<EncounterResponseDto>> getPersonEncounter(@PathVariable("personId") Long personId) {
         return ResponseEntity.ok (encounterService.getAllEncounterByPerson (personId));
     }
 
-    @PutMapping(value = "encounter/{id}")
+    @PutMapping(value = "/encounter/{id}")
     public ResponseEntity<List<EncounterResponseDto>> updateEncounter(
             @PathVariable("id") Long id,
             @RequestBody EncounterRequestDto encounterRequestDto) {
         return ResponseEntity.ok (encounterService.updateEncounter (id, encounterRequestDto));
     }
 
-    @DeleteMapping(value = "encounter/{id}")
+    @DeleteMapping(value = "/encounter/{id}")
     public ResponseEntity<String> deleteEncounter(@PathVariable("id") Long id) {
         encounterService.archivedEncounter (id);
         return ResponseEntity.accepted ().build ();

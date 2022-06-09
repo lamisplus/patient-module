@@ -14,7 +14,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/patient/visit")
+@RequestMapping("api/v1/patient/visit")
 public class VisitController {
     private final VisitService visitService;
 
