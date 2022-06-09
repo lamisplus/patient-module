@@ -65,6 +65,11 @@ public class PersonService {
                 .collect (Collectors.toList ());
     }
 
+    public Boolean isPersonExist(Long personId) {
+        Optional<Person> person = personRepository.findById (personId);
+        return person.isPresent ();
+    }
+
     public List<PersonResponseDto> getCheckedInPersonsByServiceCodeAndVisitId(String serviceCode) {
         List<Encounter> patientEncounters = encounterRepository.findAllByServiceCodeAndStatus (serviceCode, "PENDING");
         return patientEncounters.stream ()
@@ -78,7 +83,7 @@ public class PersonService {
     public PersonResponseDto getPersonById(Long id) {
         Person person = personRepository
                 .findById (id)
-                .orElseThrow (() -> new EntityNotFoundException (PersonService.class, PERSON_NOT_FOUND_MESSAGE + id));
+                .orElseThrow (() -> new EntityNotFoundException (PersonService.class, "errorMessage", PERSON_NOT_FOUND_MESSAGE + id));
         return getDtoFromPerson (person);
     }
 
@@ -86,7 +91,7 @@ public class PersonService {
     public void deletePersonById(Long id) {
         Person person = personRepository
                 .findById (id)
-                .orElseThrow (() -> new EntityNotFoundException (PersonService.class, PERSON_NOT_FOUND_MESSAGE + id));
+                .orElseThrow (() -> new EntityNotFoundException (PersonService.class, "errorMessage", PERSON_NOT_FOUND_MESSAGE + id));
         person.setArchived (1);
         personRepository.save (person);
     }
