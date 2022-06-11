@@ -97,12 +97,12 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
+
 const PatientList = (props) => {
     const [patients, setPatients] = useState([]);
     const [loading, setLoading] = useState('');
     const [modal, setModal] = useState(false);
     const [patient, setPatient] = useState(false);
-
     const toggle = (id) => {
         const patient = patients.find(obj => obj.id == id);
         setPatient(patient);
@@ -165,6 +165,8 @@ const PatientList = (props) => {
     useEffect(() => {
         loadPatients();
     }, [loadPatients]);
+
+ 
 
   return (
     <div>
