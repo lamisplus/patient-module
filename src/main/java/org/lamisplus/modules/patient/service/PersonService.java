@@ -9,8 +9,10 @@ import org.jetbrains.annotations.NotNull;
 import org.lamisplus.modules.base.controller.apierror.EntityNotFoundException;
 import org.lamisplus.modules.base.domain.entities.ApplicationCodeSet;
 import org.lamisplus.modules.base.domain.entities.OrganisationUnit;
+import org.lamisplus.modules.base.domain.entities.User;
 import org.lamisplus.modules.base.domain.repositories.ApplicationCodesetRepository;
 import org.lamisplus.modules.base.domain.repositories.OrganisationUnitRepository;
+import org.lamisplus.modules.base.service.UserService;
 import org.lamisplus.modules.patient.domain.dto.*;
 import org.lamisplus.modules.patient.domain.entity.Encounter;
 import org.lamisplus.modules.patient.domain.entity.Person;
@@ -39,8 +41,12 @@ public class PersonService {
     private final VisitRepository visitRepository;
 
     private final EncounterRepository encounterRepository;
-
+    private final UserService userService;
     public PersonResponseDto createPerson(PersonDto personDto) {
+        Optional<User> currentUser = userService.getUserWithRoles ();
+        if (currentUser.isPresent ()) {
+            log.info ("currentUser: " + currentUser.get ());
+        }
         Person person = getPersonFromDto (personDto);
         person.setUuid (UUID.randomUUID ().toString ());
         return getDtoFromPerson (personRepository.save (person));
@@ -59,6 +65,10 @@ public class PersonService {
 
 
     public List<PersonResponseDto> getAllPerson() {
+        Optional<User> currentUser = userService.getUserWithRoles ();
+        if (currentUser.isPresent ()) {
+            log.info ("currentUser: " + currentUser.get ());
+        }
         return personRepository.getAllByArchived (0)
                 .stream ()
                 .map (this::getDtoFromPerson)
@@ -73,7 +83,7 @@ public class PersonService {
     public List<PersonResponseDto> getCheckedInPersonsByServiceCodeAndVisitId(String serviceCode) {
         List<Encounter> patientEncounters = encounterRepository.findAllByServiceCodeAndStatus (serviceCode, "PENDING");
         return patientEncounters.stream ()
-                .map (encounter -> encounter.getPerson ())
+                .map (Encounter::getPerson)
                 .map (this::getDtoFromPerson)
                 .collect (Collectors.toList ());
 
