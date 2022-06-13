@@ -14,7 +14,15 @@
             </sqlCheck>
         </preConditions>
         <sqlFile dbms="postgresql"
-                 path="sql/patient_check_post_service.sql"
+                 path="sql/patient_post_service_query.sql"
+                 relativeToChangelogFile="true"
+                 splitStatements="false"
+                 stripComments="true"/>
+    </changeSet>
+
+    <changeSet failOnError="false" author="Aniwange Amos" id="20220609-018">
+        <sqlFile dbms="postgresql"
+                 path="sql/patient_permission_query.sql"
                  relativeToChangelogFile="true"
                  splitStatements="false"
                  stripComments="true"/>
