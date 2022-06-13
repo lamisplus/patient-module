@@ -203,7 +203,7 @@ const CaptureBiometric = (props) => {
             });
         }else{
             
-            toast.error("You can't capture less than a finger");
+            toast.error("You can't save less than 2 finger");
         }
   }  
     

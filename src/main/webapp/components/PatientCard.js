@@ -242,7 +242,18 @@ function PatientCard(props) {
                             </div>
                         </>
                         )
-                        :""
+                        :
+                        <>
+                            <div >
+                                <Typography variant="caption">
+                                    <Label color={"red"} size={"mini"}>
+                                        Biometric Not Install
+                                        
+                                    </Label>
+                                   
+                                </Typography>
+                            </div>
+                        </>
                     }
                 </AccordionDetails>
                 <Divider />
