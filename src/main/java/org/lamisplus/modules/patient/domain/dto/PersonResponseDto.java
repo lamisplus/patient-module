@@ -24,6 +24,7 @@ public class PersonResponseDto {
     private Object employmentStatus;
     private Object education;
     private Object organization;
+    private boolean biometricStatus;
     @Convert(converter = LocalDateConverter.class)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate dateOfBirth;

@@ -12,6 +12,7 @@ import org.lamisplus.modules.base.domain.entities.OrganisationUnit;
 import org.lamisplus.modules.base.domain.entities.User;
 import org.lamisplus.modules.base.domain.repositories.ApplicationCodesetRepository;
 import org.lamisplus.modules.base.domain.repositories.OrganisationUnitRepository;
+import org.lamisplus.modules.base.service.MenuService;
 import org.lamisplus.modules.base.service.UserService;
 import org.lamisplus.modules.patient.domain.dto.*;
 import org.lamisplus.modules.patient.domain.entity.Encounter;
@@ -42,6 +43,9 @@ public class PersonService {
 
     private final EncounterRepository encounterRepository;
     private final UserService userService;
+
+    private final MenuService menuService;
+
     public PersonResponseDto createPerson(PersonDto personDto) {
         Optional<User> currentUser = userService.getUserWithRoles ();
         if (currentUser.isPresent ()) {
@@ -218,7 +222,17 @@ public class PersonService {
         personResponseDto.setActive (person.getActive ());
         personResponseDto.setDeceasedDateTime (person.getDeceasedDateTime ());
         personResponseDto.setOrganization (person.getOrganization ());
+        personResponseDto.setBiometricStatus (getPatientBiometricStatus (person.getUuid ()));
         return personResponseDto;
+    }
+
+    Boolean getPatientBiometricStatus(String uuid) {
+        String moduleName = "BiometricModule";
+        if (! menuService.exist (moduleName)) {
+            return false;
+        }
+        Integer fingerCount = personRepository.getBiometricCountByPersonUuid (uuid);
+        return fingerCount > 0;
     }
 
 
