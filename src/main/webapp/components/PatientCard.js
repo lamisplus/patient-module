@@ -49,7 +49,9 @@ const styles = theme => ({
 function PatientCard(props) {
     const { classes } = props;
     const patientObj = props.patientObj ? props.patientObj : {};
+    const permissions= props.permissions ? props.permissions : [];
     const [modal, setModal] = useState(false) //Modal to collect sample 
+    const [patientBiometricStatus, setPatientBiometricStatus]= useState(props.patientObj.biometricStatus);
     const toggleModal = () => setModal(!modal)
 
     const [biometricStatus, setBiometricStatus] = useState(false);
@@ -230,13 +232,26 @@ function PatientCard(props) {
                         <>
                             <div >
                                 <Typography variant="caption">
-                                    <Label color={"red"} size={"mini"}>
+                                    <Label color={patientBiometricStatus===true? "green" : "red"} size={"mini"}>
                                         Biometric Status
-                                        <Label.Detail>Not Captured</Label.Detail>
+                                        <Label.Detail>{patientBiometricStatus===true? "Captured" : "Not Capture"}</Label.Detail>
                                     </Label>
-                                    <Label as='a' color='teal' onClick={() => handleBiometricCapture(patientObj.id)} tag>
-                                        Capture Now
-                                    </Label>
+                                    {patientBiometricStatus!==true ? (
+                                   
+                                        <>
+                                             {permissions.includes('patient_check_in') || permissions.includes("all_permission") ? (
+                                                <>
+                                                <Label as='a' color='teal' onClick={() => handleBiometricCapture(patientObj.id)} tag>
+                                                    Capture Now
+                                                </Label>
+                                                </>
+                                            )
+                                            :""
+                                            }
+                                        </>
+                                    )
+                                    :""
+                                    }
                                     
                                 </Typography>
                             </div>
@@ -261,7 +276,7 @@ function PatientCard(props) {
 
                 </AccordionActions>
             </Accordion>
-            <CaptureBiometric modalstatus={modal} togglestatus={toggleModal} patientId={patientObj.id} biometricDevices={devices}/>
+            <CaptureBiometric modalstatus={modal} togglestatus={toggleModal} patientId={patientObj.id} biometricDevices={devices} setPatientBiometricStatus={setPatientBiometricStatus} />
         </div>
     );
 }

@@ -100,6 +100,7 @@ const useStyles = makeStyles(theme => ({
 
 const PatientList = (props) => {
     const [patients, setPatients] = useState([]);
+    const [permissions, setPermissions] = useState([]);
     const [loading, setLoading] = useState('');
     const [modal, setModal] = useState(false);
     const [patient, setPatient] = useState(false);
@@ -108,7 +109,23 @@ const PatientList = (props) => {
         setPatient(patient);
         setModal(!modal);
     }
-
+    useEffect(() => {      
+        userPermission();        
+      }, []);
+    //Get list of Finger index
+    const userPermission =()=>{
+        axios
+           .get(`${baseUrl}account`,
+               { headers: {"Authorization" : `Bearer ${token}`} }
+           )
+           .then((response) => {
+                setPermissions(response.data.permissions);
+      
+           })
+           .catch((error) => {
+           });
+       
+     }
     const loadPatients = useCallback(async () => {
         try {
             const response = await axios.get(`${baseUrl}patient`, { headers: {"Authorization" : `Bearer ${token}`} });
@@ -165,15 +182,15 @@ const PatientList = (props) => {
     useEffect(() => {
         loadPatients();
     }, [loadPatients]);
-
- 
+    console.log(permissions)
+console.log(permissions.includes( "all_permission"))
 
   return (
     <div>
         <ToastContainer autoClose={3000} hideProgressBar />
         <Card>
             <CardBody>
-
+            {permissions.includes('view_patient') || permissions.includes("all_permission") ? (
                 <Link to={"register-patient"}>
                     <Button
                         variant="contained"
@@ -184,6 +201,8 @@ const PatientList = (props) => {
                         <span style={{ textTransform: "capitalize" }}>New Patient</span>
                     </Button>
                 </Link>
+            ):""
+        }
                 <br/><br/>
                 <br/>
                 <MaterialTable
@@ -225,17 +244,23 @@ const PatientList = (props) => {
                                     <MenuButton style={{ backgroundColor:"#3F51B5", color:"#fff", border:"2px solid #3F51B5", borderRadius:"4px", }}>
                                         Actions <span aria-hidden>▾</span>
                                     </MenuButton>
+                                   
                                     <MenuList className={'menuClass'} >
+                                    {permissions.includes('view_patient') || permissions.includes("all_permission") ? (
                                         <MenuItem  style={{ color:"#000 !important"}}>
                                             <Link
                                                 to={{
                                                     pathname: "/patient-dashboard",
-                                                    state: { patientObj: row }
+                                                    state: { patientObj: row, permissions:permissions }
                                                 }}
                                             >
                                                 <MdDashboard size="15" />{" "}<span style={{color: '#000'}}>Patient Dashboard</span>
                                             </Link>
                                         </MenuItem>
+                                    ):""
+                                }
+
+                                    {permissions.includes('edit_patient') || permissions.includes("all_permission") ? (
                                         <MenuItem style={{ color:"#000 !important"}}>
                                             <Link
                                                 to={{
@@ -246,6 +271,8 @@ const PatientList = (props) => {
                                                 <MdModeEdit size="15" />{" "}<span style={{color: '#000'}}>Edit Patient </span>
                                             </Link>
                                         </MenuItem>
+                                    ):""}
+                                    {permissions.includes('delete_patient') || permissions.includes("all_permission") ? (
                                         <MenuItem style={{ color:"#000 !important"}}>
                                             <Link
                                                 onClick={(e) => toggle(row.id)}
@@ -258,6 +285,7 @@ const PatientList = (props) => {
                                                 <span style={{color: '#000'}}>Delete Patient</span>
                                             </Link>
                                         </MenuItem>
+                                    ):""}
                                     </MenuList>
                                 </Menu>
                             </div>

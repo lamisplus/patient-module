@@ -15,7 +15,7 @@ import {Card, CardContent} from "@material-ui/core";
 import SaveIcon from "@material-ui/icons/Save";
 import AddIcon from "@material-ui/icons/Add";
 import CancelIcon from "@material-ui/icons/Cancel";
-import {ToastContainer} from "react-toastify";
+import {ToastContainer, toast} from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "react-widgets/dist/css/react-widgets.css";
 import {Link, useHistory, useLocation} from "react-router-dom";
@@ -286,6 +286,7 @@ const UserRegistration = (props) => {
             } else {
                 const response = await axios.post(`${baseUrl}patient/`, patientForm, { headers: {"Authorization" : `Bearer ${token}`} });
             }
+            toast.success("Patient Register successful");
             history.push('/');
         } catch (e) {
             console.log(e);
@@ -523,7 +524,7 @@ const UserRegistration = (props) => {
 
                                             <div className="form-group mb-3 col-md-4">
                                                 <FormGroup>
-                                                    <Label for="patientId">Patient ID * </Label>
+                                                    <Label for="patientId">Hospital Number* </Label>
                                                     <input
                                                         className="form-control"
                                                         type="text"

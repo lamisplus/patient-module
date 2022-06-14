@@ -196,6 +196,7 @@ const CaptureBiometric = (props) => {
               .then(response => {
                 toast.success("Biometric save successful");
                 setCapturedFingered([])
+                props.setPatientBiometricStatus(true)
                 props.togglestatus()
             })
             .catch(error => {
@@ -277,6 +278,7 @@ const CaptureBiometric = (props) => {
                                         
 
                                         <Col md={4}>
+                                        
                                         <MatButton
                                             type='button'
                                             variant='contained'
