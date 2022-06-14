@@ -21,7 +21,8 @@ import "react-widgets/dist/css/react-widgets.css";
 import {Link, useHistory, useLocation} from "react-router-dom";
 import {TiArrowBack} from 'react-icons/ti'
 import {useForm} from "react-hook-form";
-import {token, url as baseUrl} from "../../../api";
+import { toast } from 'react-toastify';
+import {token, url as baseUrl } from "../../../api";
 
 library.add(faCheckSquare, faCoffee, faEdit, faTrash);
 
@@ -284,11 +285,14 @@ const UserRegistration = (props) => {
                 patientForm.id = null;
                 const response = await axios.put(`${baseUrl}patient/${patientId}`, patientForm, { headers: {"Authorization" : `Bearer ${token}`} });
             } else {
-                const response = await axios.post(`${baseUrl}patient/`, patientForm, { headers: {"Authorization" : `Bearer ${token}`} });
+                const response = await axios.post(`${baseUrl}patient`, patientForm, { headers: {"Authorization" : `Bearer ${token}`} });
             }
             history.push('/');
         } catch (e) {
             console.log(e);
+            toast.error("An error occured while registering a patient !", {
+                position: toast.POSITION.TOP_RIGHT
+            });
         }
     };
     const onError = (errors) => {
@@ -318,7 +322,9 @@ const UserRegistration = (props) => {
             const response = await axios.get(`${baseUrl}application-codesets/v2/GENDER`, { headers: {"Authorization" : `Bearer ${token}`} });
             setGenders(response.data);
         } catch (e) {
-
+            toast.error("An error occured while fetching gender codesets !", {
+                position: toast.POSITION.TOP_RIGHT
+            });
         }
     }, []);
     const loadMaritalStatus = useCallback(async () => {
@@ -326,7 +332,9 @@ const UserRegistration = (props) => {
             const response = await axios.get(`${baseUrl}application-codesets/v2/MARITAL_STATUS`, { headers: {"Authorization" : `Bearer ${token}`} });
             setMaritalStatusOptions(response.data);
         } catch (e) {
-
+            toast.error("An error occured while fetching marital codesets !", {
+                position: toast.POSITION.TOP_RIGHT
+            });
         }
     }, []);
     const loadEducation = useCallback(async () => {
@@ -334,7 +342,9 @@ const UserRegistration = (props) => {
             const response = await axios.get(`${baseUrl}application-codesets/v2/EDUCATION`, { headers: {"Authorization" : `Bearer ${token}`} });
             setEducationOptions(response.data);
         } catch (e) {
-
+            toast.error("An error occured while fetching education codesets !", {
+                position: toast.POSITION.TOP_RIGHT
+            });
         }
     }, []);
     const loadOccupation = useCallback(async () => {
@@ -342,7 +352,9 @@ const UserRegistration = (props) => {
             const response = await axios.get(`${baseUrl}application-codesets/v2/OCCUPATION`, { headers: {"Authorization" : `Bearer ${token}`} });
             setOccupationOptions(response.data);
         } catch (e) {
-
+            toast.error("An error occured while fetching occupation codesets !", {
+                position: toast.POSITION.TOP_RIGHT
+            });
         }
     }, []);
     const loadRelationships = useCallback(async () => {
@@ -350,7 +362,9 @@ const UserRegistration = (props) => {
           const response = await axios.get(`${baseUrl}application-codesets/v2/RELATIONSHIP`, { headers: {"Authorization" : `Bearer ${token}`} });
           setRelationshipOptions(response.data);
       } catch (e) {
-          
+          toast.error("An error occured while fetching relationship codesets !", {
+              position: toast.POSITION.TOP_RIGHT
+          });
       }
     }, []);
     const loadTopLevelCountry = useCallback(async () => {
