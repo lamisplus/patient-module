@@ -9,8 +9,11 @@ import org.jetbrains.annotations.NotNull;
 import org.lamisplus.modules.base.controller.apierror.EntityNotFoundException;
 import org.lamisplus.modules.base.domain.entities.ApplicationCodeSet;
 import org.lamisplus.modules.base.domain.entities.OrganisationUnit;
+import org.lamisplus.modules.base.domain.entities.User;
 import org.lamisplus.modules.base.domain.repositories.ApplicationCodesetRepository;
 import org.lamisplus.modules.base.domain.repositories.OrganisationUnitRepository;
+import org.lamisplus.modules.base.service.MenuService;
+import org.lamisplus.modules.base.service.UserService;
 import org.lamisplus.modules.patient.domain.dto.*;
 import org.lamisplus.modules.patient.domain.entity.Encounter;
 import org.lamisplus.modules.patient.domain.entity.Person;
@@ -39,8 +42,15 @@ public class PersonService {
     private final VisitRepository visitRepository;
 
     private final EncounterRepository encounterRepository;
+    private final UserService userService;
+
+    private final MenuService menuService;
 
     public PersonResponseDto createPerson(PersonDto personDto) {
+        Optional<User> currentUser = userService.getUserWithRoles ();
+        if (currentUser.isPresent ()) {
+            log.info ("currentUser: " + currentUser.get ());
+        }
         Person person = getPersonFromDto (personDto);
         person.setUuid (UUID.randomUUID ().toString ());
         return getDtoFromPerson (personRepository.save (person));
@@ -59,16 +69,25 @@ public class PersonService {
 
 
     public List<PersonResponseDto> getAllPerson() {
+        Optional<User> currentUser = userService.getUserWithRoles ();
+        if (currentUser.isPresent ()) {
+            log.info ("currentUser: " + currentUser.get ());
+        }
         return personRepository.getAllByArchived (0)
                 .stream ()
                 .map (this::getDtoFromPerson)
                 .collect (Collectors.toList ());
     }
 
+    public Boolean isPersonExist(Long personId) {
+        Optional<Person> person = personRepository.findById (personId);
+        return person.isPresent ();
+    }
+
     public List<PersonResponseDto> getCheckedInPersonsByServiceCodeAndVisitId(String serviceCode) {
         List<Encounter> patientEncounters = encounterRepository.findAllByServiceCodeAndStatus (serviceCode, "PENDING");
         return patientEncounters.stream ()
-                .map (encounter -> encounter.getPerson ())
+                .map (Encounter::getPerson)
                 .map (this::getDtoFromPerson)
                 .collect (Collectors.toList ());
 
@@ -78,7 +97,7 @@ public class PersonService {
     public PersonResponseDto getPersonById(Long id) {
         Person person = personRepository
                 .findById (id)
-                .orElseThrow (() -> new EntityNotFoundException (PersonService.class, PERSON_NOT_FOUND_MESSAGE + id));
+                .orElseThrow (() -> new EntityNotFoundException (PersonService.class, "errorMessage", PERSON_NOT_FOUND_MESSAGE + id));
         return getDtoFromPerson (person);
     }
 
@@ -86,7 +105,7 @@ public class PersonService {
     public void deletePersonById(Long id) {
         Person person = personRepository
                 .findById (id)
-                .orElseThrow (() -> new EntityNotFoundException (PersonService.class, PERSON_NOT_FOUND_MESSAGE + id));
+                .orElseThrow (() -> new EntityNotFoundException (PersonService.class, "errorMessage", PERSON_NOT_FOUND_MESSAGE + id));
         person.setArchived (1);
         personRepository.save (person);
     }
@@ -203,7 +222,17 @@ public class PersonService {
         personResponseDto.setActive (person.getActive ());
         personResponseDto.setDeceasedDateTime (person.getDeceasedDateTime ());
         personResponseDto.setOrganization (person.getOrganization ());
+        personResponseDto.setBiometricStatus (getPatientBiometricStatus (person.getUuid ()));
         return personResponseDto;
+    }
+
+    Boolean getPatientBiometricStatus(String uuid) {
+        String moduleName = "BiometricModule";
+        if (! menuService.exist (moduleName)) {
+            return false;
+        }
+        Integer fingerCount = personRepository.getBiometricCountByPersonUuid (uuid);
+        return fingerCount > 0;
     }
 
 

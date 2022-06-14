@@ -53,6 +53,7 @@ function PatientCard(props) {
     const toggleModal = () => setModal(!modal)
 
     const [biometricStatus, setBiometricStatus] = useState(false);
+    const [devices, setDevices] = useState([]);
     useEffect(() => {         
         TemplateType();
       }, []);
@@ -65,6 +66,20 @@ function PatientCard(props) {
            .then((response) => {
                console.log(response.data);
                setBiometricStatus(response.data);
+               if(response.data===true){
+                axios
+                    .get(`${baseUrl}biometrics/devices`,
+                        { headers: {"Authorization" : `Bearer ${token}`} }
+                    )
+                    .then((response) => {
+                        setDevices(response.data);
+                        
+                    })
+                    .catch((error) => {
+                        console.log(error)
+                    });
+               
+                }
            })
            .catch((error) => {
            //console.log(error);
@@ -227,7 +242,18 @@ function PatientCard(props) {
                             </div>
                         </>
                         )
-                        :""
+                        :
+                        <>
+                            <div >
+                                <Typography variant="caption">
+                                    <Label color={"red"} size={"mini"}>
+                                        Biometric Not Install
+                                        
+                                    </Label>
+                                   
+                                </Typography>
+                            </div>
+                        </>
                     }
                 </AccordionDetails>
                 <Divider />
@@ -235,7 +261,7 @@ function PatientCard(props) {
 
                 </AccordionActions>
             </Accordion>
-            <CaptureBiometric modalstatus={modal} togglestatus={toggleModal} patientId={patientObj.id}/>
+            <CaptureBiometric modalstatus={modal} togglestatus={toggleModal} patientId={patientObj.id} biometricDevices={devices}/>
         </div>
     );
 }

@@ -2,7 +2,7 @@ package org.lamisplus.modules.patient.service;
 
 import lombok.RequiredArgsConstructor;
 import org.lamisplus.modules.base.controller.apierror.EntityNotFoundException;
-import org.lamisplus.modules.patient.controller.exception.AlreadyExistException;
+import org.lamisplus.modules.base.controller.apierror.RecordExistException;
 import org.lamisplus.modules.patient.domain.dto.CheckInDto;
 import org.lamisplus.modules.patient.domain.dto.VisitDetailDto;
 import org.lamisplus.modules.patient.domain.dto.VisitDto;
@@ -37,10 +37,10 @@ public class VisitService {
     public VisitDto createVisit(VisitDto visitDto) {
         Person person = personRepository
                 .findById (visitDto.getPersonId ())
-                .orElseThrow (() -> new EntityNotFoundException (VisitService.class, "No person found with id " + visitDto.getPersonId ()));
+                .orElseThrow (() -> new EntityNotFoundException (VisitService.class, "errorMessage", "No person found with id " + visitDto.getPersonId ()));
         Optional<Visit> currentVisit = visitRepository.findVisitByPersonAndVisitStartDateNotNullAndVisitEndDateIsNull (person);
         if (currentVisit.isPresent ())
-            throw new AlreadyExistException ("Visit Already exist for this patient " + person.getId ());
+            throw new RecordExistException (VisitService.class, "errorMessage", "Visit Already exist for this patient " + person.getId ());
         Visit visit = convertDtoToEntity (visitDto);
         visit.setUuid (UUID.randomUUID ().toString ());
         visit.setArchived (0);
@@ -93,14 +93,14 @@ public class VisitService {
         Long personId = checkInDto.getVisitDto ().getPersonId ();
         Person person = personRepository
                 .findById (personId)
-                .orElseThrow (() -> new EntityNotFoundException (VisitService.class, "No person found with id " + personId));
+                .orElseThrow (() -> new EntityNotFoundException (VisitService.class, "errorMessage", "No person found with id " + personId));
         VisitDto visitDto = createVisit (checkInDto.getVisitDto ());
         Visit visit = getExistVisit (visitDto.getId ());
         checkInDto.getServiceIds ()
                 .stream ()
                 .map (id -> patientCheckPostServiceRepository
                         .findById (id)
-                        .orElseThrow (() -> new EntityNotFoundException (VisitService.class, "No service found with Id " + id)))
+                        .orElseThrow (() -> new EntityNotFoundException (VisitService.class, "errorMessage", "No service found with Id " + id)))
                 .forEach (patientCheckPostService -> createEncounter (person, visit, patientCheckPostService.getModuleServiceCode ()));
         return visitDto;
     }
@@ -149,14 +149,14 @@ public class VisitService {
     private Visit getExistVisit(Long id) {
         return visitRepository
                 .findById (id)
-                .orElseThrow (() -> new EntityNotFoundException (VisitService.class, "No visit was found with given Id " + id));
+                .orElseThrow (() -> new EntityNotFoundException (VisitService.class, "errorMessage", "No visit was found with given Id " + id));
     }
 
 
     private Visit convertDtoToEntity(VisitDto visitDto) {
         Person person = personRepository
                 .findById (visitDto.getPersonId ())
-                .orElseThrow (() -> new EntityNotFoundException (VisitService.class, "No patient found with id " + visitDto.getPersonId ()));
+                .orElseThrow (() -> new EntityNotFoundException (VisitService.class, "errorMessage", "No patient found with id " + visitDto.getPersonId ()));
         Visit visit = new Visit ();
         BeanUtils.copyProperties (visitDto, visit);
         visit.setPerson (person);

@@ -25,10 +25,10 @@ import Button from '@mui/material/Button';
 import Fab from '@mui/material/Fab';
 import CheckIcon from '@mui/icons-material/Check';
 //import SaveIcon from '@mui/icons-material/Save';
-import LinearProgress from '@mui/material/LinearProgress';
+// import LinearProgress from '@mui/material/LinearProgress';
 import Typography from '@mui/material/Typography';
-import CancelIcon from '@mui/icons-material/Cancel';
-import ModalImage from "react-modal-image";
+// import CancelIcon from '@mui/icons-material/Cancel';
+// import ModalImage from "react-modal-image";
 
 const useStyles = makeStyles((theme) => ({
     card: {
@@ -68,12 +68,13 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-let capturedFingerList =[]
+
 const CaptureBiometric = (props) => {
     const classes = useStyles()
+    const biometricDevices = props.biometricDevices
     const [objValues, setObjValues]= useState({biometricType: "FINGERPRINT", patientId:props.patientId, templateType:"", device:""})
     const [fingerType, setFingerType] = useState([]);
-    const [devices, setDevices] = useState([]);
+    const [devices, setDevices] = useState(props.biometricDevices);
     const [loading, setLoading] = React.useState(false);
     const [showCapture, setshowCapture] = React.useState(false);
     const [tryAgain, setTryAgain] = React.useState(false);
@@ -81,8 +82,7 @@ const CaptureBiometric = (props) => {
     const [errors, setErrors] = useState({});
    // const [responseImage, setResponseImage] = useState("")
     const [capturedFingered, setCapturedFingered]= useState([])
-
-  
+    
     const buttonSx = {
       ...(success && {
         bgcolor: green[500],
@@ -92,12 +92,14 @@ const CaptureBiometric = (props) => {
       }),
     };
 
-    useEffect(() => {         
+
+    useEffect(() => {
+      
         TemplateType();
-        DeviceList();
         if(objValues.device===""){
             setshowCapture(false)
         }
+        
       }, []);
      //Get list of Finger index
      const TemplateType =()=>{
@@ -112,19 +114,7 @@ const CaptureBiometric = (props) => {
            });
        
      }
-     //gettting list of devices 
-     const DeviceList =()=>{
-        axios
-           .get(`${baseUrl}biometrics/devices`,
-               { headers: {"Authorization" : `Bearer ${token}`} }
-           )
-           .then((response) => {
-               setDevices(response.data);
-           })
-           .catch((error) => {
-           });
-       
-     }
+
      //check if device is plugged or not 
      const checkDevice = e =>{
         const deviceName =e.target.value;
@@ -163,7 +153,7 @@ const CaptureBiometric = (props) => {
     const captureFinger = (e) => {        
         e.preventDefault();
         if(validate()){
-            axios.post(`${baseUrl}biometrics/secugen/enrollment2?reader=SG_DEV_AUTO`,objValues,
+            axios.post(`${baseUrl}biometrics/secugen/enrollment?reader=SG_DEV_AUTO`,objValues,
             { headers: {"Authorization" : `Bearer ${token}`}},           
             )
               .then(response => {
@@ -171,24 +161,26 @@ const CaptureBiometric = (props) => {
                   if(response.data.type ==="ERROR"){                   
                     setLoading(false);
                     setTryAgain(true);
-                    // setResponseImage(window.URL.createObjectURL(new Blob(response.data.image, {type: "image/jpeg"})))                    
-                    // console.log(responseImage
-                    //setCapturedFingered([])
-                    toast.error(response.data.message.PATIENT_IDENTIFIED);
+                    window.setTimeout(() => {
+                        setTryAgain(false);
+                      }, 5000);
+                    toast.error(response.data.message.ERROR);
                   }else{
-                    
+                    const templateType= response.data.templateType
                     setTryAgain(false);
-                    setLoading(false);
-                    // window.setTimeout(() => {
-                    //   setTryAgain(false);
-                    // }, 1000);
+                    setSuccess(true)
+                    window.setTimeout(() => {
+                        setSuccess(false)
+                        setLoading(false);                        
+                      }, 5000);
+                                        
                     setCapturedFingered([...capturedFingered, response.data])
+                    fingerType.splice(templateType, 1);
+                    setFingerType([...fingerType]);
                   }
                   //toast.success("Record save successful");
-
               })
-              .catch(error => {
-                  
+              .catch(error => {                 
               });
         }
     }
@@ -197,7 +189,8 @@ const CaptureBiometric = (props) => {
     const saveBiometrics = (e) => {        
         e.preventDefault();
         if(capturedFingered.length > 1){
-            axios.post(`${baseUrl}biometrics/templates`,capturedFingered,
+            const capturedObj= capturedFingered[capturedFingered.length - 1]
+            axios.post(`${baseUrl}biometrics/templates`,capturedObj,
             { headers: {"Authorization" : `Bearer ${token}`}},           
             )
               .then(response => {
@@ -210,11 +203,11 @@ const CaptureBiometric = (props) => {
             });
         }else{
             
-            toast.error("You can't capture less than a finger");
+            toast.error("You can't save less than 2 finger");
         }
   }  
     
-  console.log(capturedFingered)
+ // console.log(capturedFingered)
 
     return (
         <div >
@@ -243,7 +236,7 @@ const CaptureBiometric = (props) => {
                                                     required
                                                 >
                                                 <option value="">Select Device </option>
-                                                {devices.map(({ id, name }) => (
+                                                {biometricDevices.map(({ id, name }) => (
                                                     <option key={id} value={name}>
                                                         {name}
                                                     </option>
@@ -306,16 +299,6 @@ const CaptureBiometric = (props) => {
                                         {/* <img width='500' height='200' src={responseImage}/> */}
                                         <Col sm="12" md={{ size: 6, offset: 3 }}>
                                        
-                                        {/* {loading && (
-                                        <>
-                                            
-                                            <Dimmer active inverted>
-                                                <Loader inverted size='huge' color="teal">Capturing Please wait...</Loader>
-                                            </Dimmer>
-                                            <br/><br/><br/>
-                                        </>
-                                        )
-                                        } */}
                                      {loading && (
                                         <>
                                          <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -342,7 +325,7 @@ const CaptureBiometric = (props) => {
                                                 )}
                                             </Box>
                                             <Typography variant="h6" gutterBottom component="div">
-                                                Please place your Left Index Finger on scanner.
+                                            {success ?` your  ${objValues.templateType} Finger captured.` : `Please place your  ${objValues.templateType} Finger on scanner.`}
                                             </Typography>
                                         </Box>
                                         </>

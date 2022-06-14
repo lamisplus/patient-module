@@ -20,7 +20,7 @@
     <properties>
         <java.version>1.8</java.version>
         <mapstruct.version>1.4.2.Final</mapstruct.version>
-        <org.projectlombok.version>1.16.4</org.projectlombok.version>
+        <org.projectlombok.version>1.18.4</org.projectlombok.version>
         <jjwt.version>0.11.2</jjwt.version>
         <build.revision>1.0.0</build.revision>
         <audit4j.version>2.5.0</audit4j.version>

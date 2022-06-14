@@ -16,7 +16,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/patient")
+@RequestMapping("api/v1/patient")
 public class PatientController {
 
     private final PersonService personService;
