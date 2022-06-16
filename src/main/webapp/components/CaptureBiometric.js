@@ -68,6 +68,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+let checkUrl=""
 
 const CaptureBiometric = (props) => {
     const classes = useStyles()
@@ -82,7 +83,7 @@ const CaptureBiometric = (props) => {
     const [errors, setErrors] = useState({});
    // const [responseImage, setResponseImage] = useState("")
     const [capturedFingered, setCapturedFingered]= useState([])
-    
+     console.log(biometricDevices)
     const buttonSx = {
       ...(success && {
         bgcolor: green[500],
@@ -93,8 +94,7 @@ const CaptureBiometric = (props) => {
     };
 
 
-    useEffect(() => {
-      
+    useEffect(() => {      
         TemplateType();
         if(objValues.device===""){
             setshowCapture(false)
@@ -118,9 +118,12 @@ const CaptureBiometric = (props) => {
      //check if device is plugged or not 
      const checkDevice = e =>{
         const deviceName =e.target.value;
+        const selectedDevice=biometricDevices.find((x)=> x.name ===deviceName )
+        checkUrl= selectedDevice.url===null? baseUrl : selectedDevice.url
+        console.log(checkUrl)
         setObjValues({...objValues, device:deviceName})
         axios
-           .get(`${baseUrl}biometrics/secugen/boot?reader=${deviceName}`,
+           .get(`${checkUrl}biometrics/secugen/boot?reader=${deviceName}`,
                { headers: {"Authorization" : `Bearer ${token}`} }
            )
            .then((response) => {
@@ -153,7 +156,7 @@ const CaptureBiometric = (props) => {
     const captureFinger = (e) => {        
         e.preventDefault();
         if(validate()){
-            axios.post(`${baseUrl}biometrics/secugen/enrollment?reader=SG_DEV_AUTO`,objValues,
+            axios.post(`${checkUrl}biometrics/secugen/enrollment?reader=SG_DEV_AUTO`,objValues,
             { headers: {"Authorization" : `Bearer ${token}`}},           
             )
               .then(response => {
