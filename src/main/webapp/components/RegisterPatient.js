@@ -21,7 +21,6 @@ import "react-widgets/dist/css/react-widgets.css";
 import {Link, useHistory, useLocation} from "react-router-dom";
 import {TiArrowBack} from 'react-icons/ti'
 import {useForm} from "react-hook-form";
-import { toast } from 'react-toastify';
 import {token, url as baseUrl } from "../../../api";
 
 library.add(faCheckSquare, faCoffee, faEdit, faTrash);
