@@ -74,11 +74,13 @@ public class Person extends PatientAuditEntity implements Serializable, Persista
 
     @Column(name = "other_name")
     private String otherName;
+    @Column(name = "hospital_number")
+    private String hospitalNumber;
     @Column(name = "is_date_of_birth_estimated")
     private Boolean isDateOfBirthEstimated;
 
     @Override
     public boolean isNew() {
-      return id == null;
+        return id == null;
     }
 }

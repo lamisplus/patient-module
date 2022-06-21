@@ -49,4 +49,6 @@ public class AsyncConfiguration implements AsyncConfigurer, SchedulingConfigurer
     public Executor scheduledTaskExecutor() {
         return Executors.newScheduledThreadPool (3);
     }
+
+
 }
