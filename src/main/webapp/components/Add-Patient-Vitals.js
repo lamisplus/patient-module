@@ -8,6 +8,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import {token, url as baseUrl} from "../../../api";
 
+
 const AddPatientVitals = () => {
     const { handleSubmit, control } = useForm();
     const onSubmit = async (data) => {

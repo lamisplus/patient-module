@@ -9,14 +9,15 @@ import { Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import Button from "@material-ui/core/Button";
 import 'react-toastify/dist/ReactToastify.css';
 import 'react-widgets/dist/css/react-widgets.css';
-import { FaUserPlus } from "react-icons/fa";
-import { MdDashboard, MdDeleteForever, MdModeEdit } from "react-icons/md";
+import {FaEye, FaUserPlus} from "react-icons/fa";
+import { MdDashboard, MdDeleteForever, MdModeEdit,MdPerson} from "react-icons/md";
 import {Menu,MenuList,MenuButton,MenuItem,} from "@reach/menu-button";
 import "@reach/menu-button/styles.css";
 import { ToastContainer } from "react-toastify";
 import { Label } from 'semantic-ui-react';
 import { makeStyles } from '@material-ui/core/styles';
 import "./patient.css";
+import SplitActionButton from './SplitActionButton';
 
 const useStyles = makeStyles(theme => ({
     card: {
@@ -61,6 +62,20 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
+const actionItems = [
+    {
+        name:'Patient Dashboard',
+        icon:<MdPerson size="20" />,
+    },
+    {
+        name:'Edit Patient',
+        icon:<MdModeEdit size="20" />,
+    },
+    {
+        name:'Delete Patient',
+        icon:<MdDeleteForever size="20"  />,
+    }
+]
 const SyncList = (props) => {
     const [patients, setPatients] = useState([]);
     const [loading, setLoading] = useState('');
@@ -130,6 +145,42 @@ const SyncList = (props) => {
         loadPatients();
     }, [loadPatients]);
 
+    function actionItems(row){
+       return  [
+           {
+               name:'View',
+               icon:<FaEye  size="22"/>,
+               to:{
+                   pathname: "/register-patient",
+                   state: { patientId : row.id }
+               }
+           },
+            {
+                name:'Patient Dashboard',
+                icon:<MdPerson size="20" color='rgb(4, 196, 217)' />,
+                to:{
+                    pathname: "/patient-dashboard",
+                    state: { patientObj: row }
+                }
+            },
+            {
+                name:'Edit Patient',
+                icon:<MdModeEdit size="20" color='rgb(4, 196, 217)' />,
+                to:{
+                    pathname: "/register-patient",
+                    state: { patientId : row.id }
+                }
+            },
+            {
+                name:'Delete Patient',
+                icon:<MdDeleteForever size="20" color='rgb(4, 196, 217)'  />,
+                to:{
+                    pathname: "/#",
+                    state: { patientObj: row }
+                }
+            }
+        ]
+    }
   return (
     <div>
         <ToastContainer autoClose={3000} hideProgressBar />
@@ -141,9 +192,10 @@ const SyncList = (props) => {
                         variant="contained"
                         color="primary"
                         className=" float-right mr-1"
-                        startIcon={<FaUserPlus size="10"/>}
+                        startIcon={<FaUserPlus size="25"/>}
+                        style={{backgroundColor:'rgb(4, 196, 217)'}}
                     >
-                        <span style={{ textTransform: "capitalize" }}>New Patient</span>
+                        <span style={{ textTransform: "capitalize", fontWeight:'bolder' }}>New Patient</span>
                     </Button>
                 </Link>
                 <br/><br/>
@@ -153,13 +205,13 @@ const SyncList = (props) => {
                     columns={[
                         {
                             title: "Patient Name",
-                            field: "name",
+                            field: "name", filtering: false
                         },
-                        { title: "Patient ID", field: "id" },
-                        { title: "Gender", field: "gender" },
+                        { title: "Patient ID", field: "id" , filtering: false},
+                        { title: "Gender", field: "gender", filtering: false },
                         { title: "Date Of Birth", field: "dateOfBirth", filtering: false },
                         { title: "Age", field: "age", filtering: false },
-                        { title: "Address", field: "address", filtering: false },
+                        /*{ title: "Address", field: "address", filtering: false },*/
                         { title: "Status", field: "status", filtering: false },
                         {title: "Actions", field: "actions", filtering: false },
                     ]}
@@ -175,14 +227,17 @@ const SyncList = (props) => {
                             row.dateOfBirth === "" )
                             ? 0
                             : calculate_age(row.dateOfBirth),
-                        address: getAddress(row.address),
-                        status: row.active ?
+                        /*address: getAddress(row.address),*/
+/*                        status: row.active ?
                             (<Label color="green" size="mini">active</Label>)
-                            : (<Label color="teal" size="mini">not-active</Label>),
+                            : (<Label color="teal" size="mini">not-active</Label>),*/
+                        status: row.active ?
+                            "Active"
+                            : "Not-Active",
                         actions:
                             <div>
-
-                                <Menu>
+                                <SplitActionButton actions={actionItems(row)} />
+{/*                                <Menu>
                                     <MenuButton style={{ backgroundColor:"#3F51B5", color:"#fff", border:"2px solid #3F51B5", borderRadius:"4px", }}>
                                         Actions <span aria-hidden>▾</span>
                                     </MenuButton>
@@ -220,7 +275,7 @@ const SyncList = (props) => {
                                             </Link>
                                         </MenuItem>
                                     </MenuList>
-                                </Menu>
+                                </Menu>*/}
                             </div>
                     }))}
 

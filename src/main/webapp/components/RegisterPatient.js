@@ -22,6 +22,7 @@ import {Link, useHistory, useLocation} from "react-router-dom";
 import {TiArrowBack} from 'react-icons/ti'
 import {useForm} from "react-hook-form";
 import {token, url as baseUrl} from "../../../api";
+import "./patient.css";
 
 library.add(faCheckSquare, faCoffee, faEdit, faTrash);
 
@@ -30,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
         margin: theme.spacing(20),
         display: "flex",
         flexDirection: "column",
-        alignItems: "center",
+        alignItems: "center"
     },
     form: {
         width: "100%", // Fix IE 11 issue.
@@ -489,6 +490,7 @@ const UserRegistration = (props) => {
                             variant="contained"
                             color="primary"
                             className=" float-right ms-1"
+                            style={{backgroundColor:'#04C4D9',fontWeight:"bolder"}}
                             startIcon={<TiArrowBack />}
                         >
                             <span style={{ textTransform: "capitalize" }}>Back </span>
@@ -499,7 +501,7 @@ const UserRegistration = (props) => {
                     <div className="col-xl-12 col-lg-12">
                         <Form onSubmit={handleSubmit(onSubmit, onError)}>
                             <div className="card">
-                                <div className="card-header">
+                                <div className="card-header" style={{backgroundColor:"#04C4D9",color:'#fff',fontWeight:'bolder'}}>
                                     <h5 className="card-title">{userDetail===null ? "Basic Information" : "Edit User Information"}</h5>
                                 </div>
 
@@ -516,6 +518,7 @@ const UserRegistration = (props) => {
                                                         id="dateOfRegistration"
                                                         max={today}
                                                         {...register("dateOfRegistration")}
+                                                        style={{border: "1px solid #04C4D9"}}
                                                     />
                                                     {errors.dateOfRegistration && <p>{errors.dateOfRegistration.message}</p>}
                                                 </FormGroup>
@@ -530,6 +533,7 @@ const UserRegistration = (props) => {
                                                         name="hospitalNumber"
                                                         id="hospitalNumber"
                                                         {...register("hospitalNumber")}
+                                                        style={{border: "1px solid #04C4D9"}}
                                                     />
                                                     {errors.hospitalNumber && <p>{errors.hospitalNumber.message}</p>}
                                                 </FormGroup>
@@ -546,6 +550,7 @@ const UserRegistration = (props) => {
                                                         name="firstName"
                                                         id="firstName"
                                                         {...register("firstName")}
+                                                        style={{border: "1px solid #04C4D9"}}
                                                     />
                                                     {errors.firstName && <p>{errors.firstName.message}</p>}
                                                 </FormGroup>
@@ -560,6 +565,7 @@ const UserRegistration = (props) => {
                                                         name="middleName"
                                                         id="middleName"
                                                         {...register("middleName")}
+                                                        style={{border: "1px solid #04C4D9"}}
                                                     />
                                                     {errors.middleName && <p>{errors.middleName.message}</p>}
                                                 </FormGroup>
@@ -574,6 +580,7 @@ const UserRegistration = (props) => {
                                                         name="lastName"
                                                         id="lastName"
                                                         {...register("lastName")}
+                                                        style={{border: "1px solid #04C4D9"}}
                                                     />
                                                     {errors.lastName && <p>{errors.lastName.message}</p>}
                                                 </FormGroup>
@@ -589,6 +596,7 @@ const UserRegistration = (props) => {
                                                         name="sex"
                                                         id="sex"
                                                         {...register("sex")}
+                                                        style={{border: "1px solid #04C4D9"}}
                                                     >
                                                         <option value={""}></option>
                                                         {genderRows}
@@ -605,6 +613,7 @@ const UserRegistration = (props) => {
                                                         name="employmentStatus"
                                                         id="employmentStatus"
                                                         {...register("employmentStatus")}
+                                                        style={{border: "1px solid #04C4D9"}}
                                                     >
                                                         <option value={""}></option>
                                                         {occupationRows}
@@ -621,6 +630,7 @@ const UserRegistration = (props) => {
                                                         name="highestQualification"
                                                         id="highestQualification"
                                                         {...register("highestQualification")}
+                                                        style={{border: "1px solid #04C4D9"}}
                                                     >
                                                         <option value={""}></option>
                                                         {educationRows}
@@ -639,6 +649,7 @@ const UserRegistration = (props) => {
                                                         name="maritalStatus"
                                                         id="maritalStatus"
                                                         {...register("maritalStatus")}
+                                                        style={{border: "1px solid #04C4D9"}}
                                                     >
                                                         <option value={""}></option>
                                                         {maritalStatusRows}
@@ -659,6 +670,7 @@ const UserRegistration = (props) => {
                                                                 defaultChecked
                                                                 {...register("dateOfBirth")}
                                                                 onChange={(e) => handleDateOfBirthChange(e)}
+                                                                style={{border: "1px solid #04C4D9"}}
                                                             /> Actual
                                                         </label>
                                                     </div>
@@ -670,6 +682,7 @@ const UserRegistration = (props) => {
                                                                 name="dateOfBirth"
                                                                 {...register("dateOfBirth")}
                                                                 onChange={(e) => handleDateOfBirthChange(e)}
+                                                                style={{border: "1px solid #04C4D9"}}
                                                             /> Estimated
                                                         </label>
                                                     </div>
@@ -687,6 +700,7 @@ const UserRegistration = (props) => {
                                                         max={today}
                                                         {...register("dob")}
                                                         onChange={(e) => handleDobChange(e)}
+                                                        style={{border: "1px solid #04C4D9"}}
                                                     />
                                                     {errors.dob && <p>{errors.dob.message}</p>}
                                                 </FormGroup>
@@ -703,6 +717,7 @@ const UserRegistration = (props) => {
                                                         {...register("age")}
                                                         disabled={ageDisabled}
                                                         onChange={(e) => handleAgeChange(e)}
+                                                        style={{border: "1px solid #04C4D9"}}
                                                     />
                                                 </FormGroup>
                                             </div>
@@ -712,7 +727,7 @@ const UserRegistration = (props) => {
                             </div>
 
                             <div className="card">
-                                <div className="card-header">
+                                <div className="card-header" style={{backgroundColor:"#04C4D9",color:'#fff',fontWeight:'bolder'}}>
                                     <h5 className="card-title">Contact Details</h5>
                                 </div>
 
@@ -728,6 +743,7 @@ const UserRegistration = (props) => {
                                                     id="pnumber"
                                                     {...register("pnumber")}
                                                     placeholder="(234)7099999999"
+                                                    style={{border: "1px solid #04C4D9"}}
                                                 />
                                                 {errors.pnumber && <p>{errors.pnumber.message}</p>}
                                             </FormGroup>
@@ -743,6 +759,7 @@ const UserRegistration = (props) => {
                                                     id="altPhoneNumber"
                                                     {...register("altPhonenumber")}
                                                     placeholder="(234)7099999999"
+                                                    style={{border: "1px solid #04C4D9"}}
                                                 />
                                                 {errors.altPhonenumber && <p>{errors.altPhonenumber.message}</p>}
                                             </FormGroup>
@@ -757,6 +774,7 @@ const UserRegistration = (props) => {
                                                     name="email"
                                                     id="email"
                                                     {...register("email")}
+                                                    style={{border: "1px solid #04C4D9"}}
                                                 />
                                                 {errors.email && <p>{errors.email.message}</p>}
                                             </FormGroup>
@@ -772,6 +790,7 @@ const UserRegistration = (props) => {
                                                     type="text"
                                                     name="country"
                                                     id="country"
+                                                    style={{border: "1px solid #04C4D9"}}
                                                     {...register("countryId")}
                                                     onChange={(e) => onCountryChange(e)}>
                                                     <option value={""}></option>
@@ -789,6 +808,7 @@ const UserRegistration = (props) => {
                                                     type="text"
                                                     name="stateId"
                                                     id="stateId"
+                                                    style={{border: "1px solid #04C4D9"}}
                                                     {...register("stateId")}
                                                     onChange={(e) => onStateChange(e)}>
                                                     <option value={""}></option>
@@ -805,6 +825,7 @@ const UserRegistration = (props) => {
                                                     type="text"
                                                     name="district"
                                                     id="district"
+                                                    style={{border: "1px solid #04C4D9"}}
                                                     {...register("district")}>
                                                     <option value={""}></option>
                                                     {districtRows}
@@ -822,6 +843,7 @@ const UserRegistration = (props) => {
                                                     type="text"
                                                     name="address"
                                                     id="address"
+                                                    style={{border: "1px solid #04C4D9"}}
                                                     {...register("address")}
                                                 />
                                                 {errors.address && <p>{errors.address.message}</p>}
@@ -836,6 +858,7 @@ const UserRegistration = (props) => {
                                                     type="text"
                                                     name="landmark"
                                                     id="landmark"
+                                                    style={{border: "1px solid #04C4D9"}}
                                                     {...register("landmark")}
                                                 />
                                                 {errors.landmark && <p>{errors.landmark.message}</p>}
@@ -846,7 +869,7 @@ const UserRegistration = (props) => {
                             </div>
 
                             <div className="card">
-                                <div className="card-header">
+                                <div className="card-header" style={{backgroundColor:"#04C4D9",color:'#fff',fontWeight:'bolder'}}>
                                     <h5 className="card-title">Relationship / Next Of Kin</h5>
                                 </div>
                                 <div className="card-body">
@@ -907,6 +930,7 @@ const UserRegistration = (props) => {
                                                                             className="form-control"
                                                                             name="relationshipType"
                                                                             id="relationshipType"
+                                                                            style={{border: "1px solid #04C4D9"}}
                                                                             {...register("relationshipType")}>
                                                                             <option value={""}></option>
                                                                             {relationshipRows}
@@ -923,6 +947,7 @@ const UserRegistration = (props) => {
                                                                             type="text"
                                                                             name="cfirstName"
                                                                             id="cfirstName"
+                                                                            style={{border: "1px solid #04C4D9"}}
                                                                             {...register("cfirstName")}
                                                                         />
                                                                         {errors.cfirstName && <p>{errors.cfirstName.message}</p>}
@@ -937,6 +962,7 @@ const UserRegistration = (props) => {
                                                                             type="text"
                                                                             name="cmiddleName"
                                                                             id="cmiddleName"
+                                                                            style={{border: "1px solid #04C4D9"}}
                                                                             {...register("cmiddleName")}
                                                                         />
                                                                         {errors.cmiddleName && <p>{errors.cmiddleName.message}</p>}
@@ -951,6 +977,7 @@ const UserRegistration = (props) => {
                                                                             type="text"
                                                                             name="clastName"
                                                                             id="clastName"
+                                                                            style={{border: "1px solid #04C4D9"}}
                                                                             {...register("clastName")}
                                                                         />
                                                                         {errors.clastName && <p>{errors.clastName.message}</p>}
@@ -967,6 +994,7 @@ const UserRegistration = (props) => {
                                                                             type="text"
                                                                             name="contactPhoneNumber"
                                                                             id="contactPhoneNumber"
+                                                                            style={{border: "1px solid #04C4D9"}}
                                                                             {...register("contactPhoneNumber")}
                                                                         />
                                                                         {errors.contactPhoneNumber && <p>{errors.contactPhoneNumber.message}</p>}
@@ -981,6 +1009,7 @@ const UserRegistration = (props) => {
                                                                             type="text"
                                                                             name="contactEmail"
                                                                             id="contactEmail"
+                                                                            style={{border: "1px solid #04C4D9"}}
                                                                             {...register("contactEmail")}
                                                                         />
                                                                         {errors.contactEmail && <p>{errors.contactEmail.message}</p>}
@@ -995,6 +1024,7 @@ const UserRegistration = (props) => {
                                                                             type="text"
                                                                             name="contactAddress"
                                                                             id="contactAddress"
+                                                                            style={{border: "1px solid #04C4D9"}}
                                                                             {...register("contactAddress")}
                                                                         />
                                                                         {errors.contactAddress && <p>{errors.contactAddress.message}</p>}
@@ -1042,6 +1072,7 @@ const UserRegistration = (props) => {
                                             className={classes.button}
                                             startIcon={<AddIcon />}
                                             onClick={handleAddRelative}
+                                            style={{backgroundColor:'#04C4D9',fontWeight:"bolder"}}
                                         >
                                             Add a Relative/Next Of Kin
                                         </MatButton>

@@ -32,8 +32,8 @@ const styles = theme => ({
         flexBasis: '20.33%',
     },
     helper: {
-        borderLeft: `2px solid ${theme.palette.divider}`,
-        padding: `${theme.spacing(1)}px ${theme.spacing(1) * 2}px`,
+        /*borderLeft: `2px solid ${theme.palette.divider}`,
+        padding: `${theme.spacing(1)}px ${theme.spacing(1) * 2}px`,*/
     },
     link: {
         color: theme.palette.primary.main,
@@ -88,47 +88,47 @@ function PatientCard(props) {
                         <Col md={11}>
                             <Row className={"mt-1"}>
                                 <Col md={12} className={classes.root2}>
-                                    <b style={{fontSize: "25px"}}>
+                                    <b style={{fontSize: "25px",color:'rgb(4, 196, 217)'}}>
                                         {patientObj.surname + ", " + patientObj.firstName + " " + patientObj.otherName}
                                     </b>
 
                                 </Col>
                                 <Col md={4} className={classes.root2}>
-                                    <span>
+                                    <span style={{fontWeight:'bolder'}}>
                                         {" "}
-                                        Hospital Number : <b>{getHospitalNumber(patientObj.identifier) }</b>
+                                        Hospital Number : <b style={{color:'rgb(4, 196, 217)'}}>{getHospitalNumber(patientObj.identifier) }</b>
                                     </span>
                                 </Col>
 
                                 <Col md={4} className={classes.root2}>
-                    <span>
-                        Date Of Birth : <b>{patientObj.dateOfBirth }</b>
-                    </span>
+                                    <span style={{fontWeight:'bolder'}}>
+                                        Date Of Birth : <b style={{color:'rgb(4, 196, 217)'}}>{patientObj.dateOfBirth }</b>
+                                    </span>
                                 </Col>
                                 <Col md={4} className={classes.root2}>
-                    <span>
-                        {" "}
-                        Age : <b>{calculate_age(patientObj.dateOfBirth) }</b>
-                    </span>
+                                    <span style={{fontWeight:'bolder'}}>
+                                        {" "}
+                                        Age : <b style={{color:'rgb(4, 196, 217)'}}>{calculate_age(patientObj.dateOfBirth) }</b>
+                                    </span>
                                 </Col>
                                 <Col md={4}>
-                    <span>
-                        {" "}
-                        Gender :{" "}
-                        <b>{patientObj.gender.display }</b>
-                    </span>
+                                    <span style={{fontWeight:'bolder'}}>
+                                        {" "}
+                                        Gender :{" "}
+                                        <b style={{color:'rgb(4, 196, 217)'}}>{patientObj.gender.display }</b>
+                                    </span>
                                 </Col>
                                 <Col md={4} className={classes.root2}>
-                    <span>
-                        {" "}
-                        Phone Number : <b>{getPhone(patientObj.contactPoint) }</b>
-                    </span>
+                                    <span style={{fontWeight:'bolder'}}>
+                                        {" "}
+                                        Phone Number : <b style={{color:'rgb(4, 196, 217)'}}>{getPhone(patientObj.contactPoint) }</b>
+                                    </span>
                                 </Col>
                                 <Col md={4} className={classes.root2}>
-                    <span>
-                        {" "}
-                        Address : <b>{getAddress(patientObj.address)} </b>
-                    </span>
+                                    <span style={{fontWeight:'bolder'}}>
+                                        {" "}
+                                        Address : <b style={{color:'rgb(4, 196, 217)'}}>{getAddress(patientObj.address)} </b>
+                                    </span>
                                 </Col>
 
                                
@@ -138,7 +138,7 @@ function PatientCard(props) {
 
                 </AccordionSummary>
                 <AccordionDetails className={classes.details}>
-                    <div className={classes.column} >
+{/*                    <div className={classes.column} >
                         <Button
                             color='red'
                             content='BloodType'
@@ -176,20 +176,21 @@ function PatientCard(props) {
                                 content: '74.5 in',
                             }}
                         />
-                    </div>
-                    <div className={classNames(classes.column, classes.helper)}>
+                    </div>*/}
+                    <div className={classNames( classes.helper)}>
                         <Typography variant="caption">
-                            <Label color={"red"} size={"mini"}>
+                            <Label color={"red"} size={"mini"} style={{fontSize:'12px'}}>
                                 Biometric Status
                                 <Label.Detail>Not Captured</Label.Detail>
                             </Label>
 
-                            <Label color={"green"} size={"mini"}>
+                            <Label color={"green"} size={"mini"} style={{fontSize:'12px'}}>
                                 Patient Status
                                 <Label.Detail>Active</Label.Detail>
                             </Label>
                         </Typography>
                     </div>
+
                 </AccordionDetails>
                 <Divider />
                 <AccordionActions>

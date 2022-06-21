@@ -286,7 +286,7 @@
                         <phase>generate-resources</phase>
                         <configuration>
                             <target>
-                                <copy todir="${project.build.directory}/classes/views/static/patient">
+                                <copy todir="${project.basedir}/classes/views/static/patient">
                                     <fileset dir="${project.basedir}/build"/>
                                 </copy>
                             </target>
