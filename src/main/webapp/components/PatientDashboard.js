@@ -87,19 +87,11 @@ const appointmentColumns = [
         width: 110,
         editable: true,
     },
-    {
-        field: 'fullName',
-        headerName: 'Full name',
-        description: 'This column has a value getter and is not sortable.',
-        sortable: false,
-        width: 160,
-        valueGetter: (params) =>
-            `${params.row.firstName || ''} ${params.row.lastName || ''}`,
-    },
+    
 ];
 
 const appointments = [
-    { id: 1, lastName: 'Snow', firstName: 'Jon', age: 35 },
+   // { id: 1, lastName: 'Snow', firstName: 'Jon', age: 35 },
 
 ];
 
@@ -110,6 +102,7 @@ function PatientDashboard(props) {
     let history = useHistory();
     const { classes } = props;
     const patientObj = history.location && history.location.state ? history.location.state.patientObj : {};
+    const permissions = history.location && history.location.state ? history.location.state.permissions : [];
     const { handleSubmit, control } = useForm();
     const [modal, setModal] = useState(false);
     const [checkinStatus, setCheckinStatus]= useState(false)
@@ -251,7 +244,9 @@ function PatientDashboard(props) {
                 />
                 </Tab.Pane>
         },
-        { menuItem: 'Appointments', render: () =>
+      
+        { menuItem: permissions.includes('view_patient_appointment') || permissions.includes("all_permission") ? 'Appointments' : "", render: () =>
+            permissions.includes('view_patient_appointment') || permissions.includes("all_permission") ?
                 <Tab.Pane>
                     <div style={{ height: 400, width: '100%' }}>
                         <DataGrid
@@ -264,7 +259,10 @@ function PatientDashboard(props) {
                         />
                     </div>
                 </Tab.Pane>
+            :""
         }
+        
+       
     ];
 
     const handleCheckIn = () => {
@@ -389,7 +387,7 @@ function PatientDashboard(props) {
             <Card>
                 <CardContent>
                     
-                    <PatientCardDetail patientObj={patientObj}/>
+                    <PatientCardDetail patientObj={patientObj} permissions={permissions}/>
                     <Card>
                         <CardContent>
                             <div className="row">
@@ -411,7 +409,9 @@ function PatientDashboard(props) {
                                             <span style={{ textTransform: "capitalize" }}>Back</span>
                                         </ButtonMui>
                                     </Link>
-                                    {checkinStatus===false ? (
+                                    {permissions.includes('patient_check_in') || permissions.includes("all_permission") ? (
+                                        <>
+                                        {checkinStatus===false ? (
                                         <Button
                                             variant="contained"
                                             style={{ backgroundColor: "black" }}
@@ -423,6 +423,10 @@ function PatientDashboard(props) {
                                     )
                                     :
                                     ""
+                                    }
+                                    </>
+                                    )
+                                    :""
                                     }
                                     {checkinStatus===true ? (
                                         <Button

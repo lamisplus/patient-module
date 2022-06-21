@@ -11,7 +11,7 @@ import {token, url as baseUrl} from "../../../api";
 const AddPatientVitals = () => {
     const { handleSubmit, control } = useForm();
     const onSubmit = async (data) => {
-        console.log(data);
+        //console.log(data);
         try {
             const InData = {
                 "bodyWeight": data.Weight,
