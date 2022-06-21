@@ -35,9 +35,12 @@
                 first_name                 VARCHAR(255),
                 surname                    VARCHAR(255),
                 other_name                 VARCHAR(255),
+                hospital_number            VARCHAR(255),
                 is_date_of_birth_estimated BOOLEAN,
                 CONSTRAINT pk_person PRIMARY KEY (id)
             );
+            ALTER TABLE person
+                ADD CONSTRAINT uc_person_hospital_number UNIQUE (hospital_number);
             ALTER TABLE person
                 ADD CONSTRAINT uc_person_uuid UNIQUE (uuid);
         </sql>

@@ -47,14 +47,20 @@ public class PersonService {
     private final MenuService menuService;
 
     public PersonResponseDto createPerson(PersonDto personDto) {
+        Person person = getPersonFromDto (personDto);
         Optional<User> currentUser = userService.getUserWithRoles ();
         if (currentUser.isPresent ()) {
             log.info ("currentUser: " + currentUser.get ());
+            User user = currentUser.get ();
+            Long currentOrganisationUnitId = user.getCurrentOrganisationUnitId ();
+            person.setFacilityId (currentOrganisationUnitId);
         }
-        Person person = getPersonFromDto (personDto);
+        String hospitalNumber = getHospitalNumber (personDto);
+        person.setHospitalNumber (hospitalNumber);
         person.setUuid (UUID.randomUUID ().toString ());
         return getDtoFromPerson (personRepository.save (person));
     }
+
 
     public PersonResponseDto updatePerson(Long id, PersonDto personDto) {
         Person existPerson = personRepository
@@ -69,10 +75,6 @@ public class PersonService {
 
 
     public List<PersonResponseDto> getAllPerson() {
-        Optional<User> currentUser = userService.getUserWithRoles ();
-        if (currentUser.isPresent ()) {
-            log.info ("currentUser: " + currentUser.get ());
-        }
         return personRepository.getAllByArchived (0)
                 .stream ()
                 .map (this::getDtoFromPerson)
@@ -110,6 +112,19 @@ public class PersonService {
         personRepository.save (person);
     }
 
+    private String getHospitalNumber(PersonDto personDto) {
+        List<IdentifierDto> identifier = personDto.getIdentifier ();
+        if (! identifier.isEmpty ()) {
+            IdentifierDto identifierDto = identifier.get (0);
+            String type = identifierDto.getType ();
+            if (type.equals ("HospitalNumber")) {
+                String hospitalNumber = identifierDto.getValue ();
+                log.info ("hospitalNumber {} ", hospitalNumber);
+                return hospitalNumber;
+            }
+        }
+        return null;
+    }
 
     @NotNull
     private Person getPersonFromDto(PersonDto personDto) {
