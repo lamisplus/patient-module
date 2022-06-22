@@ -1,13 +1,15 @@
-import React from 'react';
+import React,{useState, useEffect} from 'react';
 import PropTypes from 'prop-types';
 import {withStyles} from '@material-ui/core/styles';
-import classNames from 'classnames';
 import {Accordion, AccordionActions, AccordionDetails, AccordionSummary} from '@material-ui/core';
 import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
 import {Button, Label} from 'semantic-ui-react';
 import 'semantic-ui-css/semantic.min.css';
-import {Col, Row} from "reactstrap";
+import {Col, Row, Modal} from "reactstrap";
+import CaptureBiometric from './CaptureBiometric';
+import axios from "axios";
+import {token, url as baseUrl} from "../../../api";
 
 const styles = theme => ({
     root: {
@@ -47,7 +49,45 @@ const styles = theme => ({
 function PatientCard(props) {
     const { classes } = props;
     const patientObj = props.patientObj ? props.patientObj : {};
+    const permissions= props.permissions ? props.permissions : [];
+    const [modal, setModal] = useState(false) //Modal to collect sample 
+    const [patientBiometricStatus, setPatientBiometricStatus]= useState(props.patientObj.biometricStatus);
+    const toggleModal = () => setModal(!modal)
 
+    const [biometricStatus, setBiometricStatus] = useState(false);
+    const [devices, setDevices] = useState([]);
+    useEffect(() => {         
+        TemplateType();
+      }, []);
+     //Get list of KP
+     const TemplateType =()=>{
+        axios
+           .get(`${baseUrl}modules/check?moduleName=biometric`,
+               { headers: {"Authorization" : `Bearer ${token}`} }
+           )
+           .then((response) => {
+               console.log(response.data);
+               setBiometricStatus(response.data);
+               if(response.data===true){
+                axios
+                    .get(`${baseUrl}biometrics/devices`,
+                        { headers: {"Authorization" : `Bearer ${token}`} }
+                    )
+                    .then((response) => {
+                        setDevices(response.data);
+                        
+                    })
+                    .catch((error) => {
+                        console.log(error)
+                    });
+               
+                }
+           })
+           .catch((error) => {
+           //console.log(error);
+           });
+       
+     }
     const getHospitalNumber = (identifier) => {
         const hospitalNumber = identifier.identifier.find(obj => obj.type == 'HospitalNumber');
         return hospitalNumber ? hospitalNumber.value : '';
@@ -78,6 +118,12 @@ function PatientCard(props) {
         return city;
     };
 
+
+    const handleBiometricCapture = (id) => { 
+        let patientObjID= id
+        setModal(!modal) 
+    }
+
     return (
         <div className={classes.root}>
             <Accordion defaultExpanded>
@@ -101,6 +147,7 @@ function PatientCard(props) {
                                 </Col>
 
                                 <Col md={4} className={classes.root2}>
+<<<<<<< HEAD
                                     <span style={{fontWeight:'bolder'}}>
                                         Date Of Birth : <b style={{color:'rgb(4, 196, 217)'}}>{patientObj.dateOfBirth }</b>
                                     </span>
@@ -129,8 +176,41 @@ function PatientCard(props) {
                                         {" "}
                                         Address : <b style={{color:'rgb(4, 196, 217)'}}>{getAddress(patientObj.address)} </b>
                                     </span>
+                                    <span>
+                                        Date Of Birth : <b>{patientObj.dateOfBirth }</b>
+                                    </span>
                                 </Col>
-
+                                <Col md={4} className={classes.root2}>
+                                <span>
+                                    {" "}
+                                    Age : <b>{calculate_age(patientObj.dateOfBirth) }</b>
+                                </span>
+                                </Col>
+                                <Col md={4}>
+                                <span>
+                                    {" "}
+                                    Gender :{" "}
+                                    <b>{patientObj.gender.display }</b>
+                                </span>
+                                <Label color={"green"} size={"mini"}>
+                                    Patient Status
+                                <Label.Detail>Active</Label.Detail>
+                                </Label>
+                                </Col>
+                                <Col md={4} className={classes.root2}>
+                                <span>
+                                    {" "}
+                                    Phone Number : <b>{getPhone(patientObj.contactPoint) }</b>
+                                </span>
+                                </Col>
+                                <Col md={4} className={classes.root2}>
+                                <span>
+                                    {" "}
+                                    Address : <b>{getAddress(patientObj.address)} </b>
+                                </span>
+                                
+                                </Col>
+                                
                                
                             </Row>
                         </Col>
@@ -191,13 +271,14 @@ function PatientCard(props) {
                         </Typography>
                     </div>
 
+>>>>>>> master
                 </AccordionDetails>
                 <Divider />
                 <AccordionActions>
 
                 </AccordionActions>
             </Accordion>
-
+            <CaptureBiometric modalstatus={modal} togglestatus={toggleModal} patientId={patientObj.id} biometricDevices={devices} setPatientBiometricStatus={setPatientBiometricStatus} />
         </div>
     );
 }

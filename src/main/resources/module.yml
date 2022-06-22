@@ -13,3 +13,19 @@ webModules:
     name: PatientModule
     path: patient
     position: 99
+permissions:
+  - name: create_patient
+    description: create patient
+    moduleName: PatientModule
+  - name: view_patient
+    description: view patient
+    moduleName: PatientModule
+  - name: delete_patient
+    description: delete patient
+    moduleName: PatientModule
+  - name: patient_check_in
+    description: patient check in
+    moduleName: PatientModule
+  - name: create_patient_appointment
+    description: create patient appointment
+    moduleName: PatientModule
