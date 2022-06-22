@@ -16,7 +16,9 @@ import { ToastContainer } from "react-toastify";
 import { Label } from 'semantic-ui-react';
 import { makeStyles } from '@material-ui/core/styles';
 import "./patient.css";
+<<<<<<< HEAD
 import SplitActionButton from './SplitActionButton';
+=======
 import { forwardRef } from 'react';
 //import { Button} from "react-bootstrap";
 import AddBox from '@material-ui/icons/AddBox';
@@ -54,6 +56,7 @@ SortArrow: forwardRef((props, ref) => <ArrowUpward {...props} ref={ref} />),
 ThirdStateCheck: forwardRef((props, ref) => <Remove {...props} ref={ref} />),
 ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />)
 };
+>>>>>>> master
 
 const useStyles = makeStyles(theme => ({
     card: {
@@ -114,8 +117,10 @@ const actionItems = [
     }
 ]
 const SyncList = (props) => {
+=======
 
 const PatientList = (props) => {
+>>>>>>> master
     const [patients, setPatients] = useState([]);
     const [permissions, setPermissions] = useState([]);
     const [loading, setLoading] = useState('');

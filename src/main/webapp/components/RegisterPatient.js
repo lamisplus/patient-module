@@ -24,6 +24,7 @@ import {useForm} from "react-hook-form";
 <<<<<<< HEAD
 import {token, url as baseUrl} from "../../../api";
 import "./patient.css";
+=======
 import {token, url as baseUrl } from "../../../api";
 >>>>>>> master
 

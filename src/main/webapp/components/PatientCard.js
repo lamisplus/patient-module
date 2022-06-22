@@ -176,6 +176,7 @@ function PatientCard(props) {
                                         {" "}
                                         Address : <b style={{color:'rgb(4, 196, 217)'}}>{getAddress(patientObj.address)} </b>
                                     </span>
+=======
                                     <span>
                                         Date Of Birth : <b>{patientObj.dateOfBirth }</b>
                                     </span>
@@ -209,6 +210,7 @@ function PatientCard(props) {
                                     Address : <b>{getAddress(patientObj.address)} </b>
                                 </span>
                                 
+>>>>>>> master
                                 </Col>
                                 
                                
@@ -256,6 +258,7 @@ function PatientCard(props) {
                                 content: '74.5 in',
                             }}
                         />
+<<<<<<< HEAD
                     </div>*/}
                     <div className={classNames( classes.helper)}>
                         <Typography variant="caption">
@@ -271,6 +274,50 @@ function PatientCard(props) {
                         </Typography>
                     </div>
 
+=======
+                    </div>
+                    {biometricStatus===true ? (
+                        <>
+                            <div >
+                                <Typography variant="caption">
+                                    <Label color={patientBiometricStatus===true? "green" : "red"} size={"mini"}>
+                                        Biometric Status
+                                        <Label.Detail>{patientBiometricStatus===true? "Captured" : "Not Capture"}</Label.Detail>
+                                    </Label>
+                                    {patientBiometricStatus!==true ? (
+                                   
+                                        <>
+                                             {permissions.includes('patient_check_in') || permissions.includes("all_permission") ? (
+                                                <>
+                                                <Label as='a' color='teal' onClick={() => handleBiometricCapture(patientObj.id)} tag>
+                                                    Capture Now
+                                                </Label>
+                                                </>
+                                            )
+                                            :""
+                                            }
+                                        </>
+                                    )
+                                    :""
+                                    }
+                                    
+                                </Typography>
+                            </div>
+                        </>
+                        )
+                        :
+                        <>
+                            <div >
+                                <Typography variant="caption">
+                                    <Label color={"red"} size={"mini"}>
+                                        Biometric Not Install
+                                        
+                                    </Label>
+                                   
+                                </Typography>
+                            </div>
+                        </>
+                    }
 >>>>>>> master
                 </AccordionDetails>
                 <Divider />
