@@ -34,7 +34,8 @@ application-debug.log
 build/
 !**/src/main/**/build/
 !**/src/test/**/build/
-/build
-/static/static
+/build/*
+/src/main/resources/static/*
+/classes/*
 ### VS Code ###
 .vscode/
