@@ -21,12 +21,8 @@ import "react-widgets/dist/css/react-widgets.css";
 import {Link, useHistory, useLocation} from "react-router-dom";
 import {TiArrowBack} from 'react-icons/ti'
 import {useForm} from "react-hook-form";
-<<<<<<< HEAD
-import {token, url as baseUrl} from "../../../api";
-import "./patient.css";
-=======
 import {token, url as baseUrl } from "../../../api";
->>>>>>> master
+
 
 library.add(faCheckSquare, faCoffee, faEdit, faTrash);
 

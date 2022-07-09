@@ -2,7 +2,7 @@ basePackage: org.lamisplus.modules.patient
 name: PatientModule
 store: true
 menus:
-  - icon:
+  - icon: fa-solid fa-hospital-user
     disabled: false
     name: Patient
     state: patient

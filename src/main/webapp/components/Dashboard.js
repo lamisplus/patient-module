@@ -16,9 +16,8 @@ import { ToastContainer } from "react-toastify";
 import { Label } from 'semantic-ui-react';
 import { makeStyles } from '@material-ui/core/styles';
 import "./patient.css";
-<<<<<<< HEAD
 import SplitActionButton from './SplitActionButton';
-=======
+
 import { forwardRef } from 'react';
 //import { Button} from "react-bootstrap";
 import AddBox from '@material-ui/icons/AddBox';
@@ -56,7 +55,7 @@ SortArrow: forwardRef((props, ref) => <ArrowUpward {...props} ref={ref} />),
 ThirdStateCheck: forwardRef((props, ref) => <Remove {...props} ref={ref} />),
 ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />)
 };
->>>>>>> master
+
 
 const useStyles = makeStyles(theme => ({
     card: {
@@ -101,26 +100,10 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-<<<<<<< HEAD
-const actionItems = [
-    {
-        name:'Patient Dashboard',
-        icon:<MdPerson size="20" />,
-    },
-    {
-        name:'Edit Patient',
-        icon:<MdModeEdit size="20" />,
-    },
-    {
-        name:'Delete Patient',
-        icon:<MdDeleteForever size="20"  />,
-    }
-]
-const SyncList = (props) => {
-=======
+
 
 const PatientList = (props) => {
->>>>>>> master
+
     const [patients, setPatients] = useState([]);
     const [permissions, setPermissions] = useState([]);
     const [loading, setLoading] = useState('');
@@ -131,8 +114,8 @@ const PatientList = (props) => {
         setPatient(patient);
         setModal(!modal);
     }
-    useEffect(() => {      
-        userPermission();        
+    useEffect(() => {
+        userPermission();
       }, []);
     //Get list of Finger index
     const userPermission =()=>{
@@ -142,11 +125,11 @@ const PatientList = (props) => {
            )
            .then((response) => {
                 setPermissions(response.data.permissions);
-      
+
            })
            .catch((error) => {
            });
-       
+
      }
     const loadPatients = useCallback(async () => {
         try {
@@ -186,7 +169,7 @@ const PatientList = (props) => {
         }
         return age_now + " year(s)";
     };
-    
+
     const getHospitalNumber = (identifier) => {
         const hospitalNumber = identifier.identifier.find(obj => obj.type == 'HospitalNumber');
         return hospitalNumber ? hospitalNumber.value : '';
@@ -206,7 +189,6 @@ const PatientList = (props) => {
     }, [loadPatients]);
     console.log(permissions)
 console.log(permissions.includes( "all_permission"))
-
     function actionItems(row){
        return  [
            {
@@ -214,33 +196,39 @@ console.log(permissions.includes( "all_permission"))
                icon:<FaEye  size="22"/>,
                to:{
                    pathname: "/register-patient",
-                   state: { patientId : row.id }
+                   state: { patientId : row.id, permissions:permissions  }
                }
            },
-            {
-                name:'Patient Dashboard',
-                icon:<MdPerson size="20" color='rgb(4, 196, 217)' />,
-                to:{
-                    pathname: "/patient-dashboard",
-                    state: { patientObj: row }
-                }
-            },
-            {
-                name:'Edit Patient',
-                icon:<MdModeEdit size="20" color='rgb(4, 196, 217)' />,
-                to:{
-                    pathname: "/register-patient",
-                    state: { patientId : row.id }
-                }
-            },
-            {
-                name:'Delete Patient',
-                icon:<MdDeleteForever size="20" color='rgb(4, 196, 217)'  />,
-                to:{
-                    pathname: "/#",
-                    state: { patientObj: row }
-                }
-            }
+           {...(permissions.includes('view_patient') || permissions.includes("all_permission")&&
+                   {
+                       name:'Patient Dashboard',
+                       icon:<MdPerson size="20" color='rgb(4, 196, 217)' />,
+                       to:{
+                           pathname: "/patient-dashboard",
+                           state: { patientObj: row, permissions:permissions  }
+                       }
+                   }
+           )},
+           {...(permissions.includes('edit_patient') || permissions.includes("all_permission")&&
+                   {
+                       name:'Edit Patient',
+                       icon:<MdModeEdit size="20" color='rgb(4, 196, 217)' />,
+                       to:{
+                           pathname: "/register-patient",
+                           state: { patientId : row.id, permissions:permissions  }
+                       }
+                   }
+               )},
+           {...(permissions.includes('delete_patient') || permissions.includes("all_permission")&&
+                   {
+                       name:'Delete Patient',
+                       icon:<MdDeleteForever size="20" color='rgb(4, 196, 217)'  />,
+                       to:{
+                           pathname: "/#",
+                           state: { patientObj: row, permissions:permissions  }
+                       }
+                   }
+               )}
         ]
     }
   return (
@@ -301,12 +289,16 @@ console.log(permissions.includes( "all_permission"))
                             : "Not-Active",
                         actions:
                             <div>
-                                <SplitActionButton actions={actionItems(row)} />
+                                {permissions.includes('view_patient') || permissions.includes("all_permission") ? (
+                                    <SplitActionButton actions={actionItems(row)} />
+                                ):""
+                                }
+
 {/*                                <Menu>
                                     <MenuButton style={{ backgroundColor:"#3F51B5", color:"#fff", border:"2px solid #3F51B5", borderRadius:"4px", }}>
                                         Actions <span aria-hidden>▾</span>
                                     </MenuButton>
-                                   
+
                                     <MenuList className={'menuClass'} >
                                     {permissions.includes('view_patient') || permissions.includes("all_permission") ? (
                                         <MenuItem  style={{ color:"#000 !important"}}>
