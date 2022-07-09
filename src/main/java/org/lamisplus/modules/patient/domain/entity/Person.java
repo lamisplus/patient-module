@@ -12,7 +12,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "person")
+@Table(name = "patient_person")
 @Data
 @NoArgsConstructor
 public class Person extends PatientAuditEntity implements Serializable, Persistable<Long> {

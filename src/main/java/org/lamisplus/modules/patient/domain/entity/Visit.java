@@ -8,7 +8,7 @@ import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "visit")
+@Table(name = "patient_visit")
 @NoArgsConstructor
 @Setter
 @Getter
