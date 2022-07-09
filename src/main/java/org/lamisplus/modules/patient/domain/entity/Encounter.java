@@ -26,7 +26,7 @@ public class Encounter extends PatientAuditEntity implements Persistable<Long> {
     private LocalDate encounterDate;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "person_id", nullable = false)
+    @JoinColumn(name = "person_uuid", nullable = false, referencedColumnName = "uuid")
     private Person person;
 
     @Column(name = "uuid", updatable = false, nullable = false)

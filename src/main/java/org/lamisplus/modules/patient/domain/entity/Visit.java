@@ -22,7 +22,7 @@ public class Visit extends PatientAuditEntity implements Persistable<Long> {
     private Long id;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "person_id", nullable = false)
+    @JoinColumn(name = "person_uuid", nullable = false, referencedColumnName = "uuid")
     private Person person;
 
     @PastOrPresent
