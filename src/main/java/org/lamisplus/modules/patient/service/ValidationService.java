@@ -9,6 +9,7 @@ import org.lamisplus.modules.patient.repository.PersonRepository;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -33,5 +34,10 @@ public class ValidationService {
         return CompletableFuture.completedFuture (false);
     }
 
+    @Async("taskExecutor")
+    public CompletableFuture<Boolean> isRegistrationDateBeforeDateOfBirth(LocalDate registrationDate, LocalDate birthDate) {
+        if (registrationDate.isBefore (birthDate)) CompletableFuture.completedFuture (true);
+        return CompletableFuture.completedFuture (false);
+    }
 
 }
