@@ -226,8 +226,10 @@ function PatientDashboard(props) {
 
                         options={{
                             headerStyle: {
-                                backgroundColor: "#000",
+                                backgroundColor: "rgb(4, 196, 217)",
                                 color: "#ffffff",
+                                fontSize:'14px',
+                                fontWeight:'bold'
                             },
                             search: true,
                             // searchFieldStyle: {
@@ -405,6 +407,7 @@ function PatientDashboard(props) {
                                         <ButtonMui
                                             variant="contained"
                                             color="primary"
+                                            style={{ fontSize:'14PX', fontWeight:'bold' }}
                                             className=" float-right mr-1">
                                             <span style={{ textTransform: "capitalize" }}>Back</span>
                                         </ButtonMui>
@@ -414,7 +417,7 @@ function PatientDashboard(props) {
                                                 {checkinStatus===false ? (
                                                         <Button
                                                             variant="contained"
-                                                            style={{ backgroundColor: "black" }}
+                                                            style={{ backgroundColor: "rgb(4, 196, 217)", fontSize:'14PX', fontWeight:'bold' }}
                                                             onClick={handleCheckIn}
                                                             className=" float-right mr-1"
                                                         >
@@ -431,11 +434,11 @@ function PatientDashboard(props) {
                                     {checkinStatus===true ? (
                                             <Button
                                                 variant="contained"
-                                                style={{ backgroundColor: "black" }}
+                                                style={{ backgroundColor: "#992E62", fontSize:'14PX', fontWeight:'bold' }}
                                                 onClick={handleCheckOut}
                                                 className=" float-right mr-1"
                                             >
-                                                <span style={{ textTransform: "capitalize" }}>CheckOut</span>
+                                                <span style={{ textTransform: "capitalize" }}>Check Out</span>
                                             </Button>
                                         )
                                         :
@@ -505,7 +508,7 @@ function PatientDashboard(props) {
             </Modal>
             {/* Modal for CheckOut Patient */}
             <Modal isOpen={modalCheckOut} toggle={onCancelCheckOut}>
-                <ModalHeader toggle={onCancelCheckOut}>CheckOut </ModalHeader>
+                <ModalHeader toggle={onCancelCheckOut}>Check Out </ModalHeader>
                 <ModalBody>
                     <form >
                         <Paper

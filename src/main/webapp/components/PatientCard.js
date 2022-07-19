@@ -133,48 +133,48 @@ function PatientCard(props) {
 
                         <Col md={11}>
                             <Row className={"mt-1"}>
-                                <Col md={12} className={classes.root2}>
+                                <Col md={12} className={classes.root2} >
                                     <b style={{fontSize: "25px"}}>
                                         {patientObj.surname + ", " + patientObj.firstName + " " + patientObj.otherName}
+                                        < span style={{color:'green'}}>
+                                             {": "+"Active"}
+                                        </span>
                                     </b>
 
                                 </Col>
-                                <Col md={4} className={classes.root2}>
+                                <Col md={4} className={classes.root2} style={{marginTop:"10px"}}>
                                     <span>
                                         {" "}
                                         Hospital Number : <b>{getHospitalNumber(patientObj.identifier) }</b>
                                     </span>
                                 </Col>
 
-                                <Col md={4} className={classes.root2}>
+                                <Col md={4} className={classes.root2} style={{marginTop:"10px"}}>
                                     <span>
                                         Date Of Birth : <b>{patientObj.dateOfBirth }</b>
                                     </span>
                                 </Col>
-                                <Col md={4} className={classes.root2}>
+                                <Col md={4} className={classes.root2} style={{marginTop:"10px"}}>
                                 <span>
                                     {" "}
                                     Age : <b>{calculate_age(patientObj.dateOfBirth) }</b>
                                 </span>
                                 </Col>
-                                <Col md={4}>
-                                <span>
-                                    {" "}
-                                    Gender :{" "}
-                                    <b>{patientObj.gender.display }</b>
-                                </span>
-                                    <Label color={"green"} size={"mini"}>
-                                        Patient Status
-                                        <Label.Detail>Active</Label.Detail>
-                                    </Label>
+                                <Col md={4} style={{marginTop:"10px"}}>
+                                    <span>
+                                        {" "}
+                                        Gender :{" "}
+                                        <b>{patientObj.gender.display }</b>
+                                    </span>
+
                                 </Col>
-                                <Col md={4} className={classes.root2}>
+                                <Col md={4} className={classes.root2} style={{marginTop:"10px"}}>
                                 <span>
                                     {" "}
                                     Phone Number : <b>{getPhone(patientObj.contactPoint) }</b>
                                 </span>
                                 </Col>
-                                <Col md={4} className={classes.root2}>
+                                <Col md={4} className={classes.root2} style={{marginTop:"10px"}}>
                                 <span>
                                     {" "}
                                     Address : <b>{getAddress(patientObj.address)} </b>
@@ -189,7 +189,7 @@ function PatientCard(props) {
 
                 </AccordionSummary>
                 <AccordionDetails className={classes.details}>
-                    <div className={classes.column} >
+{/*                    <div className={classes.column} >
                         <Button
                             color='red'
                             content='BloodType'
@@ -227,12 +227,12 @@ function PatientCard(props) {
                                 content: '74.5 in',
                             }}
                         />
-                    </div>
+                    </div>*/}
                     {biometricStatus===true ? (
                             <>
                                 <div >
                                     <Typography variant="caption">
-                                        <Label color={patientBiometricStatus===true? "green" : "red"} size={"mini"}>
+                                        <Label  style={{height:'30px', fontSize:'14px'}} color={patientBiometricStatus===true? "green" : "red"} size={"large"}>
                                             Biometric Status
                                             <Label.Detail>{patientBiometricStatus===true? "Captured" : "Not Capture"}</Label.Detail>
                                         </Label>
@@ -241,7 +241,7 @@ function PatientCard(props) {
                                                 <>
                                                     {permissions.includes('patient_check_in') || permissions.includes("all_permission") ? (
                                                             <>
-                                                                <Label as='a' color='teal' onClick={() => handleBiometricCapture(patientObj.id)} tag>
+                                                                <Label style={{height:'30px', fontSize:'14px'}} as='a' color='teal' onClick={() => handleBiometricCapture(patientObj.id)} tag>
                                                                     Capture Now
                                                                 </Label>
                                                             </>
@@ -261,7 +261,7 @@ function PatientCard(props) {
                         <>
                             <div >
                                 <Typography variant="caption">
-                                    <Label color={"red"} size={"mini"}>
+                                    <Label color={"red"} style={{height:'30px', fontSize:'14px'}}>
                                         Biometric Not Install
 
                                     </Label>
@@ -276,7 +276,8 @@ function PatientCard(props) {
 
                 </AccordionActions>
             </Accordion>
-            <CaptureBiometric modalstatus={modal} togglestatus={toggleModal} patientId={patientObj.id} biometricDevices={devices} setPatientBiometricStatus={setPatientBiometricStatus} />
+            <CaptureBiometric  modalstatus={modal} togglestatus={toggleModal} patientId={patientObj.id} biometricDevices={devices} setPatientBiometricStatus={setPatientBiometricStatus} />
+
         </div>
     );
 }
