@@ -20,3 +20,7 @@ p::before {
   display: inline;
   content: "⚠ ";
 }
+span {
+  text-decoration: none !important;
+  display: inline-block;
+}

@@ -193,6 +193,7 @@ console.log(permissions.includes( "all_permission"))
        return  [
            {
                name:'View',
+               type:'link',
                icon:<FaEye  size="22"/>,
                to:{
                    pathname: "/register-patient",
@@ -202,6 +203,7 @@ console.log(permissions.includes( "all_permission"))
            {...(permissions.includes('view_patient') || permissions.includes("all_permission")&&
                    {
                        name:'Patient Dashboard',
+                       type:'link',
                        icon:<MdPerson size="20" color='rgb(4, 196, 217)' />,
                        to:{
                            pathname: "/patient-dashboard",
@@ -212,6 +214,7 @@ console.log(permissions.includes( "all_permission"))
            {...(permissions.includes('edit_patient') || permissions.includes("all_permission")&&
                    {
                        name:'Edit Patient',
+                       type:'link',
                        icon:<MdModeEdit size="20" color='rgb(4, 196, 217)' />,
                        to:{
                            pathname: "/register-patient",
@@ -222,6 +225,7 @@ console.log(permissions.includes( "all_permission"))
            {...(permissions.includes('delete_patient') || permissions.includes("all_permission")&&
                    {
                        name:'Delete Patient',
+                       type:'link',
                        icon:<MdDeleteForever size="20" color='rgb(4, 196, 217)'  />,
                        to:{
                            pathname: "/#",

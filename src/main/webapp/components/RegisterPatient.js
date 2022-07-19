@@ -22,6 +22,8 @@ import {Link, useHistory, useLocation} from "react-router-dom";
 import {TiArrowBack} from 'react-icons/ti'
 import {useForm} from "react-hook-form";
 import {token, url as baseUrl } from "../../../api";
+import PhoneInput from 'react-phone-input-2'
+import 'react-phone-input-2/lib/style.css'
 
 
 library.add(faCheckSquare, faCoffee, faEdit, faTrash);
@@ -89,6 +91,9 @@ const UserRegistration = (props) => {
     const { register, watch, setValue, getValues, setError, handleSubmit, formState: { errors } } = useForm({
         resolver: yupResolver(schema),
     });
+    const watchPnumber= watch("pnumber", false);
+    const watchAltPhonenumber= watch("altPhonenumber", false);
+    const watchContactPhoneNumber= watch("contactPhoneNumber", false);
     const watchShowAge = watch("age", false);
     const [today, setToday] = useState(new Date().toISOString().substr(0, 10).replace('T', ' '));
     const [contacts, setContacts] = useState([]);
@@ -115,7 +120,7 @@ const UserRegistration = (props) => {
 
     const getNames = (relationship) => {
         const surname = relationship.surname;
-        const firstName = relationship.firstname;
+        const firstName = relationship.firstName;
         const otherName = relationship.otherName ? relationship.otherName : '';
         return surname + ', ' + firstName + ' ' + otherName;
     }
@@ -213,11 +218,17 @@ const UserRegistration = (props) => {
             "surname": clastName,
             "otherName": cmiddleName
         };
+
         if (editRelative != null) {
             contacts.splice(editRelative, 1);
             setContacts(contacts.concat(contact));
         } else {
-            setContacts(contacts.concat(contact));
+            if(contacts === undefined){
+                setContacts([].concat(contact));
+            }else{
+                setContacts(contacts.concat(contact));
+            }
+
         }
         setShowRelative(false);
     };
@@ -302,7 +313,7 @@ const UserRegistration = (props) => {
     }
     const handleEditRelative = (relative, index) => {
         setValue("relationshipType", relative.relationshipId);
-        setValue("cfirstName", relative.firstname);
+        setValue("cfirstName", relative.firstName);
         setValue("cmiddleName", relative.otherName);
         setValue("clastName", relative.surname);
         setValue("contactPhoneNumber", relative.contactPoint ? relative.contactPoint.value : '');
@@ -493,22 +504,12 @@ const UserRegistration = (props) => {
     };
 
     const checkPhoneNumber=(e, inputName)=>{
-        const limit=11;
-        const PHONE_REGEX = new RegExp(/"^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$"/gmi);
-        if(PHONE_REGEX.test(e.target.value)){
-            console.log('true')
-        }
-        const result = e.target.value.replace(/"^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$"/gi, '');
-        console.log(result)
-        //setValue(inputName, e.target.value.slice(0, limit) );
-        setValue(inputName,result);
+        setValue(inputName,e);
     }
 
      const alphabetOnly=(e, inputName)=>{
-         //console.log(e.target.value)
          const result = e.target.value.replace(/[^a-z]/gi, '');
-         console.log(result)
-       setValue(inputName,result );
+         setValue(inputName,result);
      }
     return (
         <>
@@ -710,8 +711,8 @@ const UserRegistration = (props) => {
                                         </div>
 
                                         <div className={"row"}>
-                                            {watchShowAge >=10 &&
-                                            <>
+{/*                                            {watchShowAge >=0 &&
+                                            <>*/}
                                                 <div className="form-group mb-3 col-md-3">
                                                     <FormGroup>
                                                         <Label>Marital Status</Label>
@@ -745,8 +746,10 @@ const UserRegistration = (props) => {
                                                         {errors.lastName && <p>{errors.lastName.message}</p>}
                                                     </FormGroup>
                                                 </div>
+{/*
                                             </>
                                             }
+*/}
 
 
                                             <div className="form-group  col-md-4">
@@ -780,7 +783,16 @@ const UserRegistration = (props) => {
                                         <div className="form-group  col-md-4">
                                             <FormGroup>
                                                 <Label>Phone Number *</Label>
-                                                <input
+                                                <PhoneInput
+                                                    containerStyle={{width:'100%',border: "1px solid #04C4D9"}}
+                                                    inputStyle={{width:'100%',borderRadius:'0px'}}
+                                                    country={'ng'}
+                                                    placeholder="(234)7099999999"
+                                                    value={getValues('pnumber')}
+                                                    onChange={(e)=>{checkPhoneNumber(e,'pnumber')}}
+                                                />
+
+{/*                                                <input
                                                     className="form-control"
                                                     type="tel"
                                                     name="pnumber"
@@ -790,7 +802,7 @@ const UserRegistration = (props) => {
                                                     })}
                                                     placeholder="(234)7099999999"
                                                     style={{border: "1px solid #04C4D9"}}
-                                                />
+                                                />*/}
                                                 {errors.pnumber && <p>{errors.pnumber.message}</p>}
                                             </FormGroup>
                                         </div>
@@ -798,7 +810,15 @@ const UserRegistration = (props) => {
                                         <div className="form-group col-md-4">
                                             <FormGroup>
                                                 <Label>Alt. Phone Number</Label>
-                                                <input
+                                                <PhoneInput
+                                                    containerStyle={{width:'100%',border: "1px solid #04C4D9"}}
+                                                    inputStyle={{width:'100%',borderRadius:'0px'}}
+                                                    country={'ng'}
+                                                    placeholder="(234)7099999999"
+                                                    value={getValues('altPhonenumber')}
+                                                    onChange={(e)=>{checkPhoneNumber(e,'altPhonenumber')}}
+                                                />
+{/*                                                <input
                                                     className="form-control"
                                                     type="tel"
                                                     name="altPhoneNumber"
@@ -808,7 +828,7 @@ const UserRegistration = (props) => {
                                                     })}
                                                     placeholder="(234)7099999999"
                                                     style={{border: "1px solid #04C4D9"}}
-                                                />
+                                                />*/}
                                                 {errors.altPhonenumber && <p>{errors.altPhonenumber.message}</p>}
                                             </FormGroup>
                                         </div>
@@ -1043,7 +1063,15 @@ const UserRegistration = (props) => {
                                                                 <div className="form-group mb-3 col-md-3">
                                                                     <FormGroup>
                                                                         <Label for="contactPhoneNumber">Phone Number</Label>
-                                                                        <input
+                                                                        <PhoneInput
+                                                                            containerStyle={{width:'100%',border: "1px solid #04C4D9"}}
+                                                                            inputStyle={{width:'100%',borderRadius:'0px'}}
+                                                                            country={'ng'}
+                                                                            placeholder="(234)7099999999"
+                                                                            value={getValues('contactPhoneNumber')}
+                                                                            onChange={(e)=>{checkPhoneNumber(e,'contactPhoneNumber')}}
+                                                                        />
+{/*                                                                        <input
                                                                             className="form-control"
                                                                             type="text"
                                                                             name="contactPhoneNumber"
@@ -1052,7 +1080,7 @@ const UserRegistration = (props) => {
                                                                             {...register("contactPhoneNumber",{
                                                                                 onChange:(e)=>{checkPhoneNumber(e,'contactPhoneNumber')}
                                                                             })}
-                                                                        />
+                                                                        />*/}
                                                                         {errors.contactPhoneNumber && <p>{errors.contactPhoneNumber.message}</p>}
                                                                     </FormGroup>
                                                                 </div>
