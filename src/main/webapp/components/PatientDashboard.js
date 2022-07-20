@@ -87,11 +87,11 @@ const appointmentColumns = [
         width: 110,
         editable: true,
     },
-    
+
 ];
 
 const appointments = [
-   // { id: 1, lastName: 'Snow', firstName: 'Jon', age: 35 },
+    // { id: 1, lastName: 'Snow', firstName: 'Jon', age: 35 },
 
 ];
 
@@ -111,19 +111,19 @@ function PatientDashboard(props) {
     const [selectedServices, setSelectedServices]= useState({checkInServices:""});
     const [patientVisits, setPatientVisits]= useState([]);
     const [checkOutObj, setCheckOutObj] = useState({
-                                                    facilityId: 1,
-                                                    personId: "",
-                                                    visitEndDate:format(new Date(newDate), 'yyyy-MM-dd'),
-                                                    visitStartDate:"" 
-                                                })
+        facilityId: 1,
+        personId: "",
+        visitEndDate:format(new Date(newDate), 'yyyy-MM-dd'),
+        visitStartDate:""
+    })
     const [checkInObj, setCheckInObj] = useState({
         serviceIds:"",
-          visitDto: {
+        visitDto: {
             facilityId: 1,
             personId: patientObj.id,
             visitEndDate: "",
             visitStartDate: format(new Date(newDate), 'yyyy-MM-dd')
-          }
+        }
     })
 
     const loadServices = useCallback(async () => {
@@ -203,66 +203,68 @@ function PatientDashboard(props) {
     const panes = [
         { menuItem: 'Patient Visit', render: () =>
                 <Tab.Pane>
-                   
+
                     <MaterialTable
-                    title=""
-                    columns={[
-                        {
-                            title: "Checked In Date",
-                            field: "checkInDate", filtering: false 
-                        },
-                        { title: "Check Out Date", field: "checkOutDate", filtering: false  },
-                        { title: "Service", field: "service", filtering: false  },
-                        { title: "Status", field: "status", filtering: false },
-                    ]}
-                    isLoading={loading}
-                    data={patientVisits.map((row) => ({
-                        checkInDate: row.checkInDate,
-                        checkOutDate: row.checkOutDate,
-                        service:row.service,
-                        status:(<Label color={row.status ==='COMPLETED' ? 'green' : 'red'} size="mini">{row.status}</Label>),
+                        title=""
+                        columns={[
+                            {
+                                title: "Checked In Date",
+                                field: "checkInDate", filtering: false
+                            },
+                            { title: "Check Out Date", field: "checkOutDate", filtering: false  },
+                            { title: "Service", field: "service", filtering: false  },
+                            { title: "Status", field: "status", filtering: false },
+                        ]}
+                        isLoading={loading}
+                        data={patientVisits.map((row) => ({
+                            checkInDate: row.checkInDate,
+                            checkOutDate: row.checkOutDate,
+                            service:row.service,
+                            status:(<Label color={row.status ==='COMPLETED' ? 'green' : 'red'} size="mini">{row.status}</Label>),
 
-                    }))}
+                        }))}
 
-                    options={{
-                        headerStyle: {
-                            backgroundColor: "#000",
-                            color: "#ffffff",
-                        },
-                        search: true,
-                        // searchFieldStyle: {
-                        //     width : '200%',
-                        //     margingLeft: '250px',
-                        // },
-                        filtering: false,
-                        exportButton: false,
-                        searchFieldAlignment: 'left',
-                        pageSizeOptions:[10,20,100],
-                        pageSize:10,
-                        debounceInterval: 400
-                    }}
-                />
+                        options={{
+                            headerStyle: {
+                                backgroundColor: "rgb(4, 196, 217)",
+                                color: "#ffffff",
+                                fontSize:'14px',
+                                fontWeight:'bold'
+                            },
+                            search: true,
+                            // searchFieldStyle: {
+                            //     width : '200%',
+                            //     margingLeft: '250px',
+                            // },
+                            filtering: false,
+                            exportButton: false,
+                            searchFieldAlignment: 'left',
+                            pageSizeOptions:[10,20,100],
+                            pageSize:10,
+                            debounceInterval: 400
+                        }}
+                    />
                 </Tab.Pane>
         },
-      
+
         { menuItem: permissions.includes('view_patient_appointment') || permissions.includes("all_permission") ? 'Appointments' : "", render: () =>
-            permissions.includes('view_patient_appointment') || permissions.includes("all_permission") ?
-                <Tab.Pane>
-                    <div style={{ height: 400, width: '100%' }}>
-                        <DataGrid
-                            rows={appointments}
-                            columns={appointmentColumns}
-                            pageSize={5}
-                            rowsPerPageOptions={[5]}
-                            checkboxSelection
-                            disableSelectionOnClick
-                        />
-                    </div>
-                </Tab.Pane>
-            :""
+                permissions.includes('view_patient_appointment') || permissions.includes("all_permission") ?
+                    <Tab.Pane>
+                        <div style={{ height: 400, width: '100%' }}>
+                            <DataGrid
+                                rows={appointments}
+                                columns={appointmentColumns}
+                                pageSize={5}
+                                rowsPerPageOptions={[5]}
+                                checkboxSelection
+                                disableSelectionOnClick
+                            />
+                        </div>
+                    </Tab.Pane>
+                    :""
         }
-        
-       
+
+
     ];
 
     const handleCheckIn = () => {
@@ -333,52 +335,52 @@ function PatientDashboard(props) {
 
     let checkInServicesID = [];
     /**** Submit Button For CheckIN  */
-    const handleSubmitCheckIn = (e) => {        
-        e.preventDefault();              
-        selectedServices.checkInServices.length > 0 && selectedServices.checkInServices.map((service)=> { 
+    const handleSubmitCheckIn = (e) => {
+        e.preventDefault();
+        selectedServices.checkInServices.length > 0 && selectedServices.checkInServices.map((service)=> {
 
             if(service.id!==null){
                 checkInServicesID.push(service.id)
-                console.log(service) 
+                console.log(service)
             }
         })
-        checkInObj.serviceIds= checkInServicesID  
+        checkInObj.serviceIds= checkInServicesID
         axios.post(`${baseUrl}patient/visit/checkin`, checkInObj,
-        { headers: {"Authorization" : `Bearer ${token}`}},
-        
+            { headers: {"Authorization" : `Bearer ${token}`}},
+
         )
-        .then(response => {
-            toast.success("Patient Check-In successful");
-            setCheckinStatus(true)
-            onCancelCheckIn()
-            loadPatientVisits()
-        })
-        .catch(error => {
-            console.log(error)
-            toast.error("Something went wrong");
-            onCancelCheckIn()        
-        });  
+            .then(response => {
+                toast.success("Patient Check-In successful");
+                setCheckinStatus(true)
+                onCancelCheckIn()
+                loadPatientVisits()
+            })
+            .catch(error => {
+                console.log(error)
+                toast.error("Something went wrong");
+                onCancelCheckIn()
+            });
     }
     /**** Submit Button Processing  */
-    const handleSubmitCheckOut = (e) => {        
+    const handleSubmitCheckOut = (e) => {
         e.preventDefault();
-        const getVisitID= patientVisits.find((visits)=> visits.status==='PENDING')   
+        const getVisitID= patientVisits.find((visits)=> visits.status==='PENDING')
 
         axios.put(`${baseUrl}patient/visit/checkout/${getVisitID.id}`,getVisitID.id,
-        { headers: {"Authorization" : `Bearer ${token}`}},
-        
+            { headers: {"Authorization" : `Bearer ${token}`}},
+
         )
-        .then(response => {
-            toast.success("Record save successful");
-            setCheckinStatus(false)
-            onCancelCheckOut()
-            loadPatientVisits()
-        })
-        .catch(error => {
-            console.log(error)
-            toast.error("Something went wrong");
-            onCancelCheckOut()        
-        });  
+            .then(response => {
+                toast.success("Record save successful");
+                setCheckinStatus(false)
+                onCancelCheckOut()
+                loadPatientVisits()
+            })
+            .catch(error => {
+                console.log(error)
+                toast.error("Something went wrong");
+                onCancelCheckOut()
+            });
     }
 
 
@@ -386,7 +388,7 @@ function PatientDashboard(props) {
         <div className={classes.root}>
             <Card>
                 <CardContent>
-                    
+
                     <PatientCardDetail patientObj={patientObj} permissions={permissions}/>
                     <Card>
                         <CardContent>
@@ -401,47 +403,48 @@ function PatientDashboard(props) {
                                     &nbsp;
                                 </div>
                                 <div className="mb-3 col-md-3">
-                                <Link to={"/"} >
+                                    <Link to={"/"} >
                                         <ButtonMui
                                             variant="contained"
                                             color="primary"
+                                            style={{ fontSize:'14PX', fontWeight:'bold' }}
                                             className=" float-right mr-1">
                                             <span style={{ textTransform: "capitalize" }}>Back</span>
                                         </ButtonMui>
                                     </Link>
                                     {permissions.includes('patient_check_in') || permissions.includes("all_permission") ? (
-                                        <>
-                                        {checkinStatus===false ? (
-                                        <Button
-                                            variant="contained"
-                                            style={{ backgroundColor: "black" }}
-                                            onClick={handleCheckIn}
-                                            className=" float-right mr-1"
-                                        >
-                                            <span style={{ textTransform: "capitalize" }}>CheckIn</span>
-                                        </Button>
-                                    )
-                                    :
-                                    ""
-                                    }
-                                    </>
-                                    )
-                                    :""
+                                            <>
+                                                {checkinStatus===false ? (
+                                                        <Button
+                                                            variant="contained"
+                                                            style={{ backgroundColor: "rgb(4, 196, 217)", fontSize:'14PX', fontWeight:'bold' }}
+                                                            onClick={handleCheckIn}
+                                                            className=" float-right mr-1"
+                                                        >
+                                                            <span style={{ textTransform: "capitalize" }}>CheckIn</span>
+                                                        </Button>
+                                                    )
+                                                    :
+                                                    ""
+                                                }
+                                            </>
+                                        )
+                                        :""
                                     }
                                     {checkinStatus===true ? (
-                                        <Button
-                                            variant="contained"
-                                            style={{ backgroundColor: "black" }}
-                                            onClick={handleCheckOut}
-                                            className=" float-right mr-1"
-                                        >
-                                            <span style={{ textTransform: "capitalize" }}>CheckOut</span>
-                                        </Button>
-                                    )
-                                    :
-                                    ""
+                                            <Button
+                                                variant="contained"
+                                                style={{ backgroundColor: "#992E62", fontSize:'14PX', fontWeight:'bold' }}
+                                                onClick={handleCheckOut}
+                                                className=" float-right mr-1"
+                                            >
+                                                <span style={{ textTransform: "capitalize" }}>Check Out</span>
+                                            </Button>
+                                        )
+                                        :
+                                        ""
                                     }
-                                    
+
                                 </div>
                             </div>
                             <Tab panes={panes} />
@@ -463,8 +466,8 @@ function PatientDashboard(props) {
                             <Grid container spacing={2}>
                                 <Grid item xs={8}>
                                     <FormControl >
-                                       
-                                         <Autocomplete
+
+                                        <Autocomplete
                                             multiple
                                             id="checkboxes-tags-demo"
                                             options={services}
@@ -476,21 +479,21 @@ function PatientDashboard(props) {
                                             }}
                                             renderOption={(props, option, { selected }) => (
                                                 <li {...props}>
-                                                <Checkbox
-                                                    icon={icon}
-                                                    checkedIcon={checkedIcon}
-                                                    style={{ marginRight: 8 }}
-                                                    checked={selected}
-                                                />
-                                                {option.moduleServiceName}
+                                                    <Checkbox
+                                                        icon={icon}
+                                                        checkedIcon={checkedIcon}
+                                                        style={{ marginRight: 8 }}
+                                                        checked={selected}
+                                                    />
+                                                    {option.moduleServiceName}
                                                 </li>
                                             )}
                                             style={{ width: 400 }}
                                             renderInput={(params) => (
                                                 <TextField {...params} label="Services" />
                                             )}
-                                            />
-                                       
+                                        />
+
                                     </FormControl>
                                 </Grid>
                             </Grid>
@@ -505,7 +508,7 @@ function PatientDashboard(props) {
             </Modal>
             {/* Modal for CheckOut Patient */}
             <Modal isOpen={modalCheckOut} toggle={onCancelCheckOut}>
-                <ModalHeader toggle={onCancelCheckOut}>CheckOut </ModalHeader>
+                <ModalHeader toggle={onCancelCheckOut}>Check Out </ModalHeader>
                 <ModalBody>
                     <form >
                         <Paper
@@ -517,7 +520,7 @@ function PatientDashboard(props) {
                             }}>
                             <Grid container spacing={2}>
                                 <Grid item xs={12}>
-                                   <h5>Are you sure you want to check-out patient?</h5>
+                                    <h5>Are you sure you want to check-out patient?</h5>
                                 </Grid>
                             </Grid>
                             <Grid container spacing={2}>

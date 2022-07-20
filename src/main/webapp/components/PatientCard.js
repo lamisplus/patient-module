@@ -34,8 +34,8 @@ const styles = theme => ({
         flexBasis: '20.33%',
     },
     helper: {
-        /*borderLeft: `2px solid ${theme.palette.divider}`,
-        padding: `${theme.spacing(1)}px ${theme.spacing(1) * 2}px`,*/
+        borderLeft: `2px solid ${theme.palette.divider}`,
+        padding: `${theme.spacing(1)}px ${theme.spacing(1) * 2}px`,
     },
     link: {
         color: theme.palette.primary.main,
@@ -50,44 +50,44 @@ function PatientCard(props) {
     const { classes } = props;
     const patientObj = props.patientObj ? props.patientObj : {};
     const permissions= props.permissions ? props.permissions : [];
-    const [modal, setModal] = useState(false) //Modal to collect sample 
+    const [modal, setModal] = useState(false) //Modal to collect sample
     const [patientBiometricStatus, setPatientBiometricStatus]= useState(props.patientObj.biometricStatus);
     const toggleModal = () => setModal(!modal)
 
     const [biometricStatus, setBiometricStatus] = useState(false);
     const [devices, setDevices] = useState([]);
-    useEffect(() => {         
+    useEffect(() => {
         TemplateType();
-      }, []);
-     //Get list of KP
-     const TemplateType =()=>{
+    }, []);
+    //Get list of KP
+    const TemplateType =()=>{
         axios
-           .get(`${baseUrl}modules/check?moduleName=biometric`,
-               { headers: {"Authorization" : `Bearer ${token}`} }
-           )
-           .then((response) => {
-               console.log(response.data);
-               setBiometricStatus(response.data);
-               if(response.data===true){
-                axios
-                    .get(`${baseUrl}biometrics/devices`,
-                        { headers: {"Authorization" : `Bearer ${token}`} }
-                    )
-                    .then((response) => {
-                        setDevices(response.data);
-                        
-                    })
-                    .catch((error) => {
-                        console.log(error)
-                    });
-               
+            .get(`${baseUrl}modules/check?moduleName=biometric`,
+                { headers: {"Authorization" : `Bearer ${token}`} }
+            )
+            .then((response) => {
+                console.log(response.data);
+                setBiometricStatus(response.data);
+                if(response.data===true){
+                    axios
+                        .get(`${baseUrl}biometrics/devices`,
+                            { headers: {"Authorization" : `Bearer ${token}`} }
+                        )
+                        .then((response) => {
+                            setDevices(response.data);
+
+                        })
+                        .catch((error) => {
+                            console.log(error)
+                        });
+
                 }
-           })
-           .catch((error) => {
-           //console.log(error);
-           });
-       
-     }
+            })
+            .catch((error) => {
+                //console.log(error);
+            });
+
+    }
     const getHospitalNumber = (identifier) => {
         const hospitalNumber = identifier.identifier.find(obj => obj.type == 'HospitalNumber');
         return hospitalNumber ? hospitalNumber.value : '';
@@ -119,9 +119,9 @@ function PatientCard(props) {
     };
 
 
-    const handleBiometricCapture = (id) => { 
+    const handleBiometricCapture = (id) => {
         let patientObjID= id
-        setModal(!modal) 
+        setModal(!modal)
     }
 
     return (
@@ -133,87 +133,56 @@ function PatientCard(props) {
 
                         <Col md={11}>
                             <Row className={"mt-1"}>
-                                <Col md={12} className={classes.root2}>
-                                    <b style={{fontSize: "25px",color:'rgb(4, 196, 217)'}}>
+                                <Col md={12} className={classes.root2} >
+                                    <b style={{fontSize: "25px"}}>
                                         {patientObj.surname + ", " + patientObj.firstName + " " + patientObj.otherName}
+                                        < span style={{color:'green'}}>
+                                             {": "+"Active"}
+                                        </span>
                                     </b>
 
                                 </Col>
-                                <Col md={4} className={classes.root2}>
-                                    <span style={{fontWeight:'bolder'}}>
+                                <Col md={4} className={classes.root2} style={{marginTop:"10px"}}>
+                                    <span>
                                         {" "}
-                                        Hospital Number : <b style={{color:'rgb(4, 196, 217)'}}>{getHospitalNumber(patientObj.identifier) }</b>
+                                        Hospital Number : <b>{getHospitalNumber(patientObj.identifier) }</b>
                                     </span>
                                 </Col>
 
-                                <Col md={4} className={classes.root2}>
-<<<<<<< HEAD
-                                    <span style={{fontWeight:'bolder'}}>
-                                        Date Of Birth : <b style={{color:'rgb(4, 196, 217)'}}>{patientObj.dateOfBirth }</b>
-                                    </span>
-                                </Col>
-                                <Col md={4} className={classes.root2}>
-                                    <span style={{fontWeight:'bolder'}}>
-                                        {" "}
-                                        Age : <b style={{color:'rgb(4, 196, 217)'}}>{calculate_age(patientObj.dateOfBirth) }</b>
-                                    </span>
-                                </Col>
-                                <Col md={4}>
-                                    <span style={{fontWeight:'bolder'}}>
-                                        {" "}
-                                        Gender :{" "}
-                                        <b style={{color:'rgb(4, 196, 217)'}}>{patientObj.gender.display }</b>
-                                    </span>
-                                </Col>
-                                <Col md={4} className={classes.root2}>
-                                    <span style={{fontWeight:'bolder'}}>
-                                        {" "}
-                                        Phone Number : <b style={{color:'rgb(4, 196, 217)'}}>{getPhone(patientObj.contactPoint) }</b>
-                                    </span>
-                                </Col>
-                                <Col md={4} className={classes.root2}>
-                                    <span style={{fontWeight:'bolder'}}>
-                                        {" "}
-                                        Address : <b style={{color:'rgb(4, 196, 217)'}}>{getAddress(patientObj.address)} </b>
-                                    </span>
-=======
+                                <Col md={4} className={classes.root2} style={{marginTop:"10px"}}>
                                     <span>
                                         Date Of Birth : <b>{patientObj.dateOfBirth }</b>
                                     </span>
                                 </Col>
-                                <Col md={4} className={classes.root2}>
+                                <Col md={4} className={classes.root2} style={{marginTop:"10px"}}>
                                 <span>
                                     {" "}
                                     Age : <b>{calculate_age(patientObj.dateOfBirth) }</b>
                                 </span>
                                 </Col>
-                                <Col md={4}>
-                                <span>
-                                    {" "}
-                                    Gender :{" "}
-                                    <b>{patientObj.gender.display }</b>
-                                </span>
-                                <Label color={"green"} size={"mini"}>
-                                    Patient Status
-                                <Label.Detail>Active</Label.Detail>
-                                </Label>
+                                <Col md={4} style={{marginTop:"10px"}}>
+                                    <span>
+                                        {" "}
+                                        Gender :{" "}
+                                        <b>{patientObj.gender.display }</b>
+                                    </span>
+
                                 </Col>
-                                <Col md={4} className={classes.root2}>
+                                <Col md={4} className={classes.root2} style={{marginTop:"10px"}}>
                                 <span>
                                     {" "}
                                     Phone Number : <b>{getPhone(patientObj.contactPoint) }</b>
                                 </span>
                                 </Col>
-                                <Col md={4} className={classes.root2}>
+                                <Col md={4} className={classes.root2} style={{marginTop:"10px"}}>
                                 <span>
                                     {" "}
                                     Address : <b>{getAddress(patientObj.address)} </b>
                                 </span>
-                                
->>>>>>> master
+
                                 </Col>
-                                
-                               
+
+
                             </Row>
                         </Col>
                     </Row>
@@ -258,74 +227,57 @@ function PatientCard(props) {
                                 content: '74.5 in',
                             }}
                         />
-<<<<<<< HEAD
                     </div>*/}
-                    <div className={classNames( classes.helper)}>
-                        <Typography variant="caption">
-                            <Label color={"red"} size={"mini"} style={{fontSize:'12px'}}>
-                                Biometric Status
-                                <Label.Detail>Not Captured</Label.Detail>
-                            </Label>
-
-                            <Label color={"green"} size={"mini"} style={{fontSize:'12px'}}>
-                                Patient Status
-                                <Label.Detail>Active</Label.Detail>
-                            </Label>
-                        </Typography>
-                    </div>
-
-=======
-                    </div>
                     {biometricStatus===true ? (
-                        <>
-                            <div >
-                                <Typography variant="caption">
-                                    <Label color={patientBiometricStatus===true? "green" : "red"} size={"mini"}>
-                                        Biometric Status
-                                        <Label.Detail>{patientBiometricStatus===true? "Captured" : "Not Capture"}</Label.Detail>
-                                    </Label>
-                                    {patientBiometricStatus!==true ? (
-                                   
-                                        <>
-                                             {permissions.includes('patient_check_in') || permissions.includes("all_permission") ? (
+                            <>
+                                <div >
+                                    <Typography variant="caption">
+                                        <Label  style={{height:'30px', fontSize:'14px'}} color={patientBiometricStatus===true? "green" : "red"} size={"large"}>
+                                            Biometric Status
+                                            <Label.Detail>{patientBiometricStatus===true? "Captured" : "Not Capture"}</Label.Detail>
+                                        </Label>
+                                        {patientBiometricStatus!==true ? (
+
                                                 <>
-                                                <Label as='a' color='teal' onClick={() => handleBiometricCapture(patientObj.id)} tag>
-                                                    Capture Now
-                                                </Label>
+                                                    {permissions.includes('patient_check_in') || permissions.includes("all_permission") ? (
+                                                            <>
+                                                                <Label style={{height:'30px', fontSize:'14px'}} as='a' color='teal' onClick={() => handleBiometricCapture(patientObj.id)} tag>
+                                                                    Capture Now
+                                                                </Label>
+                                                            </>
+                                                        )
+                                                        :""
+                                                    }
                                                 </>
                                             )
                                             :""
-                                            }
-                                        </>
-                                    )
-                                    :""
-                                    }
-                                    
-                                </Typography>
-                            </div>
-                        </>
+                                        }
+
+                                    </Typography>
+                                </div>
+                            </>
                         )
                         :
                         <>
                             <div >
                                 <Typography variant="caption">
-                                    <Label color={"red"} size={"mini"}>
+                                    <Label color={"red"} style={{height:'30px', fontSize:'14px'}}>
                                         Biometric Not Install
-                                        
+
                                     </Label>
-                                   
+
                                 </Typography>
                             </div>
                         </>
                     }
->>>>>>> master
                 </AccordionDetails>
                 <Divider />
                 <AccordionActions>
 
                 </AccordionActions>
             </Accordion>
-            <CaptureBiometric modalstatus={modal} togglestatus={toggleModal} patientId={patientObj.id} biometricDevices={devices} setPatientBiometricStatus={setPatientBiometricStatus} />
+            <CaptureBiometric  modalstatus={modal} togglestatus={toggleModal} patientId={patientObj.id} biometricDevices={devices} setPatientBiometricStatus={setPatientBiometricStatus} />
+
         </div>
     );
 }

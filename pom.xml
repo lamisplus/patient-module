@@ -42,6 +42,14 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-core</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.foreach.across</groupId>
             <artifactId>across-test</artifactId>
             <exclusions>
@@ -286,7 +294,7 @@
                         <phase>generate-resources</phase>
                         <configuration>
                             <target>
-                                <copy todir="${project.basedir}/classes/views/static/patient">
+                                <copy todir="${project.build.directory}/classes/views/static/patient">
                                     <fileset dir="${project.basedir}/build"/>
                                 </copy>
                             </target>
