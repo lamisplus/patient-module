@@ -57,15 +57,18 @@
                 last_modified_by   VARCHAR(255),
                 facility_id        BIGINT,
                 person_uuid        VARCHAR(255)                            NOT NULL,
-                visit_start_date   date                                    NOT NULL,
-                visit_end_date     date,
+                visit_start_date   TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+                visit_end_date     TIMESTAMP WITHOUT TIME ZONE,
                 uuid               VARCHAR(255)                            NOT NULL,
                 archived           INTEGER,
                 CONSTRAINT pk_patient_visit PRIMARY KEY (id)
             );
 
             ALTER TABLE patient_visit
-                ADD CONSTRAINT FK_PATIENT_VISIT_ON_PATIENT_PERSON FOREIGN KEY (person_uuid) REFERENCES patient_person (uuid);
+                ADD CONSTRAINT uc_patient_visit_uuid UNIQUE (uuid);
+
+            ALTER TABLE patient_visit
+                ADD CONSTRAINT FK_PATIENT_VISIT_ON_PERSON_UUID FOREIGN KEY (person_uuid) REFERENCES patient_person (uuid);
         </sql>
     </changeSet>
 
@@ -80,10 +83,10 @@
                 last_modified_date TIMESTAMP WITHOUT TIME ZONE,
                 last_modified_by   VARCHAR(255),
                 facility_id        BIGINT,
-                encounter_date     date                                    NOT NULL,
+                encounter_date     TIMESTAMP WITHOUT TIME ZONE NOT NULL,
                 person_uuid        VARCHAR(255)                            NOT NULL,
                 uuid               VARCHAR(255)                            NOT NULL,
-                visit_id           BIGINT                                  NOT NULL,
+                visit_id           VARCHAR(255)                            NOT NULL,
                 service_code       VARCHAR(255)                            NOT NULL,
                 status             VARCHAR(255)                            NOT NULL,
                 archived           INTEGER,
@@ -91,10 +94,13 @@
             );
 
             ALTER TABLE patient_encounter
-                ADD CONSTRAINT FK_PATIENT_ENCOUNTER_ON_PERSON FOREIGN KEY (person_uuid) REFERENCES patient_person (uuid);
+                ADD CONSTRAINT uc_patient_encounter_uuid UNIQUE (uuid);
 
             ALTER TABLE patient_encounter
-                ADD CONSTRAINT FK_PATIENT_ENCOUNTER_ON_VISIT FOREIGN KEY (visit_id) REFERENCES patient_visit (id);
+                ADD CONSTRAINT FK_PATIENT_ENCOUNTER_ON_PERSON_UUID FOREIGN KEY (person_uuid) REFERENCES patient_person (uuid);
+
+            ALTER TABLE patient_encounter
+                ADD CONSTRAINT FK_PATIENT_ENCOUNTER_ON_VISIT FOREIGN KEY (visit_id) REFERENCES patient_visit (uuid);
         </sql>
     </changeSet>
     <changeSet id="20222005-005" author="amos-data-fi">

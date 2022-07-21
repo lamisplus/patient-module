@@ -247,7 +247,7 @@ console.log(permissions.includes( "all_permission"))
                         color="primary"
                         className=" float-right mr-1"
                         startIcon={<FaUserPlus size="25"/>}
-                        style={{backgroundColor:'rgb(4, 196, 217)'}}
+                        style={{backgroundColor:'#014d88'}}
                     >
                         <span style={{ textTransform: "capitalize", fontWeight:'bolder' }}>New Patient</span>
                     </Button>
@@ -297,68 +297,22 @@ console.log(permissions.includes( "all_permission"))
                                     <SplitActionButton actions={actionItems(row)} />
                                 ):""
                                 }
-
-{/*                                <Menu>
-                                    <MenuButton style={{ backgroundColor:"#3F51B5", color:"#fff", border:"2px solid #3F51B5", borderRadius:"4px", }}>
-                                        Actions <span aria-hidden>▾</span>
-                                    </MenuButton>
-
-                                    <MenuList className={'menuClass'} >
-                                    {permissions.includes('view_patient') || permissions.includes("all_permission") ? (
-                                        <MenuItem  style={{ color:"#000 !important"}}>
-                                            <Link
-                                                to={{
-                                                    pathname: "/patient-dashboard",
-                                                    state: { patientObj: row, permissions:permissions }
-                                                }}
-                                            >
-                                                <MdDashboard size="15" />{" "}<span style={{color: '#000'}}>Patient Dashboard</span>
-                                            </Link>
-                                        </MenuItem>
-                                    ):""
-                                }
-
-                                    {permissions.includes('edit_patient') || permissions.includes("all_permission") ? (
-                                        <MenuItem style={{ color:"#000 !important"}}>
-                                            <Link
-                                                to={{
-                                                    pathname: "/register-patient",
-                                                    state: { patientId : row.id }
-                                                }}
-                                            >
-                                                <MdModeEdit size="15" />{" "}<span style={{color: '#000'}}>Edit Patient </span>
-                                            </Link>
-                                        </MenuItem>
-                                    ):""}
-                                    {permissions.includes('delete_patient') || permissions.includes("all_permission") ? (
-                                        <MenuItem style={{ color:"#000 !important"}}>
-                                            <Link
-                                                onClick={(e) => toggle(row.id)}
-                                                to={{
-                                                    pathname: "/#",
-                                                    currentId: row
-                                                }}
-                                            >
-                                                <MdDeleteForever size="15"  />{" "}
-                                                <span style={{color: '#000'}}>Delete Patient</span>
-                                            </Link>
-                                        </MenuItem>
-                                    ):""}
-                                    </MenuList>
-                                </Menu>*/}
                             </div>
                     }))}
 
                     options={{
                         headerStyle: {
-                            //backgroundColor: "#9F9FA5",
-                            color: "#000",
+                            backgroundColor: "#014d88",
+                            color: "#fff",
+                            fontSize:'16px',
+                            padding:'10px',
+                            fontWeight:'bolder'
                         },
                         searchFieldStyle: {
                             width : '200%',
                             margingLeft: '250px',
                         },
-                        filtering: true,
+                        filtering: false,
                         exportButton: false,
                         searchFieldAlignment: 'left',
                         pageSizeOptions:[10,20,100],

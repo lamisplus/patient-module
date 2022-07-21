@@ -1,6 +1,7 @@
 package org.lamisplus.modules.patient.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.lamisplus.modules.base.controller.apierror.EntityNotFoundException;
 import org.lamisplus.modules.base.controller.apierror.RecordExistException;
 import org.lamisplus.modules.patient.domain.dto.CheckInDto;
@@ -16,7 +17,7 @@ import org.lamisplus.modules.patient.repository.VisitRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class VisitService {
     private final PersonRepository personRepository;
     private final VisitRepository visitRepository;
@@ -60,7 +62,7 @@ public class VisitService {
         Visit visit = getExistVisit (visitId);
         List<Encounter> encounters = encounterRepository.getEncounterByVisit (visit);
         encounters.forEach (this::checkoutFromAllService);
-        visit.setVisitEndDate (LocalDate.now ());
+        visit.setVisitEndDate (LocalDateTime.now ());
         visitRepository.save (visit);
     }
 
@@ -108,6 +110,8 @@ public class VisitService {
     private void createEncounter(Person person, Visit visit, String serviceCode) {
         Encounter encounter = getEncounter (person, visit);
         encounter.setServiceCode (serviceCode);
+        encounter.setFacilityId (visit.getFacilityId ());
+        encounter.setEncounterDate (LocalDateTime.now ());
         encounterRepository.save (encounter);
     }
 
@@ -159,6 +163,7 @@ public class VisitService {
                 .orElseThrow (() -> new EntityNotFoundException (VisitService.class, "errorMessage", "No patient found with id " + visitDto.getPersonId ()));
         Visit visit = new Visit ();
         BeanUtils.copyProperties (visitDto, visit);
+        visit.setVisitStartDate (LocalDateTime.now ());
         visit.setPerson (person);
         return visit;
     }

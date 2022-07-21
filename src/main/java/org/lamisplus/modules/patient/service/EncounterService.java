@@ -13,6 +13,7 @@ import org.lamisplus.modules.patient.repository.VisitRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -38,6 +39,7 @@ public class EncounterService {
                             encounterRepository.getEncounterByVisitAndStatusAndServiceCode (visit, encounterRequestDto.getStatus (), serviceCode);
                     if (!existingEncounter.isPresent ()) {
                         Encounter encounter = processedAndSaveEncounter (encounterRequestDto, serviceCode);
+                        encounter.setVisit (visit);
                         encounterRequestDtos.add (convertEntityToResponseDto (encounterRepository.save (encounter)));
                     }
                 });
@@ -121,6 +123,8 @@ public class EncounterService {
                 .orElseThrow (() -> new EntityNotFoundException (EncounterService.class, "errorMessage", "No visit found with id " + encounterRequestDto.getVisitId ()));
         Encounter encounter = new Encounter ();
         BeanUtils.copyProperties (encounterRequestDto, encounter);
+        //Change encounter date to allow RDE - Amos and John
+        encounter.setEncounterDate(LocalDateTime.now());
         encounter.setPerson (person);
         encounter.setStatus ("PENDING");
         encounter.setVisit (visit);
