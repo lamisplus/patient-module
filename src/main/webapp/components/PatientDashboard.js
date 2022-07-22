@@ -348,29 +348,39 @@ function PatientDashboard(props) {
     /**** Submit Button For CheckIN  */
     const handleSubmitCheckIn = (e) => {
         e.preventDefault();
-        selectedServices.checkInServices.length > 0 && selectedServices.checkInServices.map((service)=> {
+/*        alert('dd')
+        console.log(selectedServices)
+        alert('dd')*/
+        //Check if selected service object is empty before creating visit and posting.
+        if(selectedServices.checkInServices.length > 0){
+            selectedServices.checkInServices.length > 0 && selectedServices.checkInServices.map((service)=> {
 
-            if(service.id!==null){
-                checkInServicesID.push(service.id)
-                console.log(service)
-            }
-        })
-        checkInObj.serviceIds= checkInServicesID
-        axios.post(`${baseUrl}patient/visit/checkin`, checkInObj,
-            { headers: {"Authorization" : `Bearer ${token}`}},
-
-        )
-            .then(response => {
-                toast.success("Patient Check-In successful");
-                setCheckinStatus(true)
-                onCancelCheckIn()
-                loadPatientVisits()
-            })
-            .catch(error => {
-                console.log(error)
-                toast.error("Something went wrong");
-                onCancelCheckIn()
+                if(service.id!==null){
+                    checkInServicesID.push(service.id)
+                    console.log(service)
+                }
             });
+
+            checkInObj.serviceIds= checkInServicesID
+            axios.post(`${baseUrl}patient/visit/checkin`, checkInObj,
+                { headers: {"Authorization" : `Bearer ${token}`}},
+
+            )
+                .then(response => {
+                    toast.success("Patient Check-In successful");
+                    setCheckinStatus(true)
+                    onCancelCheckIn()
+                    loadPatientVisits()
+                })
+                .catch(error => {
+                    console.log(error)
+                    toast.error("Something went wrong");
+                    onCancelCheckIn()
+                });
+        }else{
+            toast.error("Kindly select a service to post the patient");
+        }
+
     }
     /**** Submit Button Processing  */
     const handleSubmitCheckOut = (e) => {
