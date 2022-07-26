@@ -5,7 +5,8 @@ import org.springframework.data.domain.Persistable;
 
 import javax.persistence.*;
 import javax.validation.constraints.PastOrPresent;
-import java.time.LocalDate;
+import java.io.Serializable;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "patient_encounter")
@@ -15,7 +16,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @EqualsAndHashCode
 @Builder
-public class Encounter extends PatientAuditEntity implements Persistable<Long> {
+public class Encounter extends PatientAuditEntity implements Persistable<Long>, Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -23,17 +24,17 @@ public class Encounter extends PatientAuditEntity implements Persistable<Long> {
 
     @PastOrPresent
     @Column(name = "encounter_date", nullable = false)
-    private LocalDate encounterDate;
+    private LocalDateTime encounterDate;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "person_uuid", nullable = false, referencedColumnName = "uuid")
     private Person person;
 
-    @Column(name = "uuid", updatable = false, nullable = false)
+    @Column(name = "uuid", nullable = false, unique = true, updatable = false)
     private String uuid;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "visit_id", nullable = false)
+    @JoinColumn(name = "visit_id", nullable = false, referencedColumnName = "uuid")
     private Visit visit;
 
     @Column(name = "service_code", nullable = false)

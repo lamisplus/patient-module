@@ -38,6 +38,7 @@ public class EncounterService {
                             encounterRepository.getEncounterByVisitAndStatusAndServiceCode (visit, encounterRequestDto.getStatus (), serviceCode);
                     if (!existingEncounter.isPresent ()) {
                         Encounter encounter = processedAndSaveEncounter (encounterRequestDto, serviceCode);
+                        encounter.setVisit (visit);
                         encounterRequestDtos.add (convertEntityToResponseDto (encounterRepository.save (encounter)));
                     }
                 });
