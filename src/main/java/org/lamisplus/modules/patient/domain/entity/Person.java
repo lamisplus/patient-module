@@ -47,6 +47,8 @@ public class Person extends PatientAuditEntity implements Serializable, Persista
     @Type(type = "jsonb-node")
     @Column(columnDefinition = "jsonb")
     private JsonNode education;
+    @Column(name = "sex", nullable = false)
+    private  String sex;
     @Type(type = "jsonb-node")
     @Column(columnDefinition = "jsonb")
     private JsonNode organization;
