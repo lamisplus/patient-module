@@ -48,6 +48,14 @@ public class PersonService {
 
     public PersonResponseDto createPerson(PersonDto personDto) {
         Person person = getPersonFromDto (personDto);
+        getCurrentFacility (person);
+        String hospitalNumber = getHospitalNumber (personDto);
+        person.setHospitalNumber (hospitalNumber);
+        person.setUuid (UUID.randomUUID ().toString ());
+        return getDtoFromPerson (personRepository.save (person));
+    }
+
+    private void getCurrentFacility(Person person) {
         Optional<User> currentUser = userService.getUserWithRoles ();
         if (currentUser.isPresent ()) {
             log.info ("currentUser: " + currentUser.get ());
@@ -55,10 +63,6 @@ public class PersonService {
             Long currentOrganisationUnitId = user.getCurrentOrganisationUnitId ();
             person.setFacilityId (currentOrganisationUnitId);
         }
-        String hospitalNumber = getHospitalNumber (personDto);
-        person.setHospitalNumber (hospitalNumber);
-        person.setUuid (UUID.randomUUID ().toString ());
-        return getDtoFromPerson (personRepository.save (person));
     }
 
 
@@ -75,8 +79,17 @@ public class PersonService {
 
 
     public List<PersonResponseDto> getAllPerson() {
+        Optional<User> currentUser = userService.getUserWithRoles ();
+        Long facilityId = 0L;
+        if (currentUser.isPresent ()) {
+            log.info ("currentUser: " + currentUser.get ());
+            User user = currentUser.get ();
+            facilityId = user.getCurrentOrganisationUnitId ();
+        }
+        Long finalFacilityId = facilityId;
         return personRepository.getAllByArchived (0)
                 .stream ()
+                .filter (person -> person.getFacilityId ().equals (finalFacilityId))
                 .map (this::getDtoFromPerson)
                 .collect (Collectors.toList ());
     }
