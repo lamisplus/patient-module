@@ -154,6 +154,7 @@ public class PersonService {
         if (genderId != null) {
             ApplicationCodeDto genderDto = getAppCodeSet (genderId);
             JsonNode genderJsonNode = mapper.valueToTree (genderDto);
+            person.setSex (genderDto.getDisplay ());
             person.setGender (genderJsonNode);
         }
         if (maritalStatusId != null) {
