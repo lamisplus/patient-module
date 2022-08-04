@@ -332,10 +332,10 @@ const UserRegistration = (props) => {
 
     const loadGenders = useCallback(async () => {
         try {
-            const response = await axios.get(`${baseUrl}application-codesets/v2/GENDER`, { headers: {"Authorization" : `Bearer ${token}`} });
+            const response = await axios.get(`${baseUrl}application-codesets/v2/SEX`, { headers: {"Authorization" : `Bearer ${token}`} });
             setGenders(response.data);
         } catch (e) {
-            toast.error("An error occured while fetching gender codesets !", {
+            toast.error("An error occured while fetching sex codesets !", {
                 position: toast.POSITION.TOP_RIGHT
             });
         }
