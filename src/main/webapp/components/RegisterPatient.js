@@ -102,6 +102,7 @@ const UserRegistration = (props) => {
     const [showRelative, setShowRelative] = useState(false);
     const [editRelative, setEditRelative] = useState(null);
     const [genders, setGenders]= useState([]);
+    const [sexes, setSexes]= useState([]);
     const [maritalStatusOptions, setMaritalStatusOptions]= useState([]);
     const [educationOptions, setEducationOptions]= useState([]);
     const [occupationOptions, setOccupationOptions]= useState([]);
@@ -149,6 +150,7 @@ const UserRegistration = (props) => {
             const altphone = contactPoint.contactPoint.find(obj => obj.type == 'altphone');
             const country = address && address.address && address.address.length > 0 ? address.address[0] : null;
             const gender = patient.gender;
+            const sex = patient.sex;
             const employmentStatus = patient.employmentStatus;
             const education = patient.education;
             const maritalStatus = patient.maritalStatus;
@@ -159,7 +161,8 @@ const UserRegistration = (props) => {
             setValue('hospitalNumber', hospitalNumber ? hospitalNumber.value : '');
             setValue('maritalStatus', maritalStatus.id);
             setValue('employmentStatus', employmentStatus.id);
-            setValue('sex', gender.id);
+            setValue('gender', gender.id);
+            setValue('sex', sex);
             setValue('highestQualification', education.id);
             setValue('dob', format(new Date(patient.dateOfBirth), 'yyyy-MM-dd'));
             if (country) {
@@ -258,7 +261,8 @@ const UserRegistration = (props) => {
                 deceased: false,
                 deceasedDateTime: null,
                 firstName: data.firstName,
-                genderId: data.sex,
+                sexId: data.sex,
+                /*genderId:data.sex,*/
                 identifier: [
                     {
                         "assignerId": 1,
@@ -330,10 +334,10 @@ const UserRegistration = (props) => {
         }, 500);
     };
 
-    const loadGenders = useCallback(async () => {
+    const loadSexes = useCallback(async () => {
         try {
             const response = await axios.get(`${baseUrl}application-codesets/v2/SEX`, { headers: {"Authorization" : `Bearer ${token}`} });
-            setGenders(response.data);
+            setSexes(response.data);
         } catch (e) {
             toast.error("An error occured while fetching sex codesets !", {
                 position: toast.POSITION.TOP_RIGHT
@@ -441,16 +445,17 @@ const UserRegistration = (props) => {
     }
 
     useEffect(() => {
-        loadGenders();
+        loadSexes();
         loadMaritalStatus();
         loadEducation();
         loadOccupation();
         loadRelationships();
         loadTopLevelCountry();
         getPatient();
-    }, [loadGenders, loadMaritalStatus, loadEducation, loadOccupation, loadRelationships, loadTopLevelCountry, getPatient]);
+    }, [loadSexes, loadMaritalStatus, loadEducation, loadOccupation, loadRelationships, loadTopLevelCountry, getPatient]);
 
     let genderRows = null;
+    let sexRows = null;
     let maritalStatusRows = null;
     let educationRows = null;
     let occupationRows = null;
@@ -458,9 +463,9 @@ const UserRegistration = (props) => {
     let topLevelUnitCountryRows = null;
     let stateRows = null;
     let districtRows = null;
-    if (genders && genders.length > 0) {
-        genderRows = genders.map((gender, index) => (
-            <option key={gender.id} value={gender.id}>{gender.display}</option>
+    if (sexes && sexes.length > 0) {
+        sexRows = sexes.map((sex, index) => (
+            <option key={sex.id} value={sex.id}>{sex.display}</option>
         ));
     }
     if (maritalStatusOptions && maritalStatusOptions.length > 0) {
@@ -555,7 +560,7 @@ const UserRegistration = (props) => {
                                                         {...register("dateOfRegistration")}
                                                         style={{border: "1px solid #014d88"}}
                                                     />
-                                                    {errors.dateOfRegistration && <p>{errors.dateOfRegistration.message}</p>}
+                                                    {errors.dateOfRegistration && <p>Enter the registration date</p>}
                                                 </FormGroup>
                                             </div>
 
@@ -570,7 +575,7 @@ const UserRegistration = (props) => {
                                                         {...register("hospitalNumber")}
                                                         style={{border: "1px solid #014d88"}}
                                                     />
-                                                    {errors.hospitalNumber && <p>{errors.hospitalNumber.message}</p>}
+                                                    {errors.hospitalNumber && <p>Enter the patient hospital number</p>}
                                                 </FormGroup>
                                             </div>
                                         </div>
@@ -589,7 +594,7 @@ const UserRegistration = (props) => {
                                                         })}
                                                         style={{border: "1px solid #014d88"}}
                                                     />
-                                                    {errors.firstName && <p>{errors.firstName.message}</p>}
+                                                    {errors.firstName && <p>First Name is required</p>}
                                                 </FormGroup>
                                             </div>
 
@@ -623,7 +628,7 @@ const UserRegistration = (props) => {
                                                         })}
                                                         style={{border: "1px solid #014d88"}}
                                                     />
-                                                    {errors.lastName && <p>{errors.lastName.message}</p>}
+                                                    {errors.lastName && <p>Last Name is required</p>}
                                                 </FormGroup>
                                             </div>
                                         </div>
@@ -640,9 +645,9 @@ const UserRegistration = (props) => {
                                                         style={{border: "1px solid #014d88"}}
                                                     >
                                                         <option value={""}></option>
-                                                        {genderRows}
+                                                        {sexRows}
                                                     </select>
-                                                    {errors.sex && <p>{errors.sex.message}</p>}
+                                                    {errors.sex && <p>Select Sex</p>}
                                                 </FormGroup>
                                             </div>
                                             <div className="form-group mb-2 col-md-2">
@@ -689,7 +694,7 @@ const UserRegistration = (props) => {
                                                         onChange={(e) => handleDobChange(e)}
                                                         style={{border: "1px solid #014d88"}}
                                                     />
-                                                    {errors.dob && <p>{errors.dob.message}</p>}
+                                                    {errors.dob && <p>Enter a valid date of birth (dd/mm/yyyy)</p>}
                                                 </FormGroup>
                                             </div>
 
@@ -726,7 +731,7 @@ const UserRegistration = (props) => {
                                                             <option value={""}></option>
                                                             {maritalStatusRows}
                                                         </select>
-                                                        {errors.maritalStatus && <p>{errors.maritalStatus.message}</p>}
+                                                        {errors.maritalStatus && <p>Select Marital Status</p>}
                                                     </FormGroup>
                                                 </div>
 
@@ -743,7 +748,7 @@ const UserRegistration = (props) => {
                                                             <option value={""}></option>
                                                             {occupationRows}
                                                         </select>
-                                                        {errors.lastName && <p>{errors.lastName.message}</p>}
+                                                        {errors.employmentStatus && <p>Select Employment Status</p>}
                                                     </FormGroup>
                                                 </div>
 {/*
@@ -765,7 +770,7 @@ const UserRegistration = (props) => {
                                                         <option value={""}></option>
                                                         {educationRows}
                                                     </select>
-                                                    {errors.highestQualification && <p>{errors.highestQualification.message}</p>}
+                                                    {errors.highestQualification && <p>Select the Education Level</p>}
                                                 </FormGroup>
                                             </div>
                                         </div>
@@ -803,7 +808,7 @@ const UserRegistration = (props) => {
                                                     placeholder="(234)7099999999"
                                                     style={{border: "1px solid #014d88"}}
                                                 />*/}
-                                                {errors.pnumber && <p>{errors.pnumber.message}</p>}
+                                                {errors.pnumber && <p>Phone number is required</p>}
                                             </FormGroup>
                                         </div>
 
@@ -864,7 +869,7 @@ const UserRegistration = (props) => {
                                                     <option value={""}></option>
                                                     {topLevelUnitCountryRows}
                                                 </select>
-                                                {errors.country && <p>{errors.country.message}</p>}
+                                                {errors.countryId && <p>Select Country</p>}
                                             </FormGroup>
                                         </div>
 
@@ -882,6 +887,7 @@ const UserRegistration = (props) => {
                                                     <option value={""}></option>
                                                     {stateRows}
                                                 </select>
+                                                {errors.stateId && <p>Select State</p>}
                                             </FormGroup>
                                         </div>
 
@@ -898,6 +904,7 @@ const UserRegistration = (props) => {
                                                     <option value={""}></option>
                                                     {districtRows}
                                                 </select>
+                                                {errors.district && <p>Select Province/District/LGA</p>}
                                             </FormGroup>
                                         </div>
                                     </div>
@@ -1126,6 +1133,7 @@ const UserRegistration = (props) => {
                                                                         color="primary"
                                                                         className={classes.button}
                                                                         onClick={handleSaveRelationship}
+                                                                        style={{backgroundColor:'#014d88',color:'#fff'}}
                                                                     >
                                                                         Add
                                                                     </MatButton>
@@ -1138,6 +1146,7 @@ const UserRegistration = (props) => {
                                                                         color="secondary"
                                                                         className={classes.button}
                                                                         onClick={handleCancelSaveRelationship}
+                                                                        style={{backgroundColor:'#992E62',color:'#fff'}}
                                                                     >
                                                                         Cancel
                                                                     </MatButton>
@@ -1177,6 +1186,7 @@ const UserRegistration = (props) => {
                                         color="primary"
                                         className={classes.button}
                                         startIcon={<SaveIcon />}
+                                        style={{backgroundColor:'#014d88',color:'#fff'}}
                                     >
                                         {!saving ? (
                                             <span style={{ textTransform: "capitalize" }}>Save</span>
@@ -1193,6 +1203,7 @@ const UserRegistration = (props) => {
                                         color="primary"
                                         className={classes.button}
                                         startIcon={<SaveIcon />}
+                                        style={{backgroundColor:'#014d88',color:'#fff'}}
                                     >
                                         {!saving ? (
                                             <span style={{ textTransform: "capitalize" }}>Save</span>
@@ -1207,6 +1218,7 @@ const UserRegistration = (props) => {
                                 className={classes.button}
                                 startIcon={<CancelIcon />}
                                 onClick={handleCancel}
+                                style={{backgroundColor:'#992E62',color:'#fff'}}
                             >
                                 <span style={{ textTransform: "capitalize" }}>Cancel</span>
                             </MatButton>

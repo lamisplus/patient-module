@@ -141,6 +141,7 @@ public class PersonService {
 
     @NotNull
     private Person getPersonFromDto(PersonDto personDto) {
+        Long sexId = personDto.getSexId();
         Long genderId = personDto.getGenderId ();
         Long maritalStatusId = personDto.getMaritalStatusId ();
         Long educationalId = personDto.getEducationId ();
@@ -164,11 +165,16 @@ public class PersonService {
         person.setDeceased (personDto.getDeceased ());
         boolean isDateOfBirthEstimated = personDto.getIsDateOfBirthEstimated () != null;
         person.setIsDateOfBirthEstimated (isDateOfBirthEstimated);
+
         if (genderId != null) {
             ApplicationCodeDto genderDto = getAppCodeSet (genderId);
             JsonNode genderJsonNode = mapper.valueToTree (genderDto);
-            person.setSex (genderDto.getDisplay ());
+            //person.setSex (genderDto.getDisplay ());
             person.setGender (genderJsonNode);
+        }
+        if(sexId != null){
+            ApplicationCodeDto sexDto = getAppCodeSet (sexId);
+            person.setSex (sexDto.getDisplay());
         }
         if (maritalStatusId != null) {
             ApplicationCodeDto maritalStatusDto = getAppCodeSet (maritalStatusId);
@@ -245,6 +251,7 @@ public class PersonService {
         personResponseDto.setEducation (person.getEducation ());
         personResponseDto.setEmploymentStatus (person.getEmploymentStatus ());
         personResponseDto.setMaritalStatus (person.getMaritalStatus ());
+        personResponseDto.setSex (person.getSex ());
         personResponseDto.setGender (person.getGender ());
         personResponseDto.setDeceased (person.getDeceased ());
         personResponseDto.setDateOfRegistration (person.getDateOfRegistration ());

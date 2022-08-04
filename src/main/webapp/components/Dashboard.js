@@ -265,7 +265,7 @@ console.log(permissions.includes( "all_permission"))
                             field: "name", filtering: false
                         },
                         { title: "Patient ID", field: "id" , filtering: false},
-                        { title: "Gender", field: "gender", filtering: false },
+                        { title: "Sex", field: "sex", filtering: false },
                         { title: "Date Of Birth", field: "dateOfBirth", filtering: false },
                         { title: "Age", field: "age", filtering: false },
                         /*{ title: "Address", field: "address", filtering: false },*/
@@ -276,7 +276,7 @@ console.log(permissions.includes( "all_permission"))
                     data={patients.map((row) => ({
                         name: row.firstName +  ' ' + row.otherName +  ' ' + row.surname,
                         id: getHospitalNumber(row.identifier),
-                        gender: getGender(row.gender),
+                        sex: row.sex,
                         dateOfBirth: row.dateOfBirth,
                         age: (row.dateOfBirth === 0 ||
                             row.dateOfBirth === undefined ||
