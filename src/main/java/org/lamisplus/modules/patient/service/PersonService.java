@@ -48,6 +48,14 @@ public class PersonService {
 
     public PersonResponseDto createPerson(PersonDto personDto) {
         Person person = getPersonFromDto (personDto);
+        getCurrentFacility (person);
+        String hospitalNumber = getHospitalNumber (personDto);
+        person.setHospitalNumber (hospitalNumber);
+        person.setUuid (UUID.randomUUID ().toString ());
+        return getDtoFromPerson (personRepository.save (person));
+    }
+
+    private void getCurrentFacility(Person person) {
         Optional<User> currentUser = userService.getUserWithRoles ();
         if (currentUser.isPresent ()) {
             log.info ("currentUser: " + currentUser.get ());
@@ -55,10 +63,6 @@ public class PersonService {
             Long currentOrganisationUnitId = user.getCurrentOrganisationUnitId ();
             person.setFacilityId (currentOrganisationUnitId);
         }
-        String hospitalNumber = getHospitalNumber (personDto);
-        person.setHospitalNumber (hospitalNumber);
-        person.setUuid (UUID.randomUUID ().toString ());
-        return getDtoFromPerson (personRepository.save (person));
     }
 
 
@@ -75,8 +79,17 @@ public class PersonService {
 
 
     public List<PersonResponseDto> getAllPerson() {
+        Optional<User> currentUser = userService.getUserWithRoles ();
+        Long facilityId = 0L;
+        if (currentUser.isPresent ()) {
+            log.info ("currentUser: " + currentUser.get ());
+            User user = currentUser.get ();
+            facilityId = user.getCurrentOrganisationUnitId ();
+        }
+        Long finalFacilityId = facilityId;
         return personRepository.getAllByArchived (0)
                 .stream ()
+                .filter (person -> person.getFacilityId ().equals (finalFacilityId))
                 .map (this::getDtoFromPerson)
                 .collect (Collectors.toList ());
     }
@@ -128,6 +141,7 @@ public class PersonService {
 
     @NotNull
     private Person getPersonFromDto(PersonDto personDto) {
+        Long sexId = personDto.getSexId();
         Long genderId = personDto.getGenderId ();
         Long maritalStatusId = personDto.getMaritalStatusId ();
         Long educationalId = personDto.getEducationId ();
@@ -151,10 +165,16 @@ public class PersonService {
         person.setDeceased (personDto.getDeceased ());
         boolean isDateOfBirthEstimated = personDto.getIsDateOfBirthEstimated () != null;
         person.setIsDateOfBirthEstimated (isDateOfBirthEstimated);
+
         if (genderId != null) {
             ApplicationCodeDto genderDto = getAppCodeSet (genderId);
             JsonNode genderJsonNode = mapper.valueToTree (genderDto);
+            //person.setSex (genderDto.getDisplay ());
             person.setGender (genderJsonNode);
+        }
+        if(sexId != null){
+            ApplicationCodeDto sexDto = getAppCodeSet (sexId);
+            person.setSex (sexDto.getDisplay());
         }
         if (maritalStatusId != null) {
             ApplicationCodeDto maritalStatusDto = getAppCodeSet (maritalStatusId);
@@ -231,6 +251,7 @@ public class PersonService {
         personResponseDto.setEducation (person.getEducation ());
         personResponseDto.setEmploymentStatus (person.getEmploymentStatus ());
         personResponseDto.setMaritalStatus (person.getMaritalStatus ());
+        personResponseDto.setSex (person.getSex ());
         personResponseDto.setGender (person.getGender ());
         personResponseDto.setDeceased (person.getDeceased ());
         personResponseDto.setDateOfRegistration (person.getDateOfRegistration ());

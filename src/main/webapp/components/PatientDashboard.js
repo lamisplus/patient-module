@@ -26,6 +26,8 @@ import MaterialTable from 'material-table';
 import Autocomplete from '@mui/material/Autocomplete';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
+import MatButton from "@material-ui/core/Button";
+import {TiArrowBack} from "react-icons/ti";
 
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
@@ -209,7 +211,12 @@ function PatientDashboard(props) {
                         columns={[
                             {
                                 title: "Checked In Date",
-                                field: "checkInDate", filtering: false
+                                field: "checkInDate", filtering: false,
+                                headerStyle: {
+                                    backgroundColor: "#039be5",
+                                    border:'2px solid #fff',
+                                    paddingRight:'30px'
+                                }
                             },
                             { title: "Check Out Date", field: "checkOutDate", filtering: false  },
                             { title: "Service", field: "service", filtering: false  },
@@ -226,16 +233,20 @@ function PatientDashboard(props) {
 
                         options={{
                             headerStyle: {
-                                backgroundColor: "rgb(4, 196, 217)",
-                                color: "#ffffff",
-                                fontSize:'14px',
+                                backgroundColor: "#014d88",
+                                color: "#fff",
+                                fontSize:'16px',
+                                padding:'10px',
                                 fontWeight:'bold'
                             },
-                            search: true,
-                            // searchFieldStyle: {
-                            //     width : '200%',
-                            //     margingLeft: '250px',
-                            // },
+                            rowStyle: {
+                                color: 'rgba(0,0,0,.87)',
+                                fontFamily:`'poppins', sans-serif`
+                            },
+                            searchFieldStyle: {
+                                width : '200%',
+                                margingLeft: '250px',
+                            },
                             filtering: false,
                             exportButton: false,
                             searchFieldAlignment: 'left',
@@ -337,29 +348,39 @@ function PatientDashboard(props) {
     /**** Submit Button For CheckIN  */
     const handleSubmitCheckIn = (e) => {
         e.preventDefault();
-        selectedServices.checkInServices.length > 0 && selectedServices.checkInServices.map((service)=> {
+/*        alert('dd')
+        console.log(selectedServices)
+        alert('dd')*/
+        //Check if selected service object is empty before creating visit and posting.
+        if(selectedServices.checkInServices.length > 0){
+            selectedServices.checkInServices.length > 0 && selectedServices.checkInServices.map((service)=> {
 
-            if(service.id!==null){
-                checkInServicesID.push(service.id)
-                console.log(service)
-            }
-        })
-        checkInObj.serviceIds= checkInServicesID
-        axios.post(`${baseUrl}patient/visit/checkin`, checkInObj,
-            { headers: {"Authorization" : `Bearer ${token}`}},
-
-        )
-            .then(response => {
-                toast.success("Patient Check-In successful");
-                setCheckinStatus(true)
-                onCancelCheckIn()
-                loadPatientVisits()
-            })
-            .catch(error => {
-                console.log(error)
-                toast.error("Something went wrong");
-                onCancelCheckIn()
+                if(service.id!==null){
+                    checkInServicesID.push(service.id)
+                    console.log(service)
+                }
             });
+
+            checkInObj.serviceIds= checkInServicesID
+            axios.post(`${baseUrl}patient/visit/checkin`, checkInObj,
+                { headers: {"Authorization" : `Bearer ${token}`}},
+
+            )
+                .then(response => {
+                    toast.success("Patient Check-In successful");
+                    setCheckinStatus(true)
+                    onCancelCheckIn()
+                    loadPatientVisits()
+                })
+                .catch(error => {
+                    console.log(error)
+                    toast.error("Something went wrong");
+                    onCancelCheckIn()
+                });
+        }else{
+            toast.error("Kindly select a service to post the patient");
+        }
+
     }
     /**** Submit Button Processing  */
     const handleSubmitCheckOut = (e) => {
@@ -404,20 +425,23 @@ function PatientDashboard(props) {
                                 </div>
                                 <div className="mb-3 col-md-3">
                                     <Link to={"/"} >
-                                        <ButtonMui
+                                        <MatButton
+                                            className=" float-right mr-1"
                                             variant="contained"
-                                            color="primary"
-                                            style={{ fontSize:'14PX', fontWeight:'bold' }}
-                                            className=" float-right mr-1">
+                                            floated="left"
+                                            startIcon={<TiArrowBack  />}
+                                            style={{backgroundColor:"rgb(153, 46, 98)", color:'#fff', height:'35px'}}
+                                        >
                                             <span style={{ textTransform: "capitalize" }}>Back</span>
-                                        </ButtonMui>
+                                        </MatButton>
                                     </Link>
+
                                     {permissions.includes('patient_check_in') || permissions.includes("all_permission") ? (
                                             <>
                                                 {checkinStatus===false ? (
                                                         <Button
                                                             variant="contained"
-                                                            style={{ backgroundColor: "rgb(4, 196, 217)", fontSize:'14PX', fontWeight:'bold' }}
+                                                            style={{ backgroundColor: "rgb(4, 196, 217)", fontSize:'14PX', fontWeight:'bold', height:'35px' }}
                                                             onClick={handleCheckIn}
                                                             className=" float-right mr-1"
                                                         >
@@ -434,7 +458,7 @@ function PatientDashboard(props) {
                                     {checkinStatus===true ? (
                                             <Button
                                                 variant="contained"
-                                                style={{ backgroundColor: "#992E62", fontSize:'14PX', fontWeight:'bold' }}
+                                                style={{ backgroundColor: "green", fontSize:'14PX', fontWeight:'bold', height:'35px' }}
                                                 onClick={handleCheckOut}
                                                 className=" float-right mr-1"
                                             >

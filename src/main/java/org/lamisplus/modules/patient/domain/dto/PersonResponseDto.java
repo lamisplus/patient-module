@@ -18,6 +18,7 @@ public class PersonResponseDto {
     private String surname;
     private String firstName;
     private String otherName;
+    private String sex;
     private Object gender;
     private Boolean deceased;
     private Object maritalStatus;

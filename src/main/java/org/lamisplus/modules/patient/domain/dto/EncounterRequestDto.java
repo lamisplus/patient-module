@@ -21,8 +21,8 @@ public class EncounterRequestDto implements Serializable {
     private Long facilityId;
     private Long id;
     @PastOrPresent
-    @Convert(converter = LocalDateConverter.class)
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+/*    @Convert(converter = LocalDateConverter.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")*/
     private LocalDate encounterDate;
     private Long personId;
     private String uuid;

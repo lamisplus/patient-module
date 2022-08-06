@@ -126,6 +126,11 @@ function PatientCard(props) {
 
     return (
         <div className={classes.root}>
+
+
+
+
+
             <Accordion defaultExpanded>
                 <AccordionSummary>
 
@@ -134,7 +139,7 @@ function PatientCard(props) {
                         <Col md={11}>
                             <Row className={"mt-1"}>
                                 <Col md={12} className={classes.root2} >
-                                    <b style={{fontSize: "25px"}}>
+                                    <b style={{fontSize: "25px", color:'rgb(153, 46, 98)'}}>
                                         {patientObj.surname + ", " + patientObj.firstName + " " + patientObj.otherName}
                                         < span style={{color:'green'}}>
                                              {": "+"Active"}
@@ -143,41 +148,41 @@ function PatientCard(props) {
 
                                 </Col>
                                 <Col md={4} className={classes.root2} style={{marginTop:"10px"}}>
-                                    <span>
+                                    <span style={{color:'#000'}}>
                                         {" "}
-                                        Hospital Number : <b>{getHospitalNumber(patientObj.identifier) }</b>
+                                        Hospital Number : <b style={{color:'#0B72AA'}}>{getHospitalNumber(patientObj.identifier) }</b>
                                     </span>
                                 </Col>
 
                                 <Col md={4} className={classes.root2} style={{marginTop:"10px"}}>
-                                    <span>
-                                        Date Of Birth : <b>{patientObj.dateOfBirth }</b>
+                                    <span style={{color:'#000'}}>
+                                        Date Of Birth : <b style={{color:'#0B72AA'}}>{patientObj.dateOfBirth }</b>
                                     </span>
                                 </Col>
                                 <Col md={4} className={classes.root2} style={{marginTop:"10px"}}>
-                                <span>
+                                <span style={{color:'#000'}}>
                                     {" "}
-                                    Age : <b>{calculate_age(patientObj.dateOfBirth) }</b>
+                                    Age : <b style={{color:'#0B72AA'}}>{calculate_age(patientObj.dateOfBirth) }</b>
                                 </span>
                                 </Col>
                                 <Col md={4} style={{marginTop:"10px"}}>
-                                    <span>
+                                    <span  style={{color:'#000'}}>
                                         {" "}
                                         Gender :{" "}
-                                        <b>{patientObj.gender.display }</b>
+                                        <b style={{color:'#0B72AA',fontFamily:`'poppins', sans-serif`,fontWeight:'bolder'}}>{patientObj.gender.display }</b>
                                     </span>
 
                                 </Col>
                                 <Col md={4} className={classes.root2} style={{marginTop:"10px"}}>
-                                <span>
+                                <span style={{color:'#000'}}>
                                     {" "}
-                                    Phone Number : <b>{getPhone(patientObj.contactPoint) }</b>
+                                    Phone Number : <b style={{color:'#0B72AA'}}>{getPhone(patientObj.contactPoint)}</b>
                                 </span>
                                 </Col>
                                 <Col md={4} className={classes.root2} style={{marginTop:"10px"}}>
-                                <span>
+                                <span style={{color:'#000'}}>
                                     {" "}
-                                    Address : <b>{getAddress(patientObj.address)} </b>
+                                    Address : <b style={{color:'#0B72AA'}}>{getAddress(patientObj.address)} </b>
                                 </span>
 
                                 </Col>
@@ -185,49 +190,13 @@ function PatientCard(props) {
 
                             </Row>
                         </Col>
+
+
+
                     </Row>
 
                 </AccordionSummary>
                 <AccordionDetails className={classes.details}>
-{/*                    <div className={classes.column} >
-                        <Button
-                            color='red'
-                            content='BloodType'
-                            //icon='heart'
-                            label={{ basic: true, color: 'red', pointing: 'left', content: 'AB+' }}
-                        />
-
-                    </div>
-                    <div className={classes.column}>
-                        <Button
-                            basic
-                            color='blue'
-                            content='Height'
-                            icon='fork'
-                            label={{
-                                as: 'a',
-                                basic: true,
-                                color: 'blue',
-                                pointing: 'left',
-                                content: '74.5 in',
-                            }}
-                        />
-                    </div>
-                    <div className={classes.column}>
-                        <Button
-                            basic
-                            color='blue'
-                            content='Weight'
-                            icon='fork'
-                            label={{
-                                as: 'a',
-                                basic: true,
-                                color: 'blue',
-                                pointing: 'left',
-                                content: '74.5 in',
-                            }}
-                        />
-                    </div>*/}
                     {biometricStatus===true ? (
                             <>
                                 <div >
@@ -271,10 +240,6 @@ function PatientCard(props) {
                         </>
                     }
                 </AccordionDetails>
-                <Divider />
-                <AccordionActions>
-
-                </AccordionActions>
             </Accordion>
             <CaptureBiometric  modalstatus={modal} togglestatus={toggleModal} patientId={patientObj.id} biometricDevices={devices} setPatientBiometricStatus={setPatientBiometricStatus} />
 

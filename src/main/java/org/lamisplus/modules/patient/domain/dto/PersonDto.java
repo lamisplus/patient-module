@@ -6,7 +6,9 @@ import lombok.Builder;
 import lombok.Data;
 import org.lamisplus.modules.patient.utility.LocalDateConverter;
 
+import javax.annotation.Nullable;
 import javax.persistence.Convert;
+import javax.validation.constraints.Null;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -27,7 +29,9 @@ public class PersonDto implements Serializable {
     private final Boolean deceased;
     private final LocalDateTime deceasedDateTime;
     private final Long maritalStatusId;
+    @Nullable
     private final Long genderId;
+    private final Long sexId;
     private final Long employmentStatusId;
     private final Long educationId;
     private final Long organizationId;
