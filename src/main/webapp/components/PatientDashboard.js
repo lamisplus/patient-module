@@ -28,6 +28,7 @@ import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import MatButton from "@material-ui/core/Button";
 import {TiArrowBack} from "react-icons/ti";
+import Biometrics from "./Biometrics";
 
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
@@ -273,8 +274,16 @@ function PatientDashboard(props) {
                         </div>
                     </Tab.Pane>
                     :""
+        },
+        { menuItem: permissions.includes('view_patient_appointment') || permissions.includes("all_permission") ? 'Biometrics' : "", render: () =>
+                permissions.includes('view_patient_appointment') || permissions.includes("all_permission") ?
+                    <Tab.Pane>
+                        <div style={{ minHeight: 400, width: '100%' }}>
+                            <Biometrics patientId={patientObj.id}/>
+                        </div>
+                    </Tab.Pane>
+                    :""
         }
-
 
     ];
 
@@ -411,7 +420,7 @@ function PatientDashboard(props) {
                 <CardContent>
 
                     <PatientCardDetail patientObj={patientObj} permissions={permissions}/>
-                    <Card>
+                    <Card style={{marginTop:'10px',boxShadow: 'rgba(99, 99, 99, 0.2) 0px 2px 8px 0px'}}>
                         <CardContent>
                             <div className="row">
                                 <div className="mb-3 col-md-3">
@@ -474,6 +483,8 @@ function PatientDashboard(props) {
                             <Tab panes={panes} />
                         </CardContent>
                     </Card>
+
+
                 </CardContent>
             </Card>
             <Modal isOpen={modal} toggle={onCancelCheckIn}>

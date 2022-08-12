@@ -24,7 +24,7 @@ import {useForm} from "react-hook-form";
 import {token, url as baseUrl } from "../../../api";
 import PhoneInput from 'react-phone-input-2'
 import 'react-phone-input-2/lib/style.css'
-
+import _ from 'lodash';
 
 library.add(faCheckSquare, faCoffee, faEdit, faTrash);
 
@@ -102,7 +102,7 @@ const UserRegistration = (props) => {
     const [showRelative, setShowRelative] = useState(false);
     const [editRelative, setEditRelative] = useState(null);
     const [genders, setGenders]= useState([]);
-    const [sexes, setSexes]= useState([]);
+    const [sexOptions, setSexOptions]= useState([]);
     const [maritalStatusOptions, setMaritalStatusOptions]= useState([]);
     const [educationOptions, setEducationOptions]= useState([]);
     const [occupationOptions, setOccupationOptions]= useState([]);
@@ -138,6 +138,7 @@ const UserRegistration = (props) => {
     const getPatient = useCallback(async () => {
         if (patientId) {
             const response = await axios.get(`${baseUrl}patient/${patientId}`, { headers: {"Authorization" : `Bearer ${token}`} });
+            const sexCodeset = await axios.get(`${baseUrl}application-codesets/v2/SEX`, { headers: {"Authorization" : `Bearer ${token}`} });
             const patient = response.data;
             const contacts = patient.contact ? patient.contact : [];
             setContacts(contacts.contact);
@@ -150,7 +151,7 @@ const UserRegistration = (props) => {
             const altphone = contactPoint.contactPoint.find(obj => obj.type == 'altphone');
             const country = address && address.address && address.address.length > 0 ? address.address[0] : null;
             const gender = patient.gender;
-            const sex = patient.sex;
+            const sex = _.find(sexCodeset.data, {'display':patient.sex}).id;
             const employmentStatus = patient.employmentStatus;
             const education = patient.education;
             const maritalStatus = patient.maritalStatus;
@@ -161,7 +162,7 @@ const UserRegistration = (props) => {
             setValue('hospitalNumber', hospitalNumber ? hospitalNumber.value : '');
             setValue('maritalStatus', maritalStatus.id);
             setValue('employmentStatus', employmentStatus.id);
-            setValue('gender', gender.id);
+            //setValue('gender', gender.id);
             setValue('sex', sex);
             setValue('highestQualification', education.id);
             setValue('dob', format(new Date(patient.dateOfBirth), 'yyyy-MM-dd'));
@@ -337,7 +338,7 @@ const UserRegistration = (props) => {
     const loadSexes = useCallback(async () => {
         try {
             const response = await axios.get(`${baseUrl}application-codesets/v2/SEX`, { headers: {"Authorization" : `Bearer ${token}`} });
-            setSexes(response.data);
+            await setSexOptions(response.data);
         } catch (e) {
             toast.error("An error occured while fetching sex codesets !", {
                 position: toast.POSITION.TOP_RIGHT
@@ -463,8 +464,8 @@ const UserRegistration = (props) => {
     let topLevelUnitCountryRows = null;
     let stateRows = null;
     let districtRows = null;
-    if (sexes && sexes.length > 0) {
-        sexRows = sexes.map((sex, index) => (
+    if (sexOptions && sexOptions.length > 0) {
+        sexRows = sexOptions.map((sex, index) => (
             <option key={sex.id} value={sex.id}>{sex.display}</option>
         ));
     }
@@ -644,7 +645,7 @@ const UserRegistration = (props) => {
                                                         {...register("sex")}
                                                         style={{border: "1px solid #014d88"}}
                                                     >
-                                                        <option value={""}></option>
+                                                        <option value={""}>Select Sex</option>
                                                         {sexRows}
                                                     </select>
                                                     {errors.sex && <p>Select Sex</p>}
