@@ -43,7 +43,7 @@ const useStyles = makeStyles((theme) => ({
         margin: theme.spacing(3, 0, 2),
     },
     cardBottom: {
-        marginBottom: 20,
+
     },
     Select: {
         height: 45,
@@ -53,8 +53,34 @@ const useStyles = makeStyles((theme) => ({
         margin: theme.spacing(1),
     },
     root: {
+        marginBottom: 20,
         flexGrow: 1,
-        maxWidth: 752,
+        "& .card-title":{
+            color:'#fff',
+            fontWeight:'bold'
+        },
+        "& .form-control":{
+            borderRadius:'0.25rem',
+            height:'41px'
+        },
+        "& .card-header:first-child": {
+            borderRadius: "calc(0.25rem - 1px) calc(0.25rem - 1px) 0 0"
+        },
+        "& .dropdown-toggle::after": {
+            display: " block !important"
+        },
+        "& select":{
+            "-webkit-appearance": "listbox !important"
+        },
+        "& p":{
+            color:'red'
+        },
+        "& label":{
+            fontSize:'14px',
+            color:'#014d88',
+            fontWeight:'bold'
+        }
+
     },
     demo: {
         backgroundColor: theme.palette.background.default,
@@ -177,9 +203,9 @@ const UserRegistration = (props) => {
                 setValue('address', country.city);
                 setValue('landmark', country.line[0]);
             }
-            setValue('pnumber', phone ? phone.value : null);
+            setValue('pnumber', phone ? phone.value : "+234");
             setValue('email', email ? email.value : null);
-            setValue('altPhonenumber', altphone ? altphone.value : null);
+            setValue('altPhonenumber', altphone ? altphone.value : "+234");
         }
     }, []);
     const handleAddRelative = () => {
@@ -520,7 +546,7 @@ const UserRegistration = (props) => {
     return (
         <>
             <ToastContainer autoClose={3000} hideProgressBar />
-            <Card className={classes.cardBottom}>
+            <Card className={classes.root}>
                 <CardContent>
                     <Link
                         to={{
@@ -543,7 +569,7 @@ const UserRegistration = (props) => {
                         <Form onSubmit={handleSubmit(onSubmit, onError)}>
                             <div className="card">
                                 <div className="card-header" style={{backgroundColor:"#014d88",color:'#fff',fontWeight:'bolder'}}>
-                                    <h5 className="card-title">{userDetail===null ? "Basic Information" : "Edit User Information"}</h5>
+                                    <h5 className="card-title" style={{color:'#fff',fontWeight:'bolder'}}>{userDetail===null ? "Basic Information" : "Edit User Information"}</h5>
                                 </div>
 
                                 <div className="card-body">
@@ -729,7 +755,7 @@ const UserRegistration = (props) => {
                                                             {...register("maritalStatus")}
                                                             style={{border: "1px solid #014d88"}}
                                                         >
-                                                            <option value={""}></option>
+                                                            <option value={""}>Select Marital Status</option>
                                                             {maritalStatusRows}
                                                         </select>
                                                         {errors.maritalStatus && <p>Select Marital Status</p>}
@@ -746,7 +772,7 @@ const UserRegistration = (props) => {
                                                             {...register("employmentStatus")}
                                                             style={{border: "1px solid #014d88"}}
                                                         >
-                                                            <option value={""}></option>
+                                                            <option value={""}>Select Employment Status</option>
                                                             {occupationRows}
                                                         </select>
                                                         {errors.employmentStatus && <p>Select Employment Status</p>}
@@ -768,7 +794,7 @@ const UserRegistration = (props) => {
                                                         {...register("highestQualification")}
                                                         style={{border: "1px solid #014d88"}}
                                                     >
-                                                        <option value={""}></option>
+                                                        <option value={""}>Select the Education Level</option>
                                                         {educationRows}
                                                     </select>
                                                     {errors.highestQualification && <p>Select the Education Level</p>}
@@ -867,7 +893,7 @@ const UserRegistration = (props) => {
                                                     style={{border: "1px solid #014d88"}}
                                                     {...register("countryId")}
                                                     onChange={(e) => onCountryChange(e)}>
-                                                    <option value={""}></option>
+                                                    <option value={""}>Select Country</option>
                                                     {topLevelUnitCountryRows}
                                                 </select>
                                                 {errors.countryId && <p>Select Country</p>}
@@ -885,7 +911,7 @@ const UserRegistration = (props) => {
                                                     style={{border: "1px solid #014d88"}}
                                                     {...register("stateId")}
                                                     onChange={(e) => onStateChange(e)}>
-                                                    <option value={""}></option>
+                                                    <option value={""}>Select State</option>
                                                     {stateRows}
                                                 </select>
                                                 {errors.stateId && <p>Select State</p>}
@@ -902,7 +928,7 @@ const UserRegistration = (props) => {
                                                     id="district"
                                                     style={{border: "1px solid #014d88"}}
                                                     {...register("district")}>
-                                                    <option value={""}></option>
+                                                    <option value={""}>Select Province/District/LGA</option>
                                                     {districtRows}
                                                 </select>
                                                 {errors.district && <p>Select Province/District/LGA</p>}
@@ -1138,9 +1164,6 @@ const UserRegistration = (props) => {
                                                                     >
                                                                         Add
                                                                     </MatButton>
-                                                                </div>
-
-                                                                <div className="">
                                                                     <MatButton
                                                                         type="button"
                                                                         variant="contained"
