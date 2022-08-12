@@ -49,8 +49,6 @@ public class PersonService {
     public PersonResponseDto createPerson(PersonDto personDto) {
         Person person = getPersonFromDto (personDto);
         getCurrentFacility (person);
-        String hospitalNumber = getHospitalNumber (personDto);
-        person.setHospitalNumber (hospitalNumber);
         person.setUuid (UUID.randomUUID ().toString ());
         return getDtoFromPerson (personRepository.save (person));
     }
@@ -153,6 +151,8 @@ public class PersonService {
         List<AddressDto> address = personDto.getAddress ();
         ObjectMapper mapper = new ObjectMapper ();
         Person person = new Person ();
+        String hospitalNumber = getHospitalNumber (personDto);
+        person.setHospitalNumber (hospitalNumber);
         person.setFirstName (personDto.getFirstName ());
         person.setSurname (personDto.getSurname ());
         person.setOtherName (personDto.getOtherName ());
@@ -174,6 +174,7 @@ public class PersonService {
         }
         if(sexId != null){
             ApplicationCodeDto sexDto = getAppCodeSet (sexId);
+            log.info ("sex {}", sexDto.getDisplay ());
             person.setSex (sexDto.getDisplay());
         }
         if (maritalStatusId != null) {
