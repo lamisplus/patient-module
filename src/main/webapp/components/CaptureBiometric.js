@@ -429,6 +429,7 @@ const CaptureBiometric = (props) => {
                                 </Card>
                             </ModalBody>
                         </Form>
+
                     </Modal>
                 </CardBody>
             </Card>

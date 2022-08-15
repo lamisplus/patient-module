@@ -11,6 +11,7 @@ import PatientVitals from './main/webapp/components/PatientVitals';
 import AddPatientVitals from './main/webapp/components/Add-Patient-Vitals';
 import { ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import './main/webapp/css/style.css'
 
 export default function App() {
   return (

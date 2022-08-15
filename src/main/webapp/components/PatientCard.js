@@ -168,8 +168,8 @@ function PatientCard(props) {
                                 <Col md={4} style={{marginTop:"10px"}}>
                                     <span  style={{color:'#000'}}>
                                         {" "}
-                                        Gender :{" "}
-                                        <b style={{color:'#0B72AA',fontFamily:`'poppins', sans-serif`,fontWeight:'bolder'}}>{patientObj.gender.display }</b>
+                                        Sex :{" "}
+                                        <b style={{color:'#0B72AA',fontFamily:`'poppins', sans-serif`,fontWeight:'bolder'}}>{patientObj.sex }</b>
                                     </span>
 
                                 </Col>
@@ -241,7 +241,9 @@ function PatientCard(props) {
                     }
                 </AccordionDetails>
             </Accordion>
+{/*
             <CaptureBiometric  modalstatus={modal} togglestatus={toggleModal} patientId={patientObj.id} biometricDevices={devices} setPatientBiometricStatus={setPatientBiometricStatus} />
+*/}
 
         </div>
     );

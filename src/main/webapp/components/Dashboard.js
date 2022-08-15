@@ -202,7 +202,7 @@ console.log(permissions.includes( "all_permission"))
            },
            {...(permissions.includes('view_patient') || permissions.includes("all_permission")&&
                    {
-                       name:'Patient Dashboard',
+                       name:'Dashboard',
                        type:'link',
                        icon:<MdPerson size="20" color='rgb(4, 196, 217)' />,
                        to:{
@@ -213,7 +213,7 @@ console.log(permissions.includes( "all_permission"))
            )},
            {...(permissions.includes('edit_patient') || permissions.includes("all_permission")&&
                    {
-                       name:'Edit Patient',
+                       name:'Edit',
                        type:'link',
                        icon:<MdModeEdit size="20" color='rgb(4, 196, 217)' />,
                        to:{
@@ -224,7 +224,7 @@ console.log(permissions.includes( "all_permission"))
                )},
            {...(permissions.includes('delete_patient') || permissions.includes("all_permission")&&
                    {
-                       name:'Delete Patient',
+                       name:'Delete',
                        type:'link',
                        icon:<MdDeleteForever size="20" color='rgb(4, 196, 217)'  />,
                        to:{
@@ -261,10 +261,10 @@ console.log(permissions.includes( "all_permission"))
                     title="Find patients"
                     columns={[
                         {
-                            title: "Patient Name",
+                            title: "Name",
                             field: "name", filtering: false
                         },
-                        { title: "Patient ID", field: "id" , filtering: false},
+                        { title: "Hosp. Number", field: "id" , filtering: false},
                         { title: "Sex", field: "sex", filtering: false },
                         { title: "Date Of Birth", field: "dateOfBirth", filtering: false },
                         { title: "Age", field: "age", filtering: false },
