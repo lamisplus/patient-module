@@ -593,7 +593,7 @@ const UserRegistration = (props) => {
 
                                             <div className="form-group mb-3 col-md-4">
                                                 <FormGroup>
-                                                    <Label for="patientId">Hospital Number* </Label>
+                                                    <Label for="patientId">Patient Number* </Label>
                                                     <input
                                                         className="form-control"
                                                         type="text"

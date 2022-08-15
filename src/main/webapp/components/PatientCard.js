@@ -51,14 +51,15 @@ function PatientCard(props) {
     const patientObj = props.patientObj ? props.patientObj : {};
     const permissions= props.permissions ? props.permissions : [];
     const [modal, setModal] = useState(false) //Modal to collect sample
-    const [patientBiometricStatus, setPatientBiometricStatus]= useState(props.patientObj.biometricStatus);
+    const [patientBiometricStatus, setPatientBiometricStatus]= useState(props.patientBiometricStatus);
     const toggleModal = () => setModal(!modal)
 
     const [biometricStatus, setBiometricStatus] = useState(false);
     const [devices, setDevices] = useState([]);
     useEffect(() => {
+        setPatientBiometricStatus(props.patientBiometricStatus)
         TemplateType();
-    }, []);
+    }, [props.patientBiometricStatus]);
     //Get list of KP
     const TemplateType =()=>{
         axios
@@ -66,7 +67,6 @@ function PatientCard(props) {
                 { headers: {"Authorization" : `Bearer ${token}`} }
             )
             .then((response) => {
-                console.log(response.data);
                 setBiometricStatus(response.data);
                 if(response.data===true){
                     axios

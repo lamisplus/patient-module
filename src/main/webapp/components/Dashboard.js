@@ -85,6 +85,9 @@ const useStyles = makeStyles(theme => ({
     root: {
         '& > *': {
             margin: theme.spacing(1)
+        },
+        '& a':{
+            textDecoration:'none !important'
         }
     },
     input: {
@@ -103,7 +106,7 @@ const useStyles = makeStyles(theme => ({
 
 
 const PatientList = (props) => {
-
+    const classes = useStyles();
     const [patients, setPatients] = useState([]);
     const [permissions, setPermissions] = useState([]);
     const [loading, setLoading] = useState('');
@@ -187,8 +190,6 @@ const PatientList = (props) => {
     useEffect(() => {
         loadPatients();
     }, [loadPatients]);
-    console.log(permissions)
-console.log(permissions.includes( "all_permission"))
     function actionItems(row){
        return  [
            {
@@ -236,7 +237,7 @@ console.log(permissions.includes( "all_permission"))
         ]
     }
   return (
-    <div>
+    <div className={classes.root}>
         <ToastContainer autoClose={3000} hideProgressBar />
         <Card>
             <CardBody>
