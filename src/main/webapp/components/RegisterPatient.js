@@ -136,7 +136,9 @@ const UserRegistration = (props) => {
     const [topLevelUnitCountryOptions, settopLevelUnitCountryOptions]= useState([]);
     const [stateUnitOptions, setStateUnitOptions]= useState([]);
     const [districtUnitOptions, setDistrictUnitOptions]= useState([]);
+    const [checkHospitalNumberError, setCheckHospitalNumberError] = useState(false);
     const userDetail = props.location && props.location.state ? props.location.state.user : null;
+    const[patientFacilityId,setPatientFacilityId]=useState(null);
     const classes = useStyles();
     const history = useHistory();
 
@@ -144,6 +146,7 @@ const UserRegistration = (props) => {
     const locationState = location.state;
     let patientId = null;
     patientId = locationState ? locationState.patientId : null;
+
 
     const getNames = (relationship) => {
         const surname = relationship.surname;
@@ -181,7 +184,9 @@ const UserRegistration = (props) => {
             const employmentStatus = patient.employmentStatus;
             const education = patient.education;
             const maritalStatus = patient.maritalStatus;
+            setPatientFacilityId(patient.facilityId)
             setValue('dateOfRegistration', patient.dateOfRegistration);
+            setValue('facilityId', patient.facilityId);
             setValue('firstName', patient.firstName);
             setValue('middleName', patient.otherName);
             setValue('lastName', patient.surname);
@@ -211,6 +216,19 @@ const UserRegistration = (props) => {
     const handleAddRelative = () => {
         setShowRelative(true);
     };
+    const checkHospitalNumber = (e) =>{
+        axios.post(`${baseUrl}patient/exist/hospital-number`,e.target.value,{ responseType: 'text',headers: {"Authorization" : `Bearer ${token}`,'Content-Type': 'text/plain'} }).then(response=>{
+            console.log(response.data)
+            if(response.data){
+                toast.error("Error!!  Hospital Number Exists");
+                setCheckHospitalNumberError(true)
+            }else{
+                setCheckHospitalNumberError(false)
+            }
+        }).catch((error)=>{
+            console.log(error)
+        })
+    }
     const handleSaveRelationship = (e) => {
         const relationshipType = getValues("relationshipType");
         const cfirstName = getValues("cfirstName");
@@ -326,6 +344,7 @@ const UserRegistration = (props) => {
             patientForm.contactPoint.push(phone);
             if (patientId) {
                 patientForm.id = null;
+                patientForm.facilityId = patientFacilityId;
                 const response = await axios.put(`${baseUrl}patient/${patientId}`, patientForm, { headers: {"Authorization" : `Bearer ${token}`} });
             } else {
                 const response = await axios.post(`${baseUrl}patient`, patientForm, { headers: {"Authorization" : `Bearer ${token}`} });
@@ -593,16 +612,33 @@ const UserRegistration = (props) => {
 
                                             <div className="form-group mb-3 col-md-4">
                                                 <FormGroup>
-                                                    <Label for="patientId">Patient Number* </Label>
+                                                    <Label for="patientId">Hospital Number* </Label>
                                                     <input
                                                         className="form-control"
                                                         type="text"
                                                         name="hospitalNumber"
                                                         id="hospitalNumber"
-                                                        {...register("hospitalNumber")}
+                                                        onChange={checkHospitalNumber}
+                                                        {...register("hospitalNumber",{
+                                                            onChange:(e)=>{checkHospitalNumber(e)}
+                                                        })}
                                                         style={{border: "1px solid #014d88"}}
                                                     />
-                                                    {errors.hospitalNumber && <p>Enter the patient hospital number</p>}
+                                                    {checkHospitalNumberError && <p>Hospital Number Entered Already Exists</p> }
+                                                    {!checkHospitalNumberError && errors.hospitalNumber && <p>Enter the patient hospital number</p>}
+                                                </FormGroup>
+                                            </div>
+                                            <div className="form-group mb-3 col-md-4">
+                                                <FormGroup>
+                                                    <Label for="patientId">EMR Number *</Label>
+                                                    <input
+                                                        className="form-control"
+                                                        disabled={true}
+                                                        type="text"
+                                                        name="patientemrnumber"
+                                                        id="EMR Number"
+                                                        style={{border: "1px solid #014d88"}}
+                                                    />
                                                 </FormGroup>
                                             </div>
                                         </div>
@@ -819,6 +855,7 @@ const UserRegistration = (props) => {
                                                     containerStyle={{width:'100%',border: "1px solid #014d88"}}
                                                     inputStyle={{width:'100%',borderRadius:'0px'}}
                                                     country={'ng'}
+                                                    masks={{ng: '...-...-....', at: '(....) ...-....'}}
                                                     placeholder="(234)7099999999"
                                                     value={getValues('pnumber')}
                                                     onChange={(e)=>{checkPhoneNumber(e,'pnumber')}}
@@ -846,6 +883,7 @@ const UserRegistration = (props) => {
                                                     containerStyle={{width:'100%',border: "1px solid #014d88"}}
                                                     inputStyle={{width:'100%',borderRadius:'0px'}}
                                                     country={'ng'}
+                                                    masks={{ng: '...-...-....', at: '(....) ...-....'}}
                                                     placeholder="(234)7099999999"
                                                     value={getValues('altPhonenumber')}
                                                     onChange={(e)=>{checkPhoneNumber(e,'altPhonenumber')}}
@@ -1101,6 +1139,8 @@ const UserRegistration = (props) => {
                                                                             containerStyle={{width:'100%',border: "1px solid #014d88"}}
                                                                             inputStyle={{width:'100%',borderRadius:'0px'}}
                                                                             country={'ng'}
+                                                                            onlyCountries={['ng']}
+                                                                            masks={{ng: '...-...-....', at: '(....) ...-....'}}
                                                                             placeholder="(234)7099999999"
                                                                             value={getValues('contactPhoneNumber')}
                                                                             onChange={(e)=>{checkPhoneNumber(e,'contactPhoneNumber')}}

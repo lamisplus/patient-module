@@ -401,9 +401,6 @@ function Biometrics(props) {
                                                         </svg>
                                                     </Dropdown.Toggle>
                                                     <Dropdown.Menu alignRight={true} className="dropdown-menu-right">
-                                                        <Dropdown.Item /*onClick={()=>viewInstallModule(contact)}*/>
-                                                            <UpgradeIcon/> Update
-                                                        </Dropdown.Item>
                                                         <Dropdown.Item style={{color:'red'}} onClick={()=>deleteBiometric(biometric.id,biometric.templateType)}>
                                                             <DeleteIcon /> Delete
                                                         </Dropdown.Item>

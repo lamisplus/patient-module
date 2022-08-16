@@ -231,7 +231,7 @@ function PatientCard(props) {
                             <div >
                                 <Typography variant="caption">
                                     <Label color={"red"} style={{height:'30px', fontSize:'14px'}}>
-                                        Biometric Not Install
+                                        Biometrics Module Not Install
 
                                     </Label>
 

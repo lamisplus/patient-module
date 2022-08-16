@@ -240,6 +240,7 @@ public class PersonService {
             personResponseDto.setVisitId (visit.get ().getId ());
         }
         personResponseDto.setId (person.getId ());
+        personResponseDto.setFacilityId(person.getFacilityId());
         personResponseDto.setIsDateOfBirthEstimated (person.getIsDateOfBirthEstimated ());
         personResponseDto.setDateOfBirth (person.getDateOfBirth ());
         personResponseDto.setFirstName (person.getFirstName ());
