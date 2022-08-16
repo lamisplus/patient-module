@@ -6,7 +6,7 @@ import ButtonMui from "@material-ui/core/Button";
 import 'semantic-ui-css/semantic.min.css';
 import { Col} from "reactstrap";
 import { Step, Label, Segment, Icon } from "semantic-ui-react";
-import PatientCardDetail from './PatientCard'
+import PatientCard from './PatientCard'
 import { useHistory } from "react-router-dom";
 import { Tab } from 'semantic-ui-react';
 import { DataGrid } from '@mui/x-data-grid';
@@ -113,6 +113,8 @@ function PatientDashboard(props) {
     const [services, setServices]= useState([]);
     const [selectedServices, setSelectedServices]= useState({checkInServices:""});
     const [patientVisits, setPatientVisits]= useState([]);
+    const [patientBiometricStatus, setPatientBiometricStatus]= useState(patientObj.biometricStatus);
+    const [biometricsModuleInstalled,setBiometricsModuleInstalled]=useState(false);
     const [checkOutObj, setCheckOutObj] = useState({
         facilityId: 1,
         personId: "",
@@ -129,6 +131,9 @@ function PatientDashboard(props) {
         }
     })
 
+    const updatePatientBiometricStatus = (bioStatus) =>{
+        setPatientBiometricStatus(bioStatus);
+    }
     const loadServices = useCallback(async () => {
         try {
             const response = await axios.get(`${baseUrl}patient/post-service`, { headers: {"Authorization" : `Bearer ${token}`} });
@@ -161,9 +166,26 @@ function PatientDashboard(props) {
         }
     }, []);
 
+    const checkForBiometricsModule =()=>{
+        axios
+            .get(`${baseUrl}modules/check?moduleName=biometric`,
+                { headers: {"Authorization" : `Bearer ${token}`} }
+            )
+            .then((response) => {
+                if(response.data===true){
+                    setBiometricsModuleInstalled(true);
+                }
+            })
+            .catch((error) => {
+                //console.log(error);
+            });
+
+    }
+
     useEffect(() => {
         loadServices();
         loadPatientVisits();
+        checkForBiometricsModule();
     }, [loadServices, loadPatientVisits]);
 
     let visitTypesRows = null;
@@ -275,15 +297,18 @@ function PatientDashboard(props) {
                     </Tab.Pane>
                     :""
         },
-        { menuItem: permissions.includes('view_patient_appointment') || permissions.includes("all_permission") ? 'Biometrics' : "", render: () =>
-                permissions.includes('view_patient_appointment') || permissions.includes("all_permission") ?
-                    <Tab.Pane>
-                        <div style={{ minHeight: 400, width: '100%' }}>
-                            <Biometrics patientId={patientObj.id}/>
-                        </div>
-                    </Tab.Pane>
-                    :""
-        }
+
+                { menuItem: permissions.includes('view_patient_appointment') && biometricsModuleInstalled || permissions.includes("all_permission")  && biometricsModuleInstalled? 'Biometrics' : "", render: () =>
+                        permissions.includes('view_patient_appointment') || permissions.includes("all_permission") ?
+                            <Tab.Pane>
+                                <div style={{ minHeight: 400, width: '100%' }}>
+                                    <Biometrics patientId={patientObj.id} updatePatientBiometricStatus={updatePatientBiometricStatus}/>
+                                </div>
+                            </Tab.Pane>
+                            :""
+                }
+
+
 
     ];
 
@@ -391,6 +416,7 @@ function PatientDashboard(props) {
         }
 
     }
+
     /**** Submit Button Processing  */
     const handleSubmitCheckOut = (e) => {
         e.preventDefault();
@@ -419,7 +445,7 @@ function PatientDashboard(props) {
             <Card>
                 <CardContent>
 
-                    <PatientCardDetail patientObj={patientObj} permissions={permissions}/>
+                    <PatientCard patientObj={patientObj} permissions={permissions} patientBiometricStatus={patientBiometricStatus}/>
                     <Card style={{marginTop:'10px',boxShadow: 'rgba(99, 99, 99, 0.2) 0px 2px 8px 0px'}}>
                         <CardContent>
                             <div className="row">

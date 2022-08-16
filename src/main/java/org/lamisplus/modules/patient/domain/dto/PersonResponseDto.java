@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 public class PersonResponseDto {
     private Long id;
     private Long visitId;
+    private Long facilityId;
     private Boolean active;
     private String surname;
     private String firstName;
