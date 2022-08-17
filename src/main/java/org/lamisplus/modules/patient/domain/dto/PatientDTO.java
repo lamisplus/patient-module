@@ -45,6 +45,8 @@ public class PatientDTO {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate dateLastCd4;
     private String uuid;
+    private String ninNumber;
+    private String emrNumber;
     private Long htsId;
     private Boolean pregnant;
     private Boolean breastfeeding;

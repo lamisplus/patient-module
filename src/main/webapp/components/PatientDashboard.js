@@ -29,7 +29,7 @@ import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import MatButton from "@material-ui/core/Button";
 import {TiArrowBack} from "react-icons/ti";
 import Biometrics from "./Biometrics";
-
+import moment from "moment";
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
@@ -247,8 +247,8 @@ function PatientDashboard(props) {
                         ]}
                         isLoading={loading}
                         data={patientVisits.map((row) => ({
-                            checkInDate: row.checkInDate,
-                            checkOutDate: row.checkOutDate,
+                            checkInDate: moment(row.checkInDate).format("YYYY-MM-DD HH:mm"),
+                            checkOutDate: row.checkOutDate?moment(row.checkOutDate).format("YYYY-MM-DD HH:mm"):"Visit Ongoing",
                             service:row.service,
                             status:(<Label color={row.status ==='COMPLETED' ? 'green' : 'red'} size="mini">{row.status}</Label>),
 

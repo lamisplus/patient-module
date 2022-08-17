@@ -30,6 +30,10 @@ public class PersonDto implements Serializable {
     private final LocalDateTime deceasedDateTime;
     private final Long maritalStatusId;
     @Nullable
+    private final String ninNumber;
+    @Nullable
+    private final String emrId;
+    @Nullable
     private final Long genderId;
     private final Long sexId;
     private final Long employmentStatusId;

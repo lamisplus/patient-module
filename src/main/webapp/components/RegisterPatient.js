@@ -187,6 +187,7 @@ const UserRegistration = (props) => {
             setPatientFacilityId(patient.facilityId)
             setValue('dateOfRegistration', patient.dateOfRegistration);
             setValue('facilityId', patient.facilityId);
+            setValue('ninNumber', patient.ninNumber);
             setValue('firstName', patient.firstName);
             setValue('middleName', patient.otherName);
             setValue('lastName', patient.surname);
@@ -284,79 +285,85 @@ const UserRegistration = (props) => {
         setShowRelative(false);
     }
     const onSubmit = async (data) => {
-        try {
-            const patientForm = {
-                active: true,
-                address: [
-                    {
-                        "city": data.address,
-                        "countryId": data.countryId,
-                        "district": data.district,
-                        "line": [
-                            data.landmark
-                        ],
-                        "organisationUnitId": 0,
-                        "postalCode": "",
-                        "stateId": data.stateId
+        if(_.find(errors,function (error){return error;})){
+            toast.error("Failed to save form kindly check the form for errors", {position: toast.POSITION.TOP_RIGHT});
+        }else{
+            try {
+                const patientForm = {
+                    active: true,
+                    address: [
+                        {
+                            "city": data.address,
+                            "countryId": data.countryId,
+                            "district": data.district,
+                            "line": [
+                                data.landmark
+                            ],
+                            "organisationUnitId": 0,
+                            "postalCode": "",
+                            "stateId": data.stateId
+                        }
+                    ],
+                    contact: contacts,
+                    contactPoint: [],
+                    dateOfBirth: new Date(data.dob),
+                    deceased: false,
+                    deceasedDateTime: null,
+                    firstName: data.firstName,
+                    sexId: data.sex,
+                    /*genderId:data.sex,*/
+                    identifier: [
+                        {
+                            "assignerId": 1,
+                            "type": "HospitalNumber",
+                            "value": data.hospitalNumber
+                        }
+                    ],
+                    ninNumber: data.ninNumber,
+                    otherName: data.middleName,
+                    maritalStatusId: data.maritalStatus,
+                    surname: data.lastName,
+                    educationId: data.highestQualification,
+                    employmentStatusId: data.employmentStatus,
+                    dateOfRegistration: data.dateOfRegistration,
+                    isDateOfBirthEstimated: data.dateOfBirth == "Actual" ? false : true
+                };
+                const phone = {
+                    "type": "phone",
+                    "value": data.pnumber
+                };
+                if (data.email) {
+                    const email = {
+                        "type": "email",
+                        "value": data.email
                     }
-                ],
-                contact: contacts,
-                contactPoint: [],
-                dateOfBirth: new Date(data.dob),
-                deceased: false,
-                deceasedDateTime: null,
-                firstName: data.firstName,
-                sexId: data.sex,
-                /*genderId:data.sex,*/
-                identifier: [
-                    {
-                        "assignerId": 1,
-                        "type": "HospitalNumber",
-                        "value": data.hospitalNumber
+                    patientForm.contactPoint.push(email);
+                }
+                if (data.altPhonenumber) {
+                    const altPhonenumber = {
+                        "type": "altphone",
+                        "value": data.altPhonenumber
                     }
-                ],
-                otherName: data.middleName,
-                maritalStatusId: data.maritalStatus,
-                surname: data.lastName,
-                educationId: data.highestQualification,
-                employmentStatusId: data.employmentStatus,
-                dateOfRegistration: data.dateOfRegistration,
-                isDateOfBirthEstimated: data.dateOfBirth == "Actual" ? false : true
-            };
-            const phone = {
-                "type": "phone",
-                "value": data.pnumber
-            };
-            if (data.email) {
-                const email = {
-                    "type": "email",
-                    "value": data.email
+                    patientForm.contactPoint.push(altPhonenumber);
                 }
-                patientForm.contactPoint.push(email);
-            }
-            if (data.altPhonenumber) {
-                const altPhonenumber = {
-                    "type": "altphone",
-                    "value": data.altPhonenumber
+                patientForm.contactPoint.push(phone);
+                if (patientId) {
+                    patientForm.id = null;
+                    patientForm.facilityId = patientFacilityId;
+                    const response = await axios.put(`${baseUrl}patient/${patientId}`, patientForm, { headers: {"Authorization" : `Bearer ${token}`} });
+                } else {
+                    const response = await axios.post(`${baseUrl}patient`, patientForm, { headers: {"Authorization" : `Bearer ${token}`} });
                 }
-                patientForm.contactPoint.push(altPhonenumber);
+                toast.success("Patient Register successful");
+                history.push('/');
+            } catch (e) {
+                console.log(e);
+                toast.error("An error occured while registering a patient !", {
+                    position: toast.POSITION.TOP_RIGHT
+                });
             }
-            patientForm.contactPoint.push(phone);
-            if (patientId) {
-                patientForm.id = null;
-                patientForm.facilityId = patientFacilityId;
-                const response = await axios.put(`${baseUrl}patient/${patientId}`, patientForm, { headers: {"Authorization" : `Bearer ${token}`} });
-            } else {
-                const response = await axios.post(`${baseUrl}patient`, patientForm, { headers: {"Authorization" : `Bearer ${token}`} });
-            }
-            toast.success("Patient Register successful");
-            history.push('/');
-        } catch (e) {
-            console.log(e);
-            toast.error("An error occured while registering a patient !", {
-                position: toast.POSITION.TOP_RIGHT
-            });
         }
+
     };
     const onError = (errors) => {
         console.error(errors)
@@ -562,6 +569,7 @@ const UserRegistration = (props) => {
          const result = e.target.value.replace(/[^a-z]/gi, '');
          setValue(inputName,result);
      }
+
     return (
         <>
             <ToastContainer autoClose={3000} hideProgressBar />
@@ -594,7 +602,7 @@ const UserRegistration = (props) => {
                                 <div className="card-body">
                                     <div className="basic-form">
                                         <div className="row">
-                                            <div className="form-group mb-3 col-md-4">
+                                            <div className="form-group mb-3 col-md-3">
                                                 <FormGroup>
                                                     <Label for="dateOfRegistration">Date of Registration* </Label>
                                                     <input
@@ -610,7 +618,7 @@ const UserRegistration = (props) => {
                                                 </FormGroup>
                                             </div>
 
-                                            <div className="form-group mb-3 col-md-4">
+                                            <div className="form-group mb-3 col-md-3">
                                                 <FormGroup>
                                                     <Label for="patientId">Hospital Number* </Label>
                                                     <input
@@ -624,19 +632,32 @@ const UserRegistration = (props) => {
                                                         })}
                                                         style={{border: "1px solid #014d88"}}
                                                     />
-                                                    {checkHospitalNumberError && <p>Hospital Number Entered Already Exists</p> }
-                                                    {!checkHospitalNumberError && errors.hospitalNumber && <p>Enter the patient hospital number</p>}
+                                                    {checkHospitalNumberError && <p>Hospital number has been registered before</p> }
+                                                    {!checkHospitalNumberError && errors.hospitalNumber && <p>Enter the hospital number</p>}
                                                 </FormGroup>
                                             </div>
-                                            <div className="form-group mb-3 col-md-4">
+                                            <div className="form-group mb-3 col-md-3">
                                                 <FormGroup>
-                                                    <Label for="patientId">EMR Number *</Label>
+                                                    <Label for="ninNumber">National Identification Number (NIN)</Label>
+                                                    <input
+                                                        className="form-control"
+                                                        type="text"
+                                                        name="ninNumber"
+                                                        id="ninNumber"
+                                                        style={{border: "1px solid #014d88"}}
+                                                        {...register("ninNumber")}
+                                                    />
+                                                </FormGroup>
+                                            </div>
+                                            <div className="form-group mb-3 col-md-3">
+                                                <FormGroup>
+                                                    <Label for="emrId">EMR ID *</Label>
                                                     <input
                                                         className="form-control"
                                                         disabled={true}
                                                         type="text"
-                                                        name="patientemrnumber"
-                                                        id="EMR Number"
+                                                        name="emrId"
+                                                        id="emrId"
                                                         style={{border: "1px solid #014d88"}}
                                                     />
                                                 </FormGroup>
@@ -859,6 +880,19 @@ const UserRegistration = (props) => {
                                                     placeholder="(234)7099999999"
                                                     value={getValues('pnumber')}
                                                     onChange={(e)=>{checkPhoneNumber(e,'pnumber')}}
+                                                    isValid={(value, country) => {
+                                                        if(value === country.countryCode){
+                                                            return true;
+                                                        }else{
+                                                            if(value.length < 13){
+                                                                errors.pnumber = true;
+                                                                return false;
+                                                            }else{
+                                                                errors.pnumber = false;
+                                                                return true;
+                                                            }
+                                                        }
+                                                    }}
                                                 />
 
 {/*                                                <input
@@ -887,6 +921,19 @@ const UserRegistration = (props) => {
                                                     placeholder="(234)7099999999"
                                                     value={getValues('altPhonenumber')}
                                                     onChange={(e)=>{checkPhoneNumber(e,'altPhonenumber')}}
+                                                    isValid={(value, country) => {
+                                                        if(value === country.countryCode){
+                                                            return true;
+                                                        }else{
+                                                            if(value.length < 13){
+                                                                errors.altPhonenumber = true;
+                                                                return "Enter a valid phone number";
+                                                            }else{
+                                                                errors.altPhonenumber = false;
+                                                                return true;
+                                                            }
+                                                        }
+                                                    }}
                                                 />
 {/*                                                <input
                                                     className="form-control"
@@ -1144,6 +1191,19 @@ const UserRegistration = (props) => {
                                                                             placeholder="(234)7099999999"
                                                                             value={getValues('contactPhoneNumber')}
                                                                             onChange={(e)=>{checkPhoneNumber(e,'contactPhoneNumber')}}
+                                                                            isValid={(value, country) => {
+                                                                                if(value === country.countryCode){
+                                                                                    return true;
+                                                                                }else{
+                                                                                    if(value.length < 13){
+                                                                                        errors.contactPhoneNumber = true;
+                                                                                        return "Enter a valid phone number";
+                                                                                    }else{
+                                                                                        errors.contactPhoneNumber = false;
+                                                                                        return true;
+                                                                                    }
+                                                                                }
+                                                                            }}
                                                                         />
 {/*                                                                        <input
                                                                             className="form-control"

@@ -163,6 +163,8 @@ public class PersonService {
         person.setArchived (0);
         person.setDeceasedDateTime (personDto.getDeceasedDateTime ());
         person.setDeceased (personDto.getDeceased ());
+        person.setNinNumber(personDto.getNinNumber());
+        person.setEmrId(personDto.getEmrId());
         boolean isDateOfBirthEstimated = personDto.getIsDateOfBirthEstimated () != null;
         person.setIsDateOfBirthEstimated (isDateOfBirthEstimated);
 
@@ -240,6 +242,8 @@ public class PersonService {
             personResponseDto.setVisitId (visit.get ().getId ());
         }
         personResponseDto.setId (person.getId ());
+        personResponseDto.setNinNumber (person.getNinNumber());
+        personResponseDto.setEmrId(person.getEmrId());
         personResponseDto.setFacilityId(person.getFacilityId());
         personResponseDto.setIsDateOfBirthEstimated (person.getIsDateOfBirthEstimated ());
         personResponseDto.setDateOfBirth (person.getDateOfBirth ());

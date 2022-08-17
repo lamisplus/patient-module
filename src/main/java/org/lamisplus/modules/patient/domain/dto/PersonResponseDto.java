@@ -17,6 +17,8 @@ public class PersonResponseDto {
     private Long facilityId;
     private Boolean active;
     private String surname;
+    private String ninNumber;
+    private String emrId;
     private String firstName;
     private String otherName;
     private String sex;
