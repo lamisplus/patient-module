@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -15,4 +16,5 @@ public class VisitDto implements Serializable {
     private Long facilityId;
     private Long id;
     private Long personId;
+    private String checkInDate;
 }

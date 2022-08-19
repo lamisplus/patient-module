@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
+import {makeStyles, withStyles} from '@material-ui/core/styles';
 import { Link } from 'react-router-dom';
 import ButtonMui from "@material-ui/core/Button";
 import 'semantic-ui-css/semantic.min.css';
@@ -29,14 +29,25 @@ import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import MatButton from "@material-ui/core/Button";
 import {TiArrowBack} from "react-icons/ti";
 import Biometrics from "./Biometrics";
+import moment from "moment";
+import DualListBox from "react-dual-listbox";
+import 'react-dual-listbox/lib/react-dual-listbox.css';
+import _ from 'lodash';
 
+import { DesktopDateTimePicker } from '@mui/x-date-pickers/DesktopDateTimePicker';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import Stack from '@mui/material/Stack';
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
-const styles = theme => ({
+const useStyles = makeStyles((theme) => ({
     root: {
         width: '100%',
+        marginBottom: 20,
+        flexGrow: 1,
     },
     heading: {
         fontSize: theme.typography.pxToRem(15),
@@ -67,8 +78,49 @@ const styles = theme => ({
             textDecoration: 'underline',
         },
     },
-});
-
+    checkinModal:{
+        "& .modal-dialog":{
+            maxWidth:"1000px"
+        },
+        "& .ui.label":{
+            backgroundColor:"#fff",
+            fontSize:'16px',
+            color:'#014d88',
+            fontWeight:'bold',
+            textAlign:'left'
+        },
+        "& .card-title":{
+            color:'#fff',
+            fontWeight:'bold'
+        },
+        "& .form-control":{
+            borderRadius:'0.25rem',
+            height:'41px'
+        },
+        "& .card-header:first-child": {
+            borderRadius: "calc(0.25rem - 1px) calc(0.25rem - 1px) 0 0"
+        },
+        "& .dropdown-toggle::after": {
+            display: " block !important"
+        },
+        "& select":{
+            "-webkit-appearance": "listbox !important"
+        },
+        "& p":{
+            color:'red'
+        },
+        "& label":{
+            fontSize:'14px',
+            color:'#014d88',
+            fontWeight:'bold'
+        }
+    },
+    checkInDatePicker:{
+        '& .MuiFormControl-root.MuiTextField-root':{
+            border:'1px solid #eee'
+        }
+    }
+}));
 const appointmentColumns = [
     { field: 'id', headerName: 'ID', width: 90 },
     {
@@ -101,33 +153,34 @@ const appointments = [
 
 let newDate = new Date()
 function PatientDashboard(props) {
+    const userDetail = props.location && props.location.state ? props.location.state.user : null;
     const [loading, setLoading] = useState('');
     let history = useHistory();
-    const { classes } = props;
+    const classes = useStyles();
+    const [checkInDate,setCheckInDate]=useState(new Date());
+    const [today, setToday] = useState(new Date().toISOString().substr(0, 10).replace('T', ' '));
     const patientObj = history.location && history.location.state ? history.location.state.patientObj : {};
     const permissions = history.location && history.location.state ? history.location.state.permissions : [];
     const { handleSubmit, control } = useForm();
     const [modal, setModal] = useState(false);
+    const [allServices, setAllServices] = useState(null);
     const [checkinStatus, setCheckinStatus]= useState(false)
     const [modalCheckOut, setModalCheckOut] = useState(false);
     const [services, setServices]= useState([]);
-    const [selectedServices, setSelectedServices]= useState({checkInServices:""});
+    const [selectedServices, setSelectedServices]= useState({"selected":[]});
     const [patientVisits, setPatientVisits]= useState([]);
     const [patientBiometricStatus, setPatientBiometricStatus]= useState(patientObj.biometricStatus);
     const [biometricsModuleInstalled,setBiometricsModuleInstalled]=useState(false);
+
     const [checkOutObj, setCheckOutObj] = useState({
-        facilityId: 1,
         personId: "",
-        visitEndDate:format(new Date(newDate), 'yyyy-MM-dd'),
-        visitStartDate:""
+        visitStartDate:format(new Date(newDate), 'yyyy-MM-dd hh:mm')
     })
     const [checkInObj, setCheckInObj] = useState({
         serviceIds:"",
         visitDto: {
-            facilityId: 1,
             personId: patientObj.id,
-            visitEndDate: "",
-            visitStartDate: format(new Date(newDate), 'yyyy-MM-dd')
+            checkInDate: format(new Date(newDate), 'yyyy-MM-dd hh:mm')
         }
     })
 
@@ -137,7 +190,17 @@ function PatientDashboard(props) {
     const loadServices = useCallback(async () => {
         try {
             const response = await axios.get(`${baseUrl}patient/post-service`, { headers: {"Authorization" : `Bearer ${token}`} });
-            setServices(response.data);
+            //setServices(response.data);
+            setAllServices(response.data);
+            setServices(
+                Object.entries(response.data).map(([key, value]) => ({
+                    label: value.moduleServiceName,
+                    value: value.moduleServiceCode,
+                }))
+            );
+/*            setSelectedServices(
+                _.uniq(_.map(userDetail.applicationUserOrganisationUnits, 'organisationUnitName'))
+            )*/
         } catch (e) {
             await Swal.fire({
                 icon: 'error',
@@ -181,8 +244,16 @@ function PatientDashboard(props) {
             });
 
     }
+    const loadUserDetails = () =>{
+        axios.get(`${baseUrl}account`).then((response)=>{
+
+        }).catch((error)=>{
+
+        })
+    }
 
     useEffect(() => {
+        loadUserDetails();
         loadServices();
         loadPatientVisits();
         checkForBiometricsModule();
@@ -195,7 +266,12 @@ function PatientDashboard(props) {
         ));
     }
 
-
+    const onChangeDate = (date) => {
+        console.log(date.target.value)
+        const newDate = moment(new Date(date.target.value)).format("yyyy-MM-dd hh:mm");
+        setCheckInDate(newDate);
+        console.log(newDate);
+    };
 
 
     const columns = [
@@ -247,8 +323,8 @@ function PatientDashboard(props) {
                         ]}
                         isLoading={loading}
                         data={patientVisits.map((row) => ({
-                            checkInDate: row.checkInDate,
-                            checkOutDate: row.checkOutDate,
+                            checkInDate: moment(row.checkInDate).format("YYYY-MM-DD h:mm a"),
+                            checkOutDate: row.checkOutDate?moment(row.checkOutDate).format("YYYY-MM-DD h:mm a"):"Visit Ongoing",
                             service:row.service,
                             status:(<Label color={row.status ==='COMPLETED' ? 'green' : 'red'} size="mini">{row.status}</Label>),
 
@@ -328,9 +404,9 @@ function PatientDashboard(props) {
     const onDelete = () => {
 
     };
-    const handleInputChangeService = (e) => {
+/*    const handleInputChangeService = (e) => {
         setSelectedServices({ ...selectedServices, [e.target.name]: e.target.value });
-    };
+    };*/
     //console.lo(selectedServices)
 
     const onSubmit = async (data) => {
@@ -382,20 +458,16 @@ function PatientDashboard(props) {
     /**** Submit Button For CheckIN  */
     const handleSubmitCheckIn = (e) => {
         e.preventDefault();
-/*        alert('dd')
-        console.log(selectedServices)
-        alert('dd')*/
         //Check if selected service object is empty before creating visit and posting.
-        if(selectedServices.checkInServices.length > 0){
-            selectedServices.checkInServices.length > 0 && selectedServices.checkInServices.map((service)=> {
-
-                if(service.id!==null){
-                    checkInServicesID.push(service.id)
-                    console.log(service)
-                }
+        let m = moment(checkInDate, "yyyy-MM-DD hh:mm").format('yyyy-MM-DD H:mm');
+        if(selectedServices.selected.length > 0 && moment(m).isValid()){
+            selectedServices.selected.length > 0 && selectedServices.selected.map((service)=> {
+                checkInServicesID.push(_.find(allServices,{moduleServiceCode:service}).id)
             });
 
             checkInObj.serviceIds= checkInServicesID
+            //Ensure date time is in 24hr format
+            checkInObj.visitDto.checkInDate = moment(checkInDate, "yyyy-MM-DD hh:mm").format('yyyy-MM-DD H:mm');
             axios.post(`${baseUrl}patient/visit/checkin`, checkInObj,
                 { headers: {"Authorization" : `Bearer ${token}`}},
 
@@ -412,7 +484,7 @@ function PatientDashboard(props) {
                     onCancelCheckIn()
                 });
         }else{
-            toast.error("Kindly select a service to post the patient");
+            toast.error("Kindly check the form for a valid date and selected services");
         }
 
     }
@@ -438,7 +510,9 @@ function PatientDashboard(props) {
                 onCancelCheckOut()
             });
     }
-
+    const onServiceSelect = (selectedValues) => {
+        setSelectedServices({"selected":selectedValues});
+    };
 
     return (
         <div className={classes.root}>
@@ -513,21 +587,49 @@ function PatientDashboard(props) {
 
                 </CardContent>
             </Card>
-            <Modal isOpen={modal} toggle={onCancelCheckIn}>
-                <ModalHeader toggle={onCancelCheckIn}>Select a Service Area</ModalHeader>
-                <ModalBody>
-                    <form onSubmit={handleSubmitCheckIn}>
-                        <Paper
-                            style={{
-                                display: "grid",
-                                gridRowGap: "20px",
-                                padding: "20px",
-                                margin: "10px 10px",
-                            }}>
-                            <Grid container spacing={2}>
-                                <Grid item xs={8}>
-                                    <FormControl >
+            <Modal  size="lg" style={{maxWidth: '900px'}} isOpen={modal} toggle={onCancelCheckIn}  className={classes.checkinModal}>
+                    <ModalHeader toggle={onCancelCheckIn}><h5 style={{fontWeight:"bold",fontSize:'30px',color:'#992E62'}}>Select Check-In Service</h5></ModalHeader>
+                    <ModalBody>
+                        <form onSubmit={handleSubmitCheckIn}>
+                            <Paper
+                                style={{
+                                    display: "grid",
+                                    gridRowGap: "20px",
+                                    padding: "20px",
+                                    margin: "10px 10px",
+                                }}>
+                                <Grid container spacing={2}>
+                                    <Grid item xs={12}>
+                                        <FormGroup style={{width:'100%'}} className={classes.checkInDatePicker}>
+                                            <LocalizationProvider dateAdapter={AdapterDateFns} >
+                                                <Label for="post-services" style={{color:'#014d88',fontWeight:'bolder',fontSize:'18px'}}>Check-In Date *</Label>
+                                                <DesktopDateTimePicker
+                                                    renderInput={(params) =>
+                                                        <TextField
+                                                            {...params}
 
+                                                            sx={{
+                                                                /*label:{ color:'#014d88',fontWeight:'bolder',fontSize:'18px' }*/
+                                                                input:{fontSize:'14px'},
+                                                            }}
+                                                            fullWidth
+                                                        />
+                                                    }
+                                                    value={checkInDate}
+                                                    onChange={(newValue) => {
+                                                        setCheckInDate(newValue);
+                                                    }}
+                                                    maxDate={new Date()}
+                                                    maxTime={new Date()}
+                                                    style={{width:'100%'}}
+                                                />
+                                            </LocalizationProvider>
+                                        </FormGroup>
+                                    </Grid>
+                                    {/*                                <Grid item xs={8}>
+
+                                    <FormControl >
+                                        <Label for="dateOfRegistration">Select service </Label>
                                         <Autocomplete
                                             multiple
                                             id="checkboxes-tags-demo"
@@ -556,16 +658,26 @@ function PatientDashboard(props) {
                                         />
 
                                     </FormControl>
+                                </Grid>*/}
+                                    <Grid item xs={12}>
+                                        <FormGroup>
+                                            <Label for="post-services" style={{color:'#014d88',fontWeight:'bolder',fontSize:'18px'}}>Check-In Service *</Label>
+                                            <DualListBox
+                                                options={services}
+                                                onChange={onServiceSelect}
+                                                selected={selectedServices.selected}
+                                            />
+                                        </FormGroup>
+                                    </Grid>
                                 </Grid>
-                            </Grid>
-                            <Grid container spacing={2}>
-                                <Grid item xs={12}>
-                                    <Button type={"submit"} variant="contained" color={"primary"}>Submit</Button>
+                                <Grid container spacing={2}>
+                                    <Grid item xs={12}>
+                                        <Button type={"submit"} variant="contained" color={"primary"}>Submit</Button>
+                                    </Grid>
                                 </Grid>
-                            </Grid>
-                        </Paper>
-                    </form>
-                </ModalBody>
+                            </Paper>
+                        </form>
+                    </ModalBody>
             </Modal>
             {/* Modal for CheckOut Patient */}
             <Modal isOpen={modalCheckOut} toggle={onCancelCheckOut}>
@@ -598,4 +710,4 @@ function PatientDashboard(props) {
     );
 }
 
-export default withStyles(styles)(PatientDashboard);
+export default PatientDashboard;

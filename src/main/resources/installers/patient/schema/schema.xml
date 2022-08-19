@@ -39,6 +39,8 @@
                 archived                   INTEGER,
                 facility_id                BIGINT,
                 uuid                       VARCHAR(255) NOT NULL,
+                nin_number                 VARCHAR(255),
+                emr_id                     VARCHAR(255),
                 first_name                 VARCHAR(255),
                 sex                        VARCHAR(255) NOT NULL,
                 surname                    VARCHAR(255) NOT NULL ,
@@ -73,7 +75,7 @@
                 person_uuid        VARCHAR(255)                            NOT NULL,
                 visit_start_date   TIMESTAMP WITHOUT TIME ZONE NOT NULL,
                 visit_end_date     TIMESTAMP WITHOUT TIME ZONE,
-                uuid               VARCHAR(255)                            NOT NULL,
+                uuid               VARCHAR(255)                          NOT NULL,
                 archived           INTEGER,
                 CONSTRAINT pk_patient_visit PRIMARY KEY (id)
             );
