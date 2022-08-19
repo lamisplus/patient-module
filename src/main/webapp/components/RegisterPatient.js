@@ -113,7 +113,7 @@ const schema = yup.object().shape({
     district: yup.number().nullable(),
 });
 
-const UserRegistration = (props) => {
+const RegisterPatient = (props) => {
     const { register, watch, setValue, getValues, setError, handleSubmit, formState: { errors } } = useForm({
         resolver: yupResolver(schema),
     });
@@ -356,6 +356,7 @@ const UserRegistration = (props) => {
                 }
                 toast.success("Patient Register successful");
                 history.push('/');
+                alert("done");
             } catch (e) {
                 console.log(e);
                 toast.error("An error occured while registering a patient !", {
@@ -1354,4 +1355,4 @@ const UserRegistration = (props) => {
     );
 };
 
-export default UserRegistration
+export default RegisterPatient;

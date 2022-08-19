@@ -2,6 +2,7 @@ package org.lamisplus.modules.patient.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.joda.time.DateTime;
 import org.lamisplus.modules.base.controller.apierror.EntityNotFoundException;
 import org.lamisplus.modules.base.controller.apierror.RecordExistException;
 import org.lamisplus.modules.patient.domain.dto.CheckInDto;
@@ -18,6 +19,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -37,6 +39,7 @@ public class VisitService {
 
 
     public VisitDto createVisit(VisitDto visitDto) {
+        String checkInDate = visitDto.getCheckInDate();
         Person person = personRepository
                 .findById (visitDto.getPersonId ())
                 .orElseThrow (() -> new EntityNotFoundException (VisitService.class, "errorMessage", "No person found with id " + visitDto.getPersonId ()));
@@ -46,6 +49,17 @@ public class VisitService {
         Visit visit = convertDtoToEntity (visitDto);
         visit.setUuid (UUID.randomUUID ().toString ());
         visit.setArchived (0);
+        if(checkInDate != null){
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+            LocalDateTime visitStartDateTime = LocalDateTime.parse(checkInDate, formatter);
+            visit.setVisitStartDate(visitStartDateTime);
+        }else{
+            LocalDateTime now = LocalDateTime.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+            String formatDateTime = now.format(formatter);
+            LocalDateTime visitStartDateTime = LocalDateTime.parse(formatDateTime, formatter);
+            visit.setVisitStartDate(visitStartDateTime);
+        }
         return convertEntityToDto (visitRepository.save (visit));
     }
 
@@ -92,6 +106,7 @@ public class VisitService {
     }
 
     public VisitDto checkInPerson(CheckInDto checkInDto) {
+        String checkInDate = checkInDto.getVisitDto().getCheckInDate();
         Long personId = checkInDto.getVisitDto ().getPersonId ();
         Person person = personRepository
                 .findById (personId)
