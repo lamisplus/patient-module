@@ -39,6 +39,8 @@ public class PersonResponseDto {
     private Object address;
     private LocalDate dateOfRegistration;
     private Boolean IsDateOfBirthEstimated;
+    private LocalDateTime encounterDate;
+    private Long encounterId;
 
 
 }

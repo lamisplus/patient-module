@@ -158,6 +158,7 @@ function PatientDashboard(props) {
     let history = useHistory();
     const classes = useStyles();
     const [checkInDate,setCheckInDate]=useState(new Date());
+    const [checkOutDate,setCheckOutDate]=useState(new Date());
     const [today, setToday] = useState(new Date().toISOString().substr(0, 10).replace('T', ' '));
     const patientObj = history.location && history.location.state ? history.location.state.patientObj : {};
     const permissions = history.location && history.location.state ? history.location.state.permissions : [];
@@ -467,7 +468,7 @@ function PatientDashboard(props) {
 
             checkInObj.serviceIds= checkInServicesID
             //Ensure date time is in 24hr format
-            checkInObj.visitDto.checkInDate = moment(checkInDate, "yyyy-MM-DD hh:mm").format('yyyy-MM-DD H:mm');
+            checkInObj.visitDto.checkInDate = moment(checkInDate, "yyyy-MM-DD hh:mm").format('yyyy-MM-DD HH:mm');
             axios.post(`${baseUrl}patient/visit/checkin`, checkInObj,
                 { headers: {"Authorization" : `Bearer ${token}`}},
 
@@ -661,7 +662,7 @@ function PatientDashboard(props) {
                                 </Grid>*/}
                                     <Grid item xs={12}>
                                         <FormGroup>
-                                            <Label for="post-services" style={{color:'#014d88',fontWeight:'bolder',fontSize:'18px'}}>Check-In Service *</Label>
+                                            <Label for="post-services" style={{color:'#014d88',fontWeight:'bolder',fontSize:'18px'}}><h5 style={{fontWeight:"bold",fontSize:'30px',color:'#992E62'}}>Check-In Service *</h5></Label>
                                             <DualListBox
                                                 options={services}
                                                 onChange={onServiceSelect}
@@ -680,8 +681,8 @@ function PatientDashboard(props) {
                     </ModalBody>
             </Modal>
             {/* Modal for CheckOut Patient */}
-            <Modal isOpen={modalCheckOut} toggle={onCancelCheckOut}>
-                <ModalHeader toggle={onCancelCheckOut}>Check Out </ModalHeader>
+            <Modal isOpen={modalCheckOut} toggle={onCancelCheckOut} className={classes.checkinModal} style={{maxWidth: '900px',height:"800px"}}>
+                <ModalHeader toggle={onCancelCheckOut}><h5 style={{fontWeight:"bold",fontSize:'30px',color:'#014d88'}}>Check Out </h5></ModalHeader>
                 <ModalBody>
                     <form >
                         <Paper
@@ -693,12 +694,41 @@ function PatientDashboard(props) {
                             }}>
                             <Grid container spacing={2}>
                                 <Grid item xs={12}>
-                                    <h5>Are you sure you want to check-out patient?</h5>
+                                    <h5 style={{color:'#992E62',fontSize:"20px", fontWeight:'bold'}}>Are you sure you want to check-out patient?</h5>
                                 </Grid>
+                                <Grid item xs={12}>
+                                    <FormGroup style={{width:'100%'}} className={classes.checkInDatePicker}>
+                                        <LocalizationProvider dateAdapter={AdapterDateFns} >
+                                            <Label for="post-services" style={{color:'#014d88',fontWeight:'bolder',fontSize:'16px'}}>Check-Out Date *</Label>
+                                            <DesktopDateTimePicker
+                                                renderInput={(params) =>
+                                                    <TextField
+                                                        {...params}
+
+                                                        sx={{
+                                                            /*label:{ color:'#014d88',fontWeight:'bolder',fontSize:'18px' }*/
+                                                            input:{fontSize:'14px'},
+                                                        }}
+                                                        fullWidth
+                                                    />
+                                                }
+                                                value={checkOutDate}
+                                                onChange={(newValue) => {
+                                                    setCheckOutDate(newValue);
+                                                }}
+                                                maxDate={new Date()}
+                                                maxTime={new Date()}
+                                                style={{width:'100%'}}
+                                            />
+                                        </LocalizationProvider>
+                                    </FormGroup>
+                                </Grid>
+
                             </Grid>
                             <Grid container spacing={2}>
                                 <Grid item xs={12}>
                                     <Button type={"submit"} onClick={handleSubmitCheckOut} variant="contained" color={"primary"}>Yes</Button>
+                                    <Button  onClick={onCancelCheckOut} variant="contained" style={{backgroundColor:'#992E62',color:"#fff",marginLeft:"10px"}}>Cancel</Button>
                                 </Grid>
                             </Grid>
                         </Paper>

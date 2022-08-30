@@ -19,4 +19,7 @@ public interface EncounterRepository extends JpaRepository<Encounter, Long> {
 
     List<Encounter> getEncounterByVisit(Visit visit);
 
+    Optional<Encounter> findByPerson(Person person);
+
+
 }
