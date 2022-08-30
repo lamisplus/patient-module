@@ -356,7 +356,6 @@ const RegisterPatient = (props) => {
                 }
                 toast.success("Patient Register successful");
                 history.push('/');
-                alert("done");
             } catch (e) {
                 console.log(e);
                 toast.error("An error occured while registering a patient !", {
