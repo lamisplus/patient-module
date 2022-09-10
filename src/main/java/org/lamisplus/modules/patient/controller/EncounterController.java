@@ -33,6 +33,11 @@ public class EncounterController {
         return ResponseEntity.ok (encounterService.getEncounterById (id));
     }
 
+    @GetMapping("/encounter/visit/{visit_id}")
+    public ResponseEntity<List<EncounterResponseDto>> getEncounterByVisitId(@PathVariable("visit_id") Long id) {
+        return ResponseEntity.ok (encounterService.getEncounterByVisitId(id));
+    }
+
     @GetMapping("/encounter/person/{personId}")
     public ResponseEntity<List<EncounterResponseDto>> getPersonEncounter(@PathVariable("personId") Long personId) {
         return ResponseEntity.ok (encounterService.getAllEncounterByPerson (personId));
