@@ -265,6 +265,12 @@ public class PersonService {
         personResponseDto.setDeceasedDateTime (person.getDeceasedDateTime ());
         personResponseDto.setOrganization (person.getOrganization ());
         personResponseDto.setBiometricStatus (getPatientBiometricStatus (person.getUuid ()));
+        Optional<Encounter> encounter = this.encounterRepository.findByPerson(person);
+        if(encounter.isPresent()) {
+            Encounter encounter1 = encounter.get();
+            personResponseDto.setEncounterId(encounter1.getId());
+            personResponseDto.setEncounterDate(encounter1.getEncounterDate());
+        }
         return personResponseDto;
     }
 
