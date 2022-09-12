@@ -113,6 +113,12 @@ const schema = yup.object().shape({
     district: yup.number().nullable(),
 });
 
+const isValidEmail = email =>
+    // eslint-disable-next-line no-useless-escape
+    /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
+        email
+    );
+
 const RegisterPatient = (props) => {
     const { register, watch, setValue, getValues, setError, handleSubmit, formState: { errors } } = useForm({
         resolver: yupResolver(schema),
@@ -284,6 +290,22 @@ const RegisterPatient = (props) => {
     const handleCancelSaveRelationship = () => {
         setShowRelative(false);
     }
+    const handleEmailValidation = email => {
+        console.log("ValidateEmail was called with", email);
+
+        const isValid = isValidEmail(email);
+        if(!isValid){
+            errors.email.message = "Please enter a valid email"
+        }
+        const validityChanged =
+            (errors.email && isValid) || (!errors.email && !isValid);
+        if (validityChanged) {
+            console.log("Fire tracker with", isValid ? "Valid" : "Invalid");
+        }
+
+        return isValid;
+    };
+
     const onSubmit = async (data) => {
         if(_.find(errors,function (error){return error;})){
             toast.error("Failed to save form kindly check the form for errors", {position: toast.POSITION.TOP_RIGHT});
@@ -958,8 +980,9 @@ const RegisterPatient = (props) => {
                                                     type="email"
                                                     name="email"
                                                     id="email"
-                                                    {...register("email")}
+                                                    {...register("email",{ required: true, validate: handleEmailValidation })}
                                                     style={{border: "1px solid #014d88"}}
+                                                    /*ref={register()}*/
                                                 />
                                                 {errors.email && <p>{errors.email.message}</p>}
                                             </FormGroup>
