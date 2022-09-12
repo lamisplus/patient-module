@@ -6,6 +6,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
@@ -18,4 +19,5 @@ public class VisitDetailDto implements Serializable {
     private final LocalDateTime checkOutDate;
     private final String service;
     private final String status;
+    public List<EncounterResponseDto> encounters;
 }

@@ -96,6 +96,14 @@ public class EncounterService {
         return convertEntityToResponseDto(getExistEncounter(id));
     }
 
+    public List<EncounterResponseDto> getEncounterByVisitId(Long visitId) {
+        Visit visit = visitRepository.findById (visitId).orElseThrow (() -> new EntityNotFoundException (EncounterService.class, "errorMessage", "No visit was found with given Id " + visitId));
+        List<Encounter> visitEncounters = encounterRepository.getEncounterByVisit(visit);
+        return  visitEncounters
+                .stream ()
+                .map (this::convertEntityToResponseDto)
+                .collect (Collectors.toList ());
+    }
 
     public void archivedEncounter(Long id) {
         Encounter existEncounter = getExistEncounter(id);
@@ -107,6 +115,7 @@ public class EncounterService {
     private Encounter getExistEncounter(Long id) {
         return encounterRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(EncounterService.class, "errorMessage", "No encounter found with Id " + id));
     }
+
 
 
     private EncounterResponseDto convertEntityToResponseDto(Encounter encounter) {

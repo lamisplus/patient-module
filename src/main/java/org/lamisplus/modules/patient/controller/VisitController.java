@@ -35,7 +35,7 @@ public class VisitController {
         return ResponseEntity.ok (visitService.getVisitById (id));
     }
 
-    @GetMapping("/visit-detail/{personId}")
+    @GetMapping("/visit-by-patient/{personId}")
     public ResponseEntity<List<VisitDetailDto>> getPersonVisitDetail(@PathVariable("personId") Long personId) {
         return ResponseEntity.ok (visitService.getVisitWithEncounterDetails (personId));
     }

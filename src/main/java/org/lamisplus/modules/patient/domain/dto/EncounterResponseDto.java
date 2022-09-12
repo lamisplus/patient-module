@@ -27,4 +27,5 @@ public class EncounterResponseDto {
     private Long visitId;
     private String serviceCode;
     private String status;
+
 }
