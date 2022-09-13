@@ -6,10 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.lamisplus.modules.base.controller.apierror.EntityNotFoundException;
 import org.lamisplus.modules.base.controller.apierror.RecordExistException;
-import org.lamisplus.modules.patient.domain.dto.CheckInDto;
-import org.lamisplus.modules.patient.domain.dto.EncounterResponseDto;
-import org.lamisplus.modules.patient.domain.dto.VisitDetailDto;
-import org.lamisplus.modules.patient.domain.dto.VisitDto;
+import org.lamisplus.modules.patient.domain.dto.*;
 import org.lamisplus.modules.patient.domain.entity.Encounter;
 import org.lamisplus.modules.patient.domain.entity.Person;
 import org.lamisplus.modules.patient.domain.entity.Visit;
@@ -44,15 +41,26 @@ public class VisitService {
     private final PatientCheckPostServiceRepository patientCheckPostServiceRepository;
 
 
-    public VisitDto createVisit(VisitDto visitDto) {
-        String checkInDate = visitDto.getCheckInDate();
+    public VisitDto createVisit(VisitRequestDto visitDto) {
+
+
+        String checkInDate = visitDto.getVisitDto().getCheckInDate();
         Person person = personRepository
-                .findById(visitDto.getPersonId())
-                .orElseThrow(() -> new EntityNotFoundException(VisitService.class, "errorMessage", "No person found with id " + visitDto.getPersonId()));
+                .findById(visitDto.getVisitDto().getPersonId())
+                .orElseThrow(() -> new EntityNotFoundException(VisitService.class, "errorMessage", "No person found with id " + visitDto.getVisitDto().getPersonId()));
+
+
         Optional<Visit> currentVisit = visitRepository.findVisitByPersonAndVisitStartDateNotNullAndVisitEndDateIsNull(person);
         if (currentVisit.isPresent())
             throw new RecordExistException(VisitService.class, "errorMessage", "Visit Already exist for this patient " + person.getId());
-        Visit visit = convertDtoToEntity(visitDto);
+        Visit visit = convertDtoToEntityVisit(visitDto);
+
+        visitDto.getServiceIds().stream()
+                .map(id -> patientCheckPostServiceRepository
+                        .findById(id)
+                        .orElseThrow(() -> new EntityNotFoundException(Visit.class, "errorMessage", "No service found with Id " + id)))
+                .forEach(patientCheckPostService -> createEncounter(person, visit, patientCheckPostService.getModuleServiceCode()));
+
         visit.setUuid(UUID.randomUUID().toString());
         visit.setArchived(0);
         if (checkInDate != null) {
@@ -112,7 +120,7 @@ public class VisitService {
     }
 
     public VisitDto checkInPerson(CheckInDto checkInDto) {
-        Long personId = checkInDto.getVisitDto().getPersonId();
+        Long personId = checkInDto.getVisitDto().getVisitDto().getPersonId();
         Person person = personRepository
                 .findById(personId)
                 .orElseThrow(() -> new EntityNotFoundException(Visit.class, "errorMessage", "No person found with id " + personId));
@@ -193,6 +201,19 @@ public class VisitService {
         Person person = personRepository
                 .findById(visitDto.getPersonId())
                 .orElseThrow(() -> new EntityNotFoundException(VisitService.class, "errorMessage", "No patient found with id " + visitDto.getPersonId()));
+        Visit visit = new Visit();
+        BeanUtils.copyProperties(visitDto, visit);
+        visit.setVisitStartDate(LocalDateTime.now());
+        log.info("facilityId {}", person.getFacilityId());
+        visit.setFacilityId(person.getFacilityId());
+        visit.setPerson(person);
+        return visit;
+    }
+
+    private Visit convertDtoToEntityVisit(VisitRequestDto visitDto) {
+        Person person = personRepository
+                .findById(visitDto.getVisitDto().getPersonId())
+                .orElseThrow(() -> new EntityNotFoundException(VisitService.class, "errorMessage", "No patient found with id " + visitDto.getVisitDto().getPersonId()));
         Visit visit = new Visit();
         BeanUtils.copyProperties(visitDto, visit);
         visit.setVisitStartDate(LocalDateTime.now());
