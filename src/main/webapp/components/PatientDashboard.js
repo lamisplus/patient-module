@@ -303,7 +303,7 @@ function PatientDashboard(props) {
     ];
 
     const panes = [
-        { menuItem: 'Patient Visit', render: () =>
+        { menuItem: 'Visits', render: () =>
                 <Tab.Pane>
 
                     <MaterialTable
@@ -358,7 +358,7 @@ function PatientDashboard(props) {
                 </Tab.Pane>
         },
 
-        { menuItem: permissions.includes('view_patient_appointment') || permissions.includes("all_permission") ? 'Appointments' : "", render: () =>
+/*        { menuItem: permissions.includes('view_patient_appointment') || permissions.includes("all_permission") ? 'Appointments' : "", render: () =>
                 permissions.includes('view_patient_appointment') || permissions.includes("all_permission") ?
                     <Tab.Pane>
                         <div style={{ height: 400, width: '100%' }}>
@@ -373,7 +373,7 @@ function PatientDashboard(props) {
                         </div>
                     </Tab.Pane>
                     :""
-        },
+        },*/
 
                 { menuItem: permissions.includes('view_patient_appointment') && biometricsModuleInstalled || permissions.includes("all_permission")  && biometricsModuleInstalled? 'Biometrics' : "", render: () =>
                         permissions.includes('view_patient_appointment') || permissions.includes("all_permission") ?

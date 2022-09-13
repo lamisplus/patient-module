@@ -35,6 +35,12 @@ import Remove from '@material-ui/icons/Remove';
 import SaveAlt from '@material-ui/icons/SaveAlt';
 import Search from '@material-ui/icons/Search';
 import ViewColumn from '@material-ui/icons/ViewColumn';
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
+
+
+
 
 const tableIcons = {
     Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -112,6 +118,7 @@ const PatientList = (props) => {
     const [loading, setLoading] = useState('');
     const [modal, setModal] = useState(false);
     const [patient, setPatient] = useState(false);
+    const [enablePPI, setEnablePPI] = useState(true);
     const toggle = (id) => {
         const patient = patients.find(obj => obj.id == id);
         setPatient(patient);
@@ -236,34 +243,50 @@ const PatientList = (props) => {
                )}
         ]
     }
+    const enablePPIColumns = () =>{
+        setEnablePPI(!enablePPI)
+    }
   return (
     <div className={classes.root}>
         <ToastContainer autoClose={3000} hideProgressBar />
         <Card>
             <CardBody>
-            {permissions.includes('view_patient') || permissions.includes("all_permission") ? (
-                <Link to={"register-patient"}>
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        className=" float-right mr-1"
-                        startIcon={<FaUserPlus size="25"/>}
-                        style={{backgroundColor:'#014d88'}}
-                    >
-                        <span style={{ textTransform: "capitalize", fontWeight:'bolder' }}>New Patient</span>
-                    </Button>
-                </Link>
-            ):""
-        }
+                {permissions.includes('view_patient') || permissions.includes("all_permission") ? (
+                    <Link to={"register-patient"}>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            className=" float-right mr-1"
+                            startIcon={<FaUserPlus size="25"/>}
+                            style={{backgroundColor:'#014d88'}}
+                        >
+                            <span style={{ textTransform: "capitalize", fontWeight:'bolder' }}>New Patient</span>
+                        </Button>
+                    </Link>
+                ):""
+                }
+                {permissions.includes('view_patient') || permissions.includes("all_permission") ? (
+                    <FormGroup className=" float-right mr-1">
+                        <FormControlLabel  control={
+                            <Checkbox
+                                onChange={enablePPIColumns}
+                                style={{color:'#014d88',fontWeight:'bold'}}
+                            />
+                        } label="Show PPI" style={{color:'#014d88',fontWeight:'bold'}} />
+                    </FormGroup>
+                ):""
+                }
                 <br/><br/>
                 <br/>
                 <MaterialTable
                     icons={tableIcons}
-                    title="Find patients"
+                    title="Patients"
                     columns={[
                         {
                             title: "Name",
-                            field: "name", filtering: false
+                            field: "name",
+                            filtering: false,
+                            hidden:enablePPI
                         },
                         { title: "Hosp. Number", field: "id" , filtering: false},
                         { title: "Sex", field: "sex", filtering: false },
@@ -275,7 +298,7 @@ const PatientList = (props) => {
                     ]}
                     isLoading={loading}
                     data={patients.map((row) => ({
-                        name: row.firstName +  ' ' + row.otherName +  ' ' + row.surname,
+                        name: [row.firstName, row.otherName, row.surname].filter(Boolean).join(", "),
                         id: getHospitalNumber(row.identifier),
                         sex: row.sex,
                         dateOfBirth: row.dateOfBirth,
