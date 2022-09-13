@@ -5,6 +5,7 @@ import lombok.Data;
 @Data
 public class VisitRequest
 {
-    private String checkInDate;
     private Long personId;
+    private String checkInDate;
+
 }

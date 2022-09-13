@@ -120,11 +120,13 @@ public class VisitService {
     }
 
     public VisitDto checkInPerson(CheckInDto checkInDto) {
-        Long personId = checkInDto.getVisitDto().getVisitDto().getPersonId();
+        Long personId = checkInDto.getVisitDto().getPersonId();
         Person person = personRepository
                 .findById(personId)
                 .orElseThrow(() -> new EntityNotFoundException(Visit.class, "errorMessage", "No person found with id " + personId));
-        VisitDto visitDto = createVisit(checkInDto.getVisitDto());
+        VisitRequestDto visitRequestDto = new VisitRequestDto();
+        visitRequestDto.setVisitDto(checkInDto.getVisitDto());
+        VisitDto visitDto = createVisit(visitRequestDto);
         Visit visit = getExistVisit(visitDto.getId());
         checkInDto.getServiceIds()
                 .stream()

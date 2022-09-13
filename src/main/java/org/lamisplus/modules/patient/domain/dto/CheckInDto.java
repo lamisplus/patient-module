@@ -6,7 +6,8 @@ import java.util.List;
 
 @Data
 public class CheckInDto {
-    List<Long> serviceIds;
-    private VisitRequestDto visitDto;
+    private List<Long> serviceIds;
+    private VisitRequest visitDto;
+
 
 }
