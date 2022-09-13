@@ -1,11 +1,13 @@
 package org.lamisplus.modules.patient.service;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.lamisplus.modules.base.controller.apierror.EntityNotFoundException;
 import org.lamisplus.modules.base.controller.apierror.RecordExistException;
 import org.lamisplus.modules.patient.domain.dto.CheckInDto;
+import org.lamisplus.modules.patient.domain.dto.EncounterResponseDto;
 import org.lamisplus.modules.patient.domain.dto.VisitDetailDto;
 import org.lamisplus.modules.patient.domain.dto.VisitDto;
 import org.lamisplus.modules.patient.domain.entity.Encounter;
@@ -15,9 +17,13 @@ import org.lamisplus.modules.patient.repository.EncounterRepository;
 import org.lamisplus.modules.patient.repository.PatientCheckPostServiceRepository;
 import org.lamisplus.modules.patient.repository.PersonRepository;
 import org.lamisplus.modules.patient.repository.VisitRepository;
+import org.lamisplus.modules.patient.utility.LocalDateConverter;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.Convert;
+import javax.validation.constraints.PastOrPresent;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -149,6 +155,21 @@ public class VisitService {
     }
 
     private VisitDetailDto getVisitDetailDto(Long personId, Encounter encounter) {
+        List<Encounter> encounters = this.encounterRepository.getEncounterByVisit(encounter.getVisit());
+        List<EncounterResponseDto> encounterResponseList = new ArrayList<>();
+        encounters.forEach(encounter1 -> {
+            EncounterResponseDto encounterResponseDto = new EncounterResponseDto();
+            encounterResponseDto.setFacilityId(encounter1.getFacilityId());
+            encounterResponseDto.setId(encounter1.getId());
+            encounterResponseDto.setEncounterDate(encounter1.getEncounterDate().toLocalDate());
+            encounterResponseDto.setPersonId(encounter1.getPerson().getId());
+            encounterResponseDto.setUuid(encounter1.getUuid());
+            encounterResponseDto.setVisitId(encounter1.getVisit().getId());
+            encounterResponseDto.setServiceCode(encounter1.getServiceCode());
+            encounterResponseDto.setStatus(encounter1.getStatus());
+            encounterResponseList.add(encounterResponseDto);
+
+        });
         return VisitDetailDto.builder()
                 .status(encounter.getStatus())
                 .id(encounter.getVisit().getId())
@@ -157,6 +178,7 @@ public class VisitService {
                 .checkOutDate(encounter.getVisit().getVisitEndDate())
                 .encounterId(encounter.getId())
                 .service(encounter.getServiceCode())
+                .encounters(encounterResponseList)
                 .build();
     }
 
@@ -184,6 +206,30 @@ public class VisitService {
         VisitDto visitDto = new VisitDto();
         BeanUtils.copyProperties(visit, visitDto);
         visitDto.setPersonId(visit.getPerson().getId());
+        visitDto.setFacilityId(visit.getFacilityId());
+        visitDto.setId(visit.getId());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        String checkInDate = visit.getVisitStartDate().format(formatter);
+        String checkInOut = visit.getVisitEndDate().format(formatter);
+        visitDto.setCheckInDate(checkInDate);
+        visitDto.setCheckOutDate(checkInOut);
+        List<Encounter> encounters = this.encounterRepository.getEncounterByVisit(visit);
+        List<EncounterResponseDto> encounterResponseList = new ArrayList<>();
+        encounters.forEach(encounter -> {
+            EncounterResponseDto encounterResponseDto = new EncounterResponseDto();
+            encounterResponseDto.setFacilityId(encounter.getFacilityId());
+            encounterResponseDto.setId(encounter.getId());
+            encounterResponseDto.setEncounterDate(encounter.getEncounterDate().toLocalDate());
+            encounterResponseDto.setPersonId(encounter.getPerson().getId());
+            encounterResponseDto.setUuid(encounter.getUuid());
+            encounterResponseDto.setVisitId(encounter.getVisit().getId());
+            encounterResponseDto.setServiceCode(encounter.getServiceCode());
+            encounterResponseDto.setStatus(encounter.getStatus());
+            encounterResponseList.add(encounterResponseDto);
+
+        });
+        visitDto.setEncounters(encounterResponseList);
+
         return visitDto;
     }
 
