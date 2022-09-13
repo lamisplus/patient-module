@@ -310,7 +310,7 @@ function PatientDashboard(props) {
                         title=""
                         columns={[
                             {
-                                title: "Checked In Date",
+                                title: "Check-In Date",
                                 field: "checkInDate", filtering: false,
                                 headerStyle: {
                                     backgroundColor: "#039be5",
@@ -318,7 +318,7 @@ function PatientDashboard(props) {
                                     paddingRight:'30px'
                                 }
                             },
-                            { title: "Check Out Date", field: "checkOutDate", filtering: false  },
+                            { title: "Check-Out Date", field: "checkOutDate", filtering: false  },
                             { title: "Service", field: "service", filtering: false  },
                             { title: "Status", field: "status", filtering: false },
                         ]}
@@ -327,7 +327,7 @@ function PatientDashboard(props) {
                             checkInDate: moment(row.checkInDate).format("YYYY-MM-DD h:mm a"),
                             checkOutDate: row.checkOutDate?moment(row.checkOutDate).format("YYYY-MM-DD h:mm a"):"Visit Ongoing",
                             service:row.service,
-                            status:(<Label color={row.status ==='COMPLETED' ? 'green' : 'red'} size="mini">{row.status}</Label>),
+                            status:(<h6 style={{color:row.status ==='COMPLETED' ? 'green' : 'red'}}>{row.status}</h6>),
 
                         }))}
 
