@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.lamisplus.modules.patient.domain.dto.CheckInDto;
 import org.lamisplus.modules.patient.domain.dto.VisitDetailDto;
 import org.lamisplus.modules.patient.domain.dto.VisitDto;
+import org.lamisplus.modules.patient.domain.dto.VisitRequestDto;
 import org.lamisplus.modules.patient.service.VisitService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +21,7 @@ public class VisitController {
 
 
     @PostMapping
-    public ResponseEntity<VisitDto> createVisit(@RequestBody VisitDto visitDto) {
+    public ResponseEntity<VisitDto> createVisit(@RequestBody VisitRequestDto visitDto) {
         return ResponseEntity.ok (visitService.createVisit (visitDto));
     }
 
