@@ -212,7 +212,7 @@ function PatientDashboard(props) {
     }, []);
     const loadPatientVisits = useCallback(async () => {
         try {
-            const response = await axios.get(`${baseUrl}patient/visit/visit-detail/${patientObj.id}`, { headers: {"Authorization" : `Bearer ${token}`} });
+            const response = await axios.get(`${baseUrl}patient/visit/visit-by-patient/${patientObj.id}`, { headers: {"Authorization" : `Bearer ${token}`} });
             setPatientVisits(response.data);
             response.data.map((visits)=> {
                 if(visits.checkOutDate===null){
