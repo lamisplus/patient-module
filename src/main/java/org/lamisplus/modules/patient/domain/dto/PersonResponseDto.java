@@ -1,6 +1,7 @@
 package org.lamisplus.modules.patient.domain.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.mchange.v2.encounter.EncounterCounter;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.lamisplus.modules.patient.utility.LocalDateConverter;
@@ -8,6 +9,7 @@ import org.lamisplus.modules.patient.utility.LocalDateConverter;
 import javax.persistence.Convert;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -39,8 +41,7 @@ public class PersonResponseDto {
     private Object address;
     private LocalDate dateOfRegistration;
     private Boolean IsDateOfBirthEstimated;
-    private LocalDateTime encounterDate;
-    private Long encounterId;
+    private List<EncounterPersonListDto> encounters;
 
 
 }
