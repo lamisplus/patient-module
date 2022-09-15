@@ -1,6 +1,7 @@
 package org.lamisplus.modules.patient.service;
 
 import lombok.RequiredArgsConstructor;
+import org.audit4j.core.util.Log;
 import org.lamisplus.modules.base.controller.apierror.EntityNotFoundException;
 import org.lamisplus.modules.patient.domain.dto.EncounterRequestDto;
 import org.lamisplus.modules.patient.domain.dto.EncounterResponseDto;
@@ -123,6 +124,8 @@ public class EncounterService {
         BeanUtils.copyProperties(encounter, encounterRequestDto);
         encounterRequestDto.setPersonId(encounter.getPerson().getId());
         encounterRequestDto.setVisitId(encounter.getVisit().getId());
+        Log.info("encounter date: {}", encounter.getEncounterDate().toLocalDate() );
+        encounterRequestDto.setEncounterDate(encounter.getEncounterDate().toLocalDate());
         encounter.setServiceCode(encounter.getServiceCode());
         return encounterRequestDto;
     }
