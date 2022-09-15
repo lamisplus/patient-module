@@ -243,9 +243,8 @@ public class PersonService {
 
         encounterList.forEach(encounter -> {
             personResponseDto.setVisitId(encounter.getVisit().getId());
-            personResponseDto.setEncounterDate(encounter.getEncounterDate());
             personResponseDto.setCheckInDate(encounter.getVisit().getVisitStartDate());
-
+            personResponseDto.setEncounterDate(encounter.getEncounterDate());
         });
 
         personResponseDto.setId(person.getId());
@@ -272,6 +271,7 @@ public class PersonService {
         personResponseDto.setDeceasedDateTime(person.getDeceasedDateTime());
         personResponseDto.setOrganization(person.getOrganization());
         personResponseDto.setBiometricStatus(getPatientBiometricStatus(person.getUuid()));
+
 
         return personResponseDto;
     }
