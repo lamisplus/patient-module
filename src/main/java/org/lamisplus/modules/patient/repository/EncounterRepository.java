@@ -1,9 +1,9 @@
 package org.lamisplus.modules.patient.repository;
 
-import liquibase.pro.packaged.E;
 import org.lamisplus.modules.patient.domain.entity.Encounter;
 import org.lamisplus.modules.patient.domain.entity.Person;
 import org.lamisplus.modules.patient.domain.entity.Visit;
+import org.lamisplus.modules.patient.service.PersonService;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -21,7 +21,12 @@ public interface EncounterRepository extends JpaRepository<Encounter, Long> {
     List<Encounter> getEncounterByVisit(Visit visit);
 
     List<Encounter> findByPerson(Person person);
-    List<Encounter> findByServiceCode (String serviceCode);
+
+    List<Encounter> findByServiceCode(String serviceCode);
+
+
+    List<Encounter> findByPersonAndStatus(Person person, String status);
+
 
 
 }

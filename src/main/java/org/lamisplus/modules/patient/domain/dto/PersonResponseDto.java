@@ -14,6 +14,8 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 public class PersonResponseDto {
+
+
     private Long id;
     private Long visitId;
     private Long facilityId;
@@ -41,7 +43,10 @@ public class PersonResponseDto {
     private Object address;
     private LocalDate dateOfRegistration;
     private Boolean IsDateOfBirthEstimated;
-    private List<EncounterPersonListDto> encounters;
+    private LocalDateTime checkInDate;
+    private LocalDateTime encounterDate;
+    //private List<EncounterPersonListDto> encounters;
+
 
 
 }
