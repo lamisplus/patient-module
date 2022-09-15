@@ -17,21 +17,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
-
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-
 @Service
 @RequiredArgsConstructor
 public class EncounterService {
-
     private final VisitRepository visitRepository;
     private final EncounterRepository encounterRepository;
-
     private final PersonRepository personRepository;
-
-
     public List<EncounterResponseDto> registerEncounter(EncounterRequestDto encounterRequestDto) {
         Long visitId = encounterRequestDto.getVisitId();
         Visit visit = visitRepository.findById(visitId).orElseThrow(() -> new EntityNotFoundException(EncounterService.class, "errorMessage", "No visit found with Id " + visitId));
@@ -50,8 +44,6 @@ public class EncounterService {
                 });
         return encounterRequestDtos;
     }
-
-
     private Encounter processedAndSaveEncounter(EncounterRequestDto encounterRequestDto, String s) {
         Encounter encounter = convertDtoToEntity(encounterRequestDto);
         encounter.setUuid(UUID.randomUUID().toString());
@@ -59,7 +51,6 @@ public class EncounterService {
         encounter.setArchived(0);
         return encounter;
     }
-
     public List<EncounterResponseDto> updateEncounter(Long id, EncounterRequestDto encounterRequestDto) {
         Encounter existEncounter = getExistEncounter(id);
         List<EncounterResponseDto> encounterRequestDtos = new ArrayList<>();
@@ -73,15 +64,12 @@ public class EncounterService {
                 });
         return encounterRequestDtos;
     }
-
     public List<EncounterResponseDto> getAllEncounters() {
         return encounterRepository.findAllByArchived(0)
                 .stream()
                 .map(this::convertEntityToResponseDto)
                 .collect(Collectors.toList());
-
     }
-
     public List<EncounterResponseDto> getAllEncounterByPerson(Long personId) {
         Person person = personRepository
                 .findById(personId)
@@ -92,11 +80,9 @@ public class EncounterService {
                 .map(this::convertEntityToResponseDto)
                 .collect(Collectors.toList());
     }
-
     public EncounterResponseDto getEncounterById(Long id) {
         return convertEntityToResponseDto(getExistEncounter(id));
     }
-
     public List<EncounterResponseDto> getEncounterByVisitId(Long visitId) {
         Visit visit = visitRepository.findById (visitId).orElseThrow (() -> new EntityNotFoundException (EncounterService.class, "errorMessage", "No visit was found with given Id " + visitId));
         List<Encounter> visitEncounters = encounterRepository.getEncounterByVisit(visit);
@@ -105,20 +91,14 @@ public class EncounterService {
                 .map (this::convertEntityToResponseDto)
                 .collect (Collectors.toList ());
     }
-
     public void archivedEncounter(Long id) {
         Encounter existEncounter = getExistEncounter(id);
         existEncounter.setArchived(1);
         encounterRepository.save(existEncounter);
     }
-
-
     private Encounter getExistEncounter(Long id) {
         return encounterRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(EncounterService.class, "errorMessage", "No encounter found with Id " + id));
     }
-
-
-
     private EncounterResponseDto convertEntityToResponseDto(Encounter encounter) {
         EncounterResponseDto encounterRequestDto = new EncounterResponseDto();
         BeanUtils.copyProperties(encounter, encounterRequestDto);
@@ -129,7 +109,6 @@ public class EncounterService {
         encounter.setServiceCode(encounter.getServiceCode());
         return encounterRequestDto;
     }
-
     private Encounter convertDtoToEntity(EncounterRequestDto encounterRequestDto) {
         Person person = personRepository
                 .findById(encounterRequestDto.getPersonId())
@@ -146,8 +125,6 @@ public class EncounterService {
         encounter.setVisit(visit);
         return encounter;
     }
-
-
     @PutMapping(value = "/encounter/status-update/{id}/{status}")
     public EncounterStatusResponseDto statusUpdate(@PathVariable Long id, @PathVariable String status) {
         Optional<Encounter> encounter = this.encounterRepository.findById(id);

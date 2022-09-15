@@ -99,7 +99,12 @@ public class PersonService {
     }
 
     public List<PersonResponseDto> getCheckedInPersonsByServiceCodeAndVisitId(String serviceCode) {
+<<<<<<<<< Temporary merge branch 1
         List<Encounter> patientEncounters = encounterRepository.findAllByServiceCodeAndStatus(serviceCode, "PENDING");
+=========
+        List<Encounter> patientEncounters = encounterRepository.findByServiceCode(serviceCode);
+        //List<Encounter> patientEncounters = encounterRepository.findAllByServiceCodeAndStatus(serviceCode, "PENDING");
+>>>>>>>>> Temporary merge branch 2
         return patientEncounters.stream()
                 .map(Encounter::getPerson)
                 .map(this::getDtoFromPerson)
@@ -237,17 +242,11 @@ public class PersonService {
 
 
     public PersonResponseDto getDtoFromPerson(Person person) {
-        System.out.println("We get here Courage");
-        List<Encounter> encounterList = this.encounterRepository.findByPersonAndStatus(person, "PENDING");
+        Optional<Visit> visit = visitRepository.findVisitByPersonAndVisitStartDateNotNullAndVisitEndDateIsNull(person);
         PersonResponseDto personResponseDto = new PersonResponseDto();
-
-        encounterList.forEach(encounter -> {
-            personResponseDto.setVisitId(encounter.getVisit().getId());
-            personResponseDto.setEncounterDate(encounter.getEncounterDate());
-            personResponseDto.setCheckInDate(encounter.getVisit().getVisitStartDate());
-
-        });
-
+        if (visit.isPresent()) {
+            personResponseDto.setVisitId(visit.get().getId());
+        }
         personResponseDto.setId(person.getId());
         personResponseDto.setNinNumber(person.getNinNumber());
         personResponseDto.setEmrId(person.getEmrId());
@@ -272,7 +271,15 @@ public class PersonService {
         personResponseDto.setDeceasedDateTime(person.getDeceasedDateTime());
         personResponseDto.setOrganization(person.getOrganization());
         personResponseDto.setBiometricStatus(getPatientBiometricStatus(person.getUuid()));
-
+        List<Encounter> encounter = this.encounterRepository.findByPerson(person);
+        List<EncounterPersonListDto> encounterPersonListDtoList = new ArrayList<>();
+        encounter.forEach(encounter1 -> {
+            EncounterPersonListDto encounterPersonListDto = new EncounterPersonListDto();
+            encounterPersonListDto.setEncounterId(encounter1.getId());
+            encounterPersonListDto.setEncounterDate(encounter1.getEncounterDate());
+            encounterPersonListDtoList.add(encounterPersonListDto);
+        });
+        personResponseDto.setEncounters(encounterPersonListDtoList);
         return personResponseDto;
     }
 
