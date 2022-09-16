@@ -21,6 +21,8 @@ import org.lamisplus.modules.patient.domain.entity.Visit;
 import org.lamisplus.modules.patient.repository.EncounterRepository;
 import org.lamisplus.modules.patient.repository.PersonRepository;
 import org.lamisplus.modules.patient.repository.VisitRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -106,6 +108,22 @@ public class PersonService {
                 .collect(Collectors.toList());
 
 
+    }
+
+
+    public List<PersonResponseDto> getAllPatientWithoutBiomentic(Pageable pageable)
+    {
+
+       Page<Person> personList = this.personRepository.findAll(pageable);
+       List<PersonResponseDto> personResponseDtoList = new ArrayList<>();
+       personList.getContent().forEach(person -> {
+           Integer  checkIfUserHasBiometric = this.personRepository.getBiometricCountByPersonUuid(person.getUuid());
+           if (checkIfUserHasBiometric == 0)
+           {
+               personResponseDtoList.add(getDtoFromPersonWithoutBiometric(person, Boolean.FALSE));
+           }
+       });
+       return personResponseDtoList;
     }
 
     public PersonResponseDto getPersonById(Long id) {
@@ -237,7 +255,6 @@ public class PersonService {
 
 
     public PersonResponseDto getDtoFromPerson(Person person) {
-        System.out.println("We get here Courage");
         List<Encounter> encounterList = this.encounterRepository.findByPersonAndStatus(person, "PENDING");
         PersonResponseDto personResponseDto = new PersonResponseDto();
 
@@ -275,6 +292,46 @@ public class PersonService {
 
         return personResponseDto;
     }
+
+    public PersonResponseDto getDtoFromPersonWithoutBiometric(Person person, Boolean status) {
+        List<Encounter> encounterList = this.encounterRepository.findByPersonAndStatus(person, "PENDING");
+        PersonResponseDto personResponseDto = new PersonResponseDto();
+
+        encounterList.forEach(encounter -> {
+            personResponseDto.setVisitId(encounter.getVisit().getId());
+            personResponseDto.setCheckInDate(encounter.getVisit().getVisitStartDate());
+            personResponseDto.setEncounterDate(encounter.getEncounterDate());
+        });
+
+        personResponseDto.setId(person.getId());
+        personResponseDto.setNinNumber(person.getNinNumber());
+        personResponseDto.setEmrId(person.getEmrId());
+        personResponseDto.setFacilityId(person.getFacilityId());
+        personResponseDto.setIsDateOfBirthEstimated(person.getIsDateOfBirthEstimated());
+        personResponseDto.setDateOfBirth(person.getDateOfBirth());
+        personResponseDto.setFirstName(person.getFirstName());
+        personResponseDto.setSurname(person.getSurname());
+        personResponseDto.setOtherName(person.getOtherName());
+        personResponseDto.setContactPoint(person.getContactPoint());
+        personResponseDto.setAddress(person.getAddress());
+        personResponseDto.setContact(person.getContact());
+        personResponseDto.setIdentifier(person.getIdentifier());
+        personResponseDto.setEducation(person.getEducation());
+        personResponseDto.setEmploymentStatus(person.getEmploymentStatus());
+        personResponseDto.setMaritalStatus(person.getMaritalStatus());
+        personResponseDto.setSex(person.getSex());
+        personResponseDto.setGender(person.getGender());
+        personResponseDto.setDeceased(person.getDeceased());
+        personResponseDto.setDateOfRegistration(person.getDateOfRegistration());
+        personResponseDto.setActive(person.getActive());
+        personResponseDto.setDeceasedDateTime(person.getDeceasedDateTime());
+        personResponseDto.setOrganization(person.getOrganization());
+        personResponseDto.setBiometricStatus(status);
+
+
+        return personResponseDto;
+    }
+
 
     Boolean getPatientBiometricStatus(String uuid) {
         String moduleName = "BiometricModule";

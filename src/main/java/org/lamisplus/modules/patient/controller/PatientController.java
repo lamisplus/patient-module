@@ -8,6 +8,7 @@ import org.lamisplus.modules.patient.domain.entity.PatientCheckPostService;
 import org.lamisplus.modules.patient.repository.PatientCheckPostServiceRepository;
 import org.lamisplus.modules.patient.service.PersonService;
 import org.lamisplus.modules.patient.service.ValidationService;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -70,6 +71,13 @@ public class PatientController {
         CompletableFuture<Boolean> hospitalNumberExist = validationService.hospitalNumberExist (hospitalNumber);
         return ResponseEntity.ok (hospitalNumberExist.get ());
     }
+
+    @GetMapping(value = "/getall-patients-without-biometric")
+    public ResponseEntity<List<PersonResponseDto>> getAllPatientWithoutBiomentic(Pageable pageable) {
+        return ResponseEntity.ok (personService.getAllPatientWithoutBiomentic (pageable));
+    }
+
+
 
 
 }
