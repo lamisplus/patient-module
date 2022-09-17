@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -17,4 +18,8 @@ public class VisitDto implements Serializable {
     private Long id;
     private Long personId;
     private String checkInDate;
+    public String checkOutDate;
+    public List<EncounterResponseDto> encounters;
+
+
 }

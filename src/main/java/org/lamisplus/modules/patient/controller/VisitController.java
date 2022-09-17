@@ -2,9 +2,8 @@ package org.lamisplus.modules.patient.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.lamisplus.modules.patient.domain.dto.CheckInDto;
-import org.lamisplus.modules.patient.domain.dto.VisitDetailDto;
-import org.lamisplus.modules.patient.domain.dto.VisitDto;
+import org.lamisplus.modules.patient.domain.dto.*;
+import org.lamisplus.modules.patient.domain.entity.Visit;
 import org.lamisplus.modules.patient.service.VisitService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,8 +18,10 @@ public class VisitController {
     private final VisitService visitService;
 
 
+
+
     @PostMapping
-    public ResponseEntity<VisitDto> createVisit(@RequestBody VisitDto visitDto) {
+    public ResponseEntity<Visit> createVisit(@RequestBody VisitRequest visitDto) {
         return ResponseEntity.ok (visitService.createVisit (visitDto));
     }
 
@@ -35,7 +36,7 @@ public class VisitController {
         return ResponseEntity.ok (visitService.getVisitById (id));
     }
 
-    @GetMapping("/visit-detail/{personId}")
+    @GetMapping("/visit-by-patient/{personId}")
     public ResponseEntity<List<VisitDetailDto>> getPersonVisitDetail(@PathVariable("personId") Long personId) {
         return ResponseEntity.ok (visitService.getVisitWithEncounterDetails (personId));
     }
