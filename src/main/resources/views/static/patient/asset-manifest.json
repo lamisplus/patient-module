@@ -1,61 +1,36 @@
 {
   "files": {
     "main.css": "./static/css/main.6fcc1914.chunk.css",
-<<<<<<<<< Temporary merge branch 1
-    "main.js": "./static/js/main.89f3c838.chunk.js",
-    "main.js.map": "./static/js/main.89f3c838.chunk.js.map",
-    "runtime-main.js": "./static/js/runtime-main.4e65bd15.js",
-    "runtime-main.js.map": "./static/js/runtime-main.4e65bd15.js.map",
+    "main.js": "./static/js/main.43ba1bc8.chunk.js",
+    "main.js.map": "./static/js/main.43ba1bc8.chunk.js.map",
+    "runtime-main.js": "./static/js/runtime-main.cb950777.js",
+    "runtime-main.js.map": "./static/js/runtime-main.cb950777.js.map",
     "static/css/2.0295594d.chunk.css": "./static/css/2.0295594d.chunk.css",
-    "static/js/2.f886705a.chunk.js": "./static/js/2.f886705a.chunk.js",
-    "static/js/2.f886705a.chunk.js.map": "./static/js/2.f886705a.chunk.js.map",
-    "static/js/3.d807b483.chunk.js": "./static/js/3.d807b483.chunk.js",
-    "static/js/3.d807b483.chunk.js.map": "./static/js/3.d807b483.chunk.js.map",
-=========
-    "main.js": "./static/js/main.73301b81.chunk.js",
-    "main.js.map": "./static/js/main.73301b81.chunk.js.map",
-    "runtime-main.js": "./static/js/runtime-main.79ac9070.js",
-    "runtime-main.js.map": "./static/js/runtime-main.79ac9070.js.map",
-    "static/css/2.0295594d.chunk.css": "./static/css/2.0295594d.chunk.css",
-    "static/js/2.c15e301a.chunk.js": "./static/js/2.c15e301a.chunk.js",
-    "static/js/2.c15e301a.chunk.js.map": "./static/js/2.c15e301a.chunk.js.map",
-    "static/js/3.d9dc87a9.chunk.js": "./static/js/3.d9dc87a9.chunk.js",
-    "static/js/3.d9dc87a9.chunk.js.map": "./static/js/3.d9dc87a9.chunk.js.map",
->>>>>>>>> Temporary merge branch 2
-    "static/js/4.daec3952.chunk.js": "./static/js/4.daec3952.chunk.js",
-    "static/js/4.daec3952.chunk.js.map": "./static/js/4.daec3952.chunk.js.map",
-    "static/js/5.35819a3a.chunk.js": "./static/js/5.35819a3a.chunk.js",
-    "static/js/5.35819a3a.chunk.js.map": "./static/js/5.35819a3a.chunk.js.map",
+    "static/js/2.9a42dadd.chunk.js": "./static/js/2.9a42dadd.chunk.js",
+    "static/js/2.9a42dadd.chunk.js.map": "./static/js/2.9a42dadd.chunk.js.map",
+    "static/js/3.df2d0882.chunk.js": "./static/js/3.df2d0882.chunk.js",
+    "static/js/3.df2d0882.chunk.js.map": "./static/js/3.df2d0882.chunk.js.map",
+    "static/js/4.d0436672.chunk.js": "./static/js/4.d0436672.chunk.js",
+    "static/js/4.d0436672.chunk.js.map": "./static/js/4.d0436672.chunk.js.map",
+    "static/js/5.fb630b22.chunk.js": "./static/js/5.fb630b22.chunk.js",
+    "static/js/5.fb630b22.chunk.js.map": "./static/js/5.fb630b22.chunk.js.map",
     "index.html": "./index.html",
     "static/css/2.0295594d.chunk.css.map": "./static/css/2.0295594d.chunk.css.map",
     "static/css/main.6fcc1914.chunk.css.map": "./static/css/main.6fcc1914.chunk.css.map",
-<<<<<<<<< Temporary merge branch 1
-    "static/js/2.f886705a.chunk.js.LICENSE.txt": "./static/js/2.f886705a.chunk.js.LICENSE.txt",
-    "static/js/3.d807b483.chunk.js.LICENSE.txt": "./static/js/3.d807b483.chunk.js.LICENSE.txt",
-=========
-    "static/js/2.c15e301a.chunk.js.LICENSE.txt": "./static/js/2.c15e301a.chunk.js.LICENSE.txt",
-    "static/js/3.d9dc87a9.chunk.js.LICENSE.txt": "./static/js/3.d9dc87a9.chunk.js.LICENSE.txt",
->>>>>>>>> Temporary merge branch 2
-    "static/js/4.daec3952.chunk.js.LICENSE.txt": "./static/js/4.daec3952.chunk.js.LICENSE.txt",
-    "static/js/5.35819a3a.chunk.js.LICENSE.txt": "./static/js/5.35819a3a.chunk.js.LICENSE.txt",
+    "static/js/2.9a42dadd.chunk.js.LICENSE.txt": "./static/js/2.9a42dadd.chunk.js.LICENSE.txt",
+    "static/js/3.df2d0882.chunk.js.LICENSE.txt": "./static/js/3.df2d0882.chunk.js.LICENSE.txt",
+    "static/js/4.d0436672.chunk.js.LICENSE.txt": "./static/js/4.d0436672.chunk.js.LICENSE.txt",
+    "static/js/5.fb630b22.chunk.js.LICENSE.txt": "./static/js/5.fb630b22.chunk.js.LICENSE.txt",
     "static/media/style.css": "./static/media/themifyd41d.9bad9444.eot",
     "static/media/semantic.min.css": "./static/media/outline-icons.ddae9b1b.woff",
     "static/media/fingerprintimage.73ff98ea.png": "./static/media/fingerprintimage.73ff98ea.png",
     "static/media/react-widgets.css": "./static/media/rw-widgets.e8b49908.svg"
   },
   "entrypoints": [
-<<<<<<<<< Temporary merge branch 1
-    "static/js/runtime-main.4e65bd15.js",
+    "static/js/runtime-main.cb950777.js",
     "static/css/2.0295594d.chunk.css",
-    "static/js/2.f886705a.chunk.js",
+    "static/js/2.9a42dadd.chunk.js",
     "static/css/main.6fcc1914.chunk.css",
-    "static/js/main.89f3c838.chunk.js"
-=========
-    "static/js/runtime-main.79ac9070.js",
-    "static/css/2.0295594d.chunk.css",
-    "static/js/2.c15e301a.chunk.js",
-    "static/css/main.6fcc1914.chunk.css",
-    "static/js/main.73301b81.chunk.js"
->>>>>>>>> Temporary merge branch 2
+    "static/js/main.43ba1bc8.chunk.js"
   ]
 }

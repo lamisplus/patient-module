@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @Table(name = "patient_person")
 @Data
 @NoArgsConstructor
-public class Person extends PatientAuditEntity implements Serializable, Persistable<Long> {
+public class Person extends PatientAuditEntity implements Persistable<Long> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)

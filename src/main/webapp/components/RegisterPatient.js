@@ -103,6 +103,7 @@ const schema = yup.object().shape({
     dob: yup.date().required(),
     dateOfBirth: yup.string().required(),
     age: yup.number(),
+    ninNumber:yup.number().nullable(),
     pnumber: yup.string().required(),
     altPhonenumber: yup.string().nullable(),
     email: yup.string().nullable(),
@@ -120,7 +121,7 @@ const isValidEmail = email =>
     );
 
 const RegisterPatient = (props) => {
-    const { register, watch, setValue, getValues, setError, handleSubmit, formState: { errors } } = useForm({
+    const { register, watch, setValue, getValues, clearErrors, setError, handleSubmit, formState: { errors } } = useForm({
         resolver: yupResolver(schema),
     });
     const watchPnumber= watch("pnumber", false);
@@ -666,9 +667,24 @@ const RegisterPatient = (props) => {
                                                         type="text"
                                                         name="ninNumber"
                                                         id="ninNumber"
+                                                        onInput={(e) => {
+                                                           e.target.value = e.target.value.replace(/\D/g,'')
+                                                            if (e.target.value.length > e.target.maxLength){
+                                                                e.target.value = e.target.value.slice(0,e.target.maxLength);
+                                                                clearErrors('ninNumber');
+                                                            }else if(e.target.value.length > 0 && e.target.value.length < e.target.maxLength){
+                                                                setError('ninNumber');
+                                                            }else if(e.target.value.length <= 0 || e.target.value.length == e.target.maxLength ){
+                                                                clearErrors('ninNumber');
+                                                            }
+
+                                                        }}
+                                                        minLength={11}
+                                                        maxLength={11}
                                                         style={{border: "1px solid #014d88"}}
                                                         {...register("ninNumber")}
                                                     />
+                                                    {errors.ninNumber && <p>Enter a valid NIN Number</p>}
                                                 </FormGroup>
                                             </div>
                                             <div className="form-group mb-3 col-md-3">

@@ -30,54 +30,57 @@ public class PatientController {
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PersonResponseDto> createPatient(@RequestBody PersonDto patient) {
-        return ResponseEntity.ok (personService.createPerson (patient));
+        return ResponseEntity.ok(personService.createPerson(patient));
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<PersonResponseDto>> getAllPatients() {
-        return ResponseEntity.ok (personService.getAllPerson ());
+        return ResponseEntity.ok(personService.getAllPerson());
     }
 
 
     @GetMapping(value = "/{id}")
     public ResponseEntity<PersonResponseDto> getPatient(@PathVariable("id") Long id) {
-        return ResponseEntity.ok (personService.getPersonById (id));
+        return ResponseEntity.ok(personService.getPersonById(id));
     }
 
     @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PersonResponseDto> updatePatient(@PathVariable("id") Long id, @RequestBody PersonDto patient) {
-        return ResponseEntity.ok (personService.updatePerson (id, patient));
+        return ResponseEntity.ok(personService.updatePerson(id, patient));
     }
 
     @DeleteMapping(value = "/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> deletePerson(@PathVariable("id") Long id) {
-        personService.deletePersonById (id);
-        return ResponseEntity.accepted ().build ();
+        personService.deletePersonById(id);
+        return ResponseEntity.accepted().build();
     }
 
     @GetMapping(value = "/post-service")
     public ResponseEntity<List<PatientCheckPostService>> getPatientService() {
-        return ResponseEntity.ok (patientCheckPostServiceRepository.findAll ());
+        return ResponseEntity.ok(patientCheckPostServiceRepository.findAll());
     }
 
     @GetMapping(value = "/checked-in-by-service/{serviceCode}")
     public ResponseEntity<List<PersonResponseDto>> getCheckedInPatientByService(@PathVariable("serviceCode") String serviceCode) {
-        return ResponseEntity.ok (personService.getCheckedInPersonsByServiceCodeAndVisitId (serviceCode));
+        return ResponseEntity.ok(personService.getCheckedInPersonsByServiceCodeAndVisitId(serviceCode));
     }
 
     @PostMapping("/exist/hospital-number")
     public ResponseEntity<Boolean> hospitalNumberExists(@RequestBody String hospitalNumber) throws InterruptedException, ExecutionException {
-        CompletableFuture<Boolean> hospitalNumberExist = validationService.hospitalNumberExist (hospitalNumber);
-        return ResponseEntity.ok (hospitalNumberExist.get ());
+        CompletableFuture<Boolean> hospitalNumberExist = validationService.hospitalNumberExist(hospitalNumber);
+        return ResponseEntity.ok(hospitalNumberExist.get());
     }
 
     @GetMapping(value = "/getall-patients-without-biometric")
     public ResponseEntity<List<PersonResponseDto>> getAllPatientWithoutBiomentic(Pageable pageable) {
-        return ResponseEntity.ok (personService.getAllPatientWithoutBiomentic (pageable));
+        return ResponseEntity.ok(personService.getAllPatientWithoutBiomentic(pageable));
     }
 
-
-
+    @PostMapping("/exist/nin-number")
+    public ResponseEntity<Boolean> ninNumberExists(@RequestBody String nin) throws InterruptedException, ExecutionException {
+        CompletableFuture<Boolean> ninNumberExist = validationService.ninNumberExist(nin);
+        return ResponseEntity.ok(ninNumberExist.get());
+    }
 
 }

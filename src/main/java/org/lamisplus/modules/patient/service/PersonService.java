@@ -342,7 +342,6 @@ public class PersonService {
         return fingerCount > 0;
     }
 
-
 }
 
 
