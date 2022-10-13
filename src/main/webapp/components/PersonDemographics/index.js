@@ -1,16 +1,13 @@
-import React,{useState, useEffect} from 'react';
-import PropTypes from 'prop-types';
-import {withStyles} from '@material-ui/core/styles';
-import {Accordion, AccordionActions, AccordionDetails, AccordionSummary} from '@material-ui/core';
-import Typography from '@material-ui/core/Typography';
-import Divider from '@material-ui/core/Divider';
-import {Button, Label} from 'semantic-ui-react';
-import 'semantic-ui-css/semantic.min.css';
-import {Col, Row, Modal} from "reactstrap";
-import CaptureBiometric from './CaptureBiometric';
+import React, {useEffect, useState} from 'react';
 import axios from "axios";
-import {token, url as baseUrl} from "../../../api";
+import {token, url as baseUrl} from "../../../../api";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
+import Typography from "@material-ui/core/Typography";
+import {Accordion, AccordionDetails, AccordionSummary} from "@material-ui/core";
+import {Col, Row} from "reactstrap";
+import {Label} from "semantic-ui-react";
+import PropTypes from "prop-types";
+import {withStyles} from "@material-ui/core/styles";
 
 const styles = theme => ({
     root: {
@@ -46,8 +43,7 @@ const styles = theme => ({
         },
     },
 });
-
-function PatientCard(props) {
+function Index(props) {
     const { classes } = props;
     const patientObj = props.patientObj ? props.patientObj : {};
     const permissions= props.permissions ? props.permissions : [];
@@ -124,14 +120,8 @@ function PatientCard(props) {
         let patientObjID= id
         setModal(!modal)
     }
-
     return (
         <div className={classes.root}>
-
-            <Breadcrumbs aria-label="breadcrumb">
-                <Typography style={{color:'#992E62'}}>Patient</Typography>
-                <Typography style={{color:'#014d88'}}>Dashboard</Typography>
-            </Breadcrumbs>
             <Accordion defaultExpanded>
                 <AccordionSummary>
 
@@ -199,26 +189,8 @@ function PatientCard(props) {
                                 <div >
                                     <Typography variant="caption">
                                         <Label  style={{height:'30px', fontSize:'14px'}} color={patientBiometricStatus===true? "green" : "red"} size={"large"}>
-                                            Biometric Status
-                                            <Label.Detail>{patientBiometricStatus===true? "Captured" : "Not Capture"}</Label.Detail>
+                                            Biometrics {patientBiometricStatus===true? "Captured" : "Not Capture"}
                                         </Label>
-                                        {patientBiometricStatus!==true ? (
-
-                                                <>
-                                                    {permissions.includes('patient_check_in') || permissions.includes("all_permission") ? (
-                                                            <>
-                                                                <Label style={{height:'30px', fontSize:'14px'}} as='a' color='teal' onClick={() => handleBiometricCapture(patientObj.id)} tag>
-                                                                    Capture Now
-                                                                </Label>
-                                                            </>
-                                                        )
-                                                        :""
-                                                    }
-                                                </>
-                                            )
-                                            :""
-                                        }
-
                                     </Typography>
                                 </div>
                             </>
@@ -238,7 +210,7 @@ function PatientCard(props) {
                     }
                 </AccordionDetails>
             </Accordion>
-{/*
+            {/*
             <CaptureBiometric  modalstatus={modal} togglestatus={toggleModal} patientId={patientObj.id} biometricDevices={devices} setPatientBiometricStatus={setPatientBiometricStatus} />
 */}
 
@@ -246,8 +218,8 @@ function PatientCard(props) {
     );
 }
 
-PatientCard.propTypes = {
+Index.propTypes = {
     classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(PatientCard);
+export default withStyles(styles)(Index);
