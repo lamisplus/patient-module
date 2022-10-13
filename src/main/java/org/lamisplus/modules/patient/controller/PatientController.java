@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -37,9 +38,7 @@ public class PatientController {
     public ResponseEntity<List<PersonResponseDto>> getAllPatients() {
         return ResponseEntity.ok(personService.getAllPerson());
     }
-
-
-    @GetMapping(value = "/{id}")
+        @GetMapping(value = "/{id}")
     public ResponseEntity<PersonResponseDto> getPatient(@PathVariable("id") Long id) {
         return ResponseEntity.ok(personService.getPersonById(id));
     }
@@ -72,15 +71,26 @@ public class PatientController {
         return ResponseEntity.ok(hospitalNumberExist.get());
     }
 
+
+
     @GetMapping(value = "/getall-patients-without-biometric")
     public ResponseEntity<List<PersonResponseDto>> getAllPatientWithoutBiomentic(Pageable pageable) {
         return ResponseEntity.ok(personService.getAllPatientWithoutBiomentic(pageable));
     }
 
-    @PostMapping("/exist/nin-number")
-    public ResponseEntity<Boolean> ninNumberExists(@RequestBody String nin) throws InterruptedException, ExecutionException {
-        CompletableFuture<Boolean> ninNumberExist = validationService.ninNumberExist(nin);
-        return ResponseEntity.ok(ninNumberExist.get());
+    @PostMapping("/exist/nin-number/{nin}")
+    public boolean isNinNumberExisting(@PathVariable("nin") String nin) {
+        return personService.isNINExisting(nin);
     }
 
+    @GetMapping(value = "get-person-by-nin/{nin}")
+    public ResponseEntity<PersonResponseDto> getPatientByNin(@PathVariable("nin") String nin) {
+        return ResponseEntity.ok(personService.getPersonByNin(nin));
+    }
+
+    @GetMapping(value = "/list-of-checked-in-persons")
+    public ArrayList<PersonResponseDto> listOfCheckedinPersons()
+    {
+        return personService.getAllActiveVisit();
+    }
 }

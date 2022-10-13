@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @Table(name = "patient_person")
 @Data
 @NoArgsConstructor
-public class Person extends PatientAuditEntity implements Persistable<Long> {
+public class Person extends PatientAuditEntity implements Persistable<Long>  , Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -85,6 +85,8 @@ public class Person extends PatientAuditEntity implements Persistable<Long> {
     private String hospitalNumber;
     @Column(name = "is_date_of_birth_estimated")
     private Boolean isDateOfBirthEstimated;
+
+
 
     @Override
     public boolean isNew() {

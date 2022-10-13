@@ -25,6 +25,9 @@ import {token, url as baseUrl } from "../../../api";
 import PhoneInput from 'react-phone-input-2'
 import 'react-phone-input-2/lib/style.css'
 import _ from 'lodash';
+import Breadcrumbs from "@mui/material/Breadcrumbs";
+import Typography from "@mui/material/Typography";
+import {FaUserPlus} from "react-icons/fa";
 
 library.add(faCheckSquare, faCoffee, faEdit, faTrash);
 
@@ -199,18 +202,18 @@ const RegisterPatient = (props) => {
             setValue('middleName', patient.otherName);
             setValue('lastName', patient.surname);
             setValue('hospitalNumber', hospitalNumber ? hospitalNumber.value : '');
-            setValue('maritalStatus', maritalStatus.id);
-            setValue('employmentStatus', employmentStatus.id);
+            setValue('maritalStatus', maritalStatus?maritalStatus.id:'');
+            setValue('employmentStatus', employmentStatus?employmentStatus.id:'');
             //setValue('gender', gender.id);
             setValue('sex', sex);
-            setValue('highestQualification', education.id);
+            setValue('highestQualification', education?education.id:'');
             setValue('dob', format(new Date(patient.dateOfBirth), 'yyyy-MM-dd'));
             if (country) {
                 setValue('countryId', country.countryId);
-                const stateOptions = await loadOrganisationUnitsByParentId(country.countryId);
+                const stateOptions = country.countryId?await loadOrganisationUnitsByParentId(country.countryId):'';
                 setStateUnitOptions(stateOptions);
                 setValue('stateId', country.stateId);
-                const districtOptions = await loadOrganisationUnitsByParentId(country.stateId);
+                const districtOptions = country.stateId?await loadOrganisationUnitsByParentId(country.stateId):'';
                 setDistrictUnitOptions(districtOptions);
                 setValue('district', country.district);
                 setValue('address', country.city);
@@ -347,7 +350,7 @@ const RegisterPatient = (props) => {
                     maritalStatusId: data.maritalStatus,
                     surname: data.lastName,
                     educationId: data.highestQualification,
-                    employmentStatusId: data.employmentStatus,
+                    employmentStatusId: data.employmentStatus!=null?data.employmentStatus:null,
                     dateOfRegistration: data.dateOfRegistration,
                     isDateOfBirthEstimated: data.dateOfBirth == "Actual" ? false : true
                 };
@@ -598,23 +601,32 @@ const RegisterPatient = (props) => {
             <ToastContainer autoClose={3000} hideProgressBar />
             <Card className={classes.root}>
                 <CardContent>
-                    <Link
-                        to={{
-                            pathname: "/",
-                            state: 'users'
-                        }}>
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            className=" float-right ms-1"
-                            style={{backgroundColor:'#014d88',fontWeight:"bolder"}}
-                            startIcon={<TiArrowBack />}
-                        >
-                            <span style={{ textTransform: "capitalize" }}>Back </span>
-                        </Button>
-                    </Link>
-                    <br />
-                    <br />
+                    <div className="row mb-12 col-md-12" style={{paddingBottom:'5px'}}>
+                        <div className="mb-6 col-md-6" >
+                            <Breadcrumbs aria-label="breadcrumb">
+                                <Typography style={{color:'#992E62'}}>Patient</Typography>
+                                <Typography style={{color:'#014d88'}}>Registration</Typography>
+                            </Breadcrumbs>
+
+                        </div>
+                        <div className="mb-6 col-md-6">
+                            <Link
+                                to={{
+                                    pathname: "/",
+                                    state: 'users'
+                                }}>
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    className=" float-right ms-1"
+                                    style={{backgroundColor:'#014d88',fontWeight:"bolder"}}
+                                    startIcon={<TiArrowBack />}
+                                >
+                                    <span style={{ textTransform: "capitalize" }}>Back </span>
+                                </Button>
+                            </Link>
+                        </div>
+                    </div>
                     <div className="col-xl-12 col-lg-12">
                         <Form onSubmit={handleSubmit(onSubmit, onError)}>
                             <div className="card">

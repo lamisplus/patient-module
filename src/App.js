@@ -6,7 +6,8 @@ import {
 } from "react-router-dom";
 import RegisterPatient from './main/webapp/components/RegisterPatient';
 import PatientDashboard from './main/webapp/components/PatientDashboard';
-import Dashboard from './main/webapp/components/Dashboard';
+import Dashboard from './main/webapp/components/ClientDashboard';
+import ClientDashboard from "./main/webapp/components/ClientDashboard";
 /*import PatientVitals from './main/webapp/components/PatientVitals';
 import AddPatientVitals from './main/webapp/components/Add-Patient-Vitals';*/
 import { ToastContainer} from 'react-toastify';
@@ -14,7 +15,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import './main/webapp/css/style.css'
 import DualListBox from "react-dual-listbox";
 import 'react-dual-listbox/lib/react-dual-listbox.css';
-
+import Components from './main/webapp/components'
 export default function App() {
   return (
 
@@ -40,7 +41,7 @@ export default function App() {
             {/*<AddPatientVitalsPage />*/}
           </Route>
           <Route path="/">
-            <Dashboard />
+            <Components/>
           </Route>
           
         </Switch>
@@ -50,7 +51,7 @@ export default function App() {
 }
 
 function PatientDashboardPage() {
-  return <PatientDashboard />;
+  return <ClientDashboard />;
 }
 function RegisterPatientPage() {
   return <RegisterPatient />;

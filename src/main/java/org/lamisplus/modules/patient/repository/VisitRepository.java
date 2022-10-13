@@ -17,4 +17,6 @@ public interface VisitRepository extends JpaRepository<Visit, Long> {
    /// Visit findByPersonAndStatus(Person person);
 
     Optional<Visit> findAllByIdAndVisitStartDateNotNullAndVisitEndDateIsNull(Long id);
+
+    List<Visit> findAllByArchivedOrderByVisitStartDateDesc(Integer archived);
 }

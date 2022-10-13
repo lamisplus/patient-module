@@ -260,7 +260,7 @@ const PatientList = (props) => {
                             startIcon={<FaUserPlus size="25"/>}
                             style={{backgroundColor:'#014d88'}}
                         >
-                            <span style={{ textTransform: "capitalize", fontWeight:'bolder' }}>New Patient</span>
+                            <span style={{ textTransform: "capitalize", fontWeight:'bolder' }}>New Client</span>
                         </Button>
                     </Link>
                 ):""
@@ -293,7 +293,7 @@ const PatientList = (props) => {
                         { title: "Date Of Birth", field: "dateOfBirth", filtering: false },
                         { title: "Age", field: "age", filtering: false },
                         /*{ title: "Address", field: "address", filtering: false },*/
-                        { title: "Status", field: "status", filtering: false },
+                        /*{ title: "Status", field: "status", filtering: false },*/
                         {title: "Actions", field: "actions", filtering: false },
                     ]}
                     isLoading={loading}
@@ -312,9 +312,9 @@ const PatientList = (props) => {
 /*                        status: row.active ?
                             (<Label color="green" size="mini">active</Label>)
                             : (<Label color="teal" size="mini">not-active</Label>),*/
-                        status: row.active ?
+                        /*status: row.active ?
                             "Active"
-                            : "Not-Active",
+                            : "Not-Active",*/
                         actions:
                             <div>
                                 {permissions.includes('view_patient') || permissions.includes("all_permission") ? (
