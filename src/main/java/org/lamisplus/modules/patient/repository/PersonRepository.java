@@ -9,7 +9,7 @@ import java.util.Optional;
 
 
 public interface PersonRepository extends JpaRepository<Person, Long> {
-    List<Person> getAllByArchived(int i);
+    List<Person> getAllByArchivedOrderByDateOfRegistrationDesc(int i);
 
     @Query(
             value = "SELECT count(*) FROM biometric b WHERE b.person_uuid = ?1",
