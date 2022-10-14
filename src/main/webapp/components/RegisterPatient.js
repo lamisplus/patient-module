@@ -147,6 +147,7 @@ const RegisterPatient = (props) => {
     const [stateUnitOptions, setStateUnitOptions]= useState([]);
     const [districtUnitOptions, setDistrictUnitOptions]= useState([]);
     const [checkHospitalNumberError, setCheckHospitalNumberError] = useState(false);
+    const [checkNINError, setCheckNINError] = useState(false);
     const userDetail = props.location && props.location.state ? props.location.state.user : null;
     const[patientFacilityId,setPatientFacilityId]=useState(null);
     const classes = useStyles();
@@ -227,14 +228,25 @@ const RegisterPatient = (props) => {
     const handleAddRelative = () => {
         setShowRelative(true);
     };
-    const checkHospitalNumber = (e) =>{
-        axios.post(`${baseUrl}patient/exist/hospital-number`,e.target.value,{ responseType: 'text',headers: {"Authorization" : `Bearer ${token}`,'Content-Type': 'text/plain'} }).then(response=>{
-            console.log(response.data)
+    const checkHospitalNumber = async (e) =>{
+        setCheckHospitalNumberError(false)
+        await axios.post(`${baseUrl}patient/exist/hospital-number`,e.target.value,{ responseType: 'text',headers: {"Authorization" : `Bearer ${token}`,'Content-Type': 'text/plain'} }).then(response=>{
             if(response.data){
-                toast.error("Error!!  Hospital Number Exists");
                 setCheckHospitalNumberError(true)
             }else{
                 setCheckHospitalNumberError(false)
+            }
+        }).catch((error)=>{
+            console.log(error)
+        })
+    }
+    const checkNIN = async (e) =>{
+        setCheckNINError(false)
+        await axios.post(`${baseUrl}patient/exist/nin-number/${e.target.value}`,e.target.value,{ responseType: 'text',headers: {"Authorization" : `Bearer ${token}`,'Content-Type': 'text/plain'} }).then(response=>{
+            if(response.data){
+                setCheckNINError(true)
+            }else{
+                setCheckNINError(false)
             }
         }).catch((error)=>{
             console.log(error)
@@ -661,6 +673,11 @@ const RegisterPatient = (props) => {
                                                         type="text"
                                                         name="hospitalNumber"
                                                         id="hospitalNumber"
+                                                        autoComplete="off"
+                                                        onInput={(e) => {
+                                                            e.target.value = e.target.value.replace(/\D/g,'');
+                                                            checkHospitalNumber(e);
+                                                        }}
                                                         onChange={checkHospitalNumber}
                                                         {...register("hospitalNumber",{
                                                             onChange:(e)=>{checkHospitalNumber(e)}
@@ -679,8 +696,10 @@ const RegisterPatient = (props) => {
                                                         type="text"
                                                         name="ninNumber"
                                                         id="ninNumber"
+                                                        autoComplete="off"
                                                         onInput={(e) => {
-                                                           e.target.value = e.target.value.replace(/\D/g,'')
+                                                           e.target.value = e.target.value.replace(/\D/g,'');
+                                                            checkNIN(e);
                                                             if (e.target.value.length > e.target.maxLength){
                                                                 e.target.value = e.target.value.slice(0,e.target.maxLength);
                                                                 clearErrors('ninNumber');
@@ -696,10 +715,12 @@ const RegisterPatient = (props) => {
                                                         style={{border: "1px solid #014d88"}}
                                                         {...register("ninNumber")}
                                                     />
-                                                    {errors.ninNumber && <p>Enter a valid NIN Number</p>}
+                                                    {checkNINError && <p>NIN has been registered before</p> }
+                                                    {!checkNINError && errors.ninNumber && <p>Enter a valid NIN Number</p>}
+
                                                 </FormGroup>
                                             </div>
-                                            <div className="form-group mb-3 col-md-3">
+{/*                                            <div className="form-group mb-3 col-md-3">
                                                 <FormGroup>
                                                     <Label for="emrId">EMR ID *</Label>
                                                     <input
@@ -711,7 +732,7 @@ const RegisterPatient = (props) => {
                                                         style={{border: "1px solid #014d88"}}
                                                     />
                                                 </FormGroup>
-                                            </div>
+                                            </div>*/}
                                         </div>
 
                                         <div className="row">

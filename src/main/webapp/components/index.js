@@ -17,6 +17,7 @@ import PatientList from "./Home/PatientList";
 import BiometricsList from "./Home/BiometricsList";
 import Typography from '@mui/material/Typography';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
+import CheckedInPatients from "./Home/CheckedInPatients";
 
 
 const useStyles = makeStyles(theme => ({
@@ -105,7 +106,7 @@ function Index(props) {
         },
         { menuItem: 'Checked-In', render: () =>
                 <Tab.Pane>
-
+                    <CheckedInPatients/>
                 </Tab.Pane>
         },
         { menuItem: 'Biometrics', render: () =>

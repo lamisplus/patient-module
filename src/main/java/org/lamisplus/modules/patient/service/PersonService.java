@@ -131,78 +131,89 @@ public class PersonService {
 
     @NotNull
     private Person getPersonFromDto(PersonDto personDto) {
-        Long genderId = personDto.getGenderId ();
-        Long maritalStatusId = personDto.getMaritalStatusId ();
-        Long educationalId = personDto.getEducationId ();
-        Long employmentStatusId = personDto.getEmploymentStatusId ();
-        Long organizationId = personDto.getOrganizationId ();
-        List<ContactPointDto> contactPointDtos = personDto.getContactPoint ();
-        List<ContactDto> contact = personDto.getContact ();
-        List<IdentifierDto> identifier = personDto.getIdentifier ();
-        List<AddressDto> address = personDto.getAddress ();
-        ObjectMapper mapper = new ObjectMapper ();
-        Person person = new Person ();
-        person.setFirstName (personDto.getFirstName ());
-        person.setSurname (personDto.getSurname ());
-        person.setOtherName (personDto.getOtherName ());
-        person.setDateOfBirth (personDto.getDateOfBirth ());
-        person.setDateOfRegistration (personDto.getDateOfRegistration ());
-        person.setActive (personDto.getActive ());
-        person.setFacilityId (personDto.getFacilityId ());
-        person.setArchived (0);
-        person.setDeceasedDateTime (personDto.getDeceasedDateTime ());
-        person.setDeceased (personDto.getDeceased ());
-        boolean isDateOfBirthEstimated = personDto.getIsDateOfBirthEstimated () != null;
-        person.setIsDateOfBirthEstimated (isDateOfBirthEstimated);
+        Long sexId = personDto.getSexId();
+        Long genderId = personDto.getGenderId();
+        Long maritalStatusId = personDto.getMaritalStatusId();
+        Long educationalId = personDto.getEducationId();
+        Long employmentStatusId = personDto.getEmploymentStatusId();
+        Long organizationId = personDto.getOrganizationId();
+        List<ContactPointDto> contactPointDtos = personDto.getContactPoint();
+        List<ContactDto> contact = personDto.getContact();
+        List<IdentifierDto> identifier = personDto.getIdentifier();
+        List<AddressDto> address = personDto.getAddress();
+        ObjectMapper mapper = new ObjectMapper();
+        Person person = new Person();
+        String hospitalNumber = getHospitalNumber(personDto);
+        person.setHospitalNumber(hospitalNumber);
+        person.setFirstName(personDto.getFirstName());
+        person.setSurname(personDto.getSurname());
+        person.setOtherName(personDto.getOtherName());
+        person.setDateOfBirth(personDto.getDateOfBirth());
+        person.setDateOfRegistration(personDto.getDateOfRegistration());
+        person.setActive(personDto.getActive());
+        person.setFacilityId(personDto.getFacilityId());
+        person.setArchived(0);
+        person.setDeceasedDateTime(personDto.getDeceasedDateTime());
+        person.setDeceased(personDto.getDeceased());
+        person.setNinNumber(personDto.getNinNumber());
+        person.setEmrId(personDto.getEmrId());
+        boolean isDateOfBirthEstimated = personDto.getIsDateOfBirthEstimated() != null;
+        person.setIsDateOfBirthEstimated(isDateOfBirthEstimated);
+
         if (genderId != null) {
-            ApplicationCodeDto genderDto = getAppCodeSet (genderId);
-            JsonNode genderJsonNode = mapper.valueToTree (genderDto);
-            person.setGender (genderJsonNode);
+            ApplicationCodeDto genderDto = getAppCodeSet(genderId);
+            JsonNode genderJsonNode = mapper.valueToTree(genderDto);
+            //person.setSex (genderDto.getDisplay ());
+            person.setGender(genderJsonNode);
+        }
+        if (sexId != null) {
+            ApplicationCodeDto sexDto = getAppCodeSet(sexId);
+            log.info("sex {}", sexDto.getDisplay());
+            person.setSex(sexDto.getDisplay());
         }
         if (maritalStatusId != null) {
-            ApplicationCodeDto maritalStatusDto = getAppCodeSet (maritalStatusId);
-            JsonNode maritalJsonNode = mapper.valueToTree (maritalStatusDto);
-            person.setMaritalStatus (maritalJsonNode);
+            ApplicationCodeDto maritalStatusDto = getAppCodeSet(maritalStatusId);
+            JsonNode maritalJsonNode = mapper.valueToTree(maritalStatusDto);
+            person.setMaritalStatus(maritalJsonNode);
         }
         if (educationalId != null) {
-            ApplicationCodeDto educationStatusDto = getAppCodeSet (educationalId);
-            JsonNode educationJsonNode = mapper.valueToTree (educationStatusDto);
-            person.setEducation (educationJsonNode);
+            ApplicationCodeDto educationStatusDto = getAppCodeSet(educationalId);
+            JsonNode educationJsonNode = mapper.valueToTree(educationStatusDto);
+            person.setEducation(educationJsonNode);
         }
         if (employmentStatusId != null) {
-            ApplicationCodeDto employmentStatusDto = getAppCodeSet (employmentStatusId);
-            JsonNode educationJsonNode = mapper.valueToTree (employmentStatusDto);
-            person.setEmploymentStatus (educationJsonNode);
+            ApplicationCodeDto employmentStatusDto = getAppCodeSet(employmentStatusId);
+            JsonNode educationJsonNode = mapper.valueToTree(employmentStatusDto);
+            person.setEmploymentStatus(educationJsonNode);
         }
         if (organizationId != null) {
-            OrgUnitDto organisationUnitDto = getOrgUnit (organizationId);
-            JsonNode organisationUnitJsonNode = mapper.valueToTree (organisationUnitDto);
-            person.setOrganization (organisationUnitJsonNode);
+            OrgUnitDto organisationUnitDto = getOrgUnit(organizationId);
+            JsonNode organisationUnitJsonNode = mapper.valueToTree(organisationUnitDto);
+            person.setOrganization(organisationUnitJsonNode);
         }
-        if (contactPointDtos != null && ! contactPointDtos.isEmpty ()) {
-            ArrayNode contactPointDtoArrayNode = mapper.valueToTree (contactPointDtos);
-            JsonNode contactPointDtoJsonNode = mapper.createObjectNode ().set ("contactPoint", contactPointDtoArrayNode);
-            person.setContactPoint (contactPointDtoJsonNode);
+        if (contactPointDtos != null && !contactPointDtos.isEmpty()) {
+            ArrayNode contactPointDtoArrayNode = mapper.valueToTree(contactPointDtos);
+            JsonNode contactPointDtoJsonNode = mapper.createObjectNode().set("contactPoint", contactPointDtoArrayNode);
+            person.setContactPoint(contactPointDtoJsonNode);
         }
-        if (contact != null && ! contact.isEmpty ()) {
-            ArrayNode contactsDtoArrayNode = mapper.valueToTree (contact);
-            JsonNode contactDtoJsonNode = mapper.createObjectNode ().set ("contact", contactsDtoArrayNode);
-            person.setContact (contactDtoJsonNode);
+        if (contact != null && !contact.isEmpty()) {
+            ArrayNode contactsDtoArrayNode = mapper.valueToTree(contact);
+            JsonNode contactDtoJsonNode = mapper.createObjectNode().set("contact", contactsDtoArrayNode);
+            person.setContact(contactDtoJsonNode);
         }
-        if (identifier != null && ! identifier.isEmpty ()) {
-            ArrayNode identifierDtoArrayNode = mapper.valueToTree (identifier);
-            JsonNode identifierDtoJsonNode = mapper.createObjectNode ().set ("identifier", identifierDtoArrayNode);
-            person.setIdentifier (identifierDtoJsonNode);
+        if (identifier != null && !identifier.isEmpty()) {
+            ArrayNode identifierDtoArrayNode = mapper.valueToTree(identifier);
+            JsonNode identifierDtoJsonNode = mapper.createObjectNode().set("identifier", identifierDtoArrayNode);
+            person.setIdentifier(identifierDtoJsonNode);
         }
 
-        if (address != null && ! address.isEmpty ()) {
-            ArrayNode addressesDtoArrayNode = mapper.valueToTree (address);
-            JsonNode addressesDtoJsonNode = mapper.createObjectNode ().set ("address", addressesDtoArrayNode);
-            person.setAddress (addressesDtoJsonNode);
+        if (address != null && !address.isEmpty()) {
+            ArrayNode addressesDtoArrayNode = mapper.valueToTree(address);
+            JsonNode addressesDtoJsonNode = mapper.createObjectNode().set("address", addressesDtoArrayNode);
+            person.setAddress(addressesDtoJsonNode);
         }
         return person;
     }
-
 
     private ApplicationCodeDto getAppCodeSet(Long id) {
         ApplicationCodeSet applicationCodeSet = applicationCodesetRepository.getOne (id);
@@ -234,6 +245,7 @@ public class PersonService {
         personResponseDto.setEducation (person.getEducation ());
         personResponseDto.setEmploymentStatus (person.getEmploymentStatus ());
         personResponseDto.setMaritalStatus (person.getMaritalStatus ());
+        personResponseDto.setSex(person.getSex());
         personResponseDto.setGender (person.getGender ());
         personResponseDto.setDeceased (person.getDeceased ());
         personResponseDto.setDateOfRegistration (person.getDateOfRegistration ());
