@@ -9,6 +9,8 @@ import org.lamisplus.modules.patient.repository.PatientCheckPostServiceRepositor
 import org.lamisplus.modules.patient.service.PersonService;
 import org.lamisplus.modules.patient.service.ValidationService;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,7 +40,8 @@ public class PatientController {
     public ResponseEntity<List<PersonResponseDto>> getAllPatients() {
         return ResponseEntity.ok(personService.getAllPerson());
     }
-        @GetMapping(value = "/{id}")
+
+    @GetMapping(value = "/{id}")
     public ResponseEntity<PersonResponseDto> getPatient(@PathVariable("id") Long id) {
         return ResponseEntity.ok(personService.getPersonById(id));
     }
@@ -93,4 +96,15 @@ public class PatientController {
     {
         return personService.getAllActiveVisit();
     }
+
+
+    @GetMapping(value = "/get-all-patient-pageable", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<PersonResponseDto>> getAllPatientPageable(
+            @RequestParam(defaultValue = "0") Integer pageNo,
+            @RequestParam(defaultValue = "10") Integer pageSize) {
+        List<PersonResponseDto> list = personService.getAllPersonPageable(pageNo, pageSize);
+        return new ResponseEntity<> (list, new HttpHeaders(), HttpStatus.OK);
+    }
+
+
 }

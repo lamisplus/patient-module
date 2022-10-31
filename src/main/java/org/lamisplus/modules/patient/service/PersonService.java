@@ -22,7 +22,9 @@ import org.lamisplus.modules.patient.repository.EncounterRepository;
 import org.lamisplus.modules.patient.repository.PersonRepository;
 import org.lamisplus.modules.patient.repository.VisitRepository;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -83,6 +85,16 @@ public class PersonService {
                 .map (this::getDtoFromPerson)
                 .collect (Collectors.toList ());
     }
+    public List<PersonResponseDto> getAllPersonPageable(int pageNo, int pageSize) {
+        //Person person = getPerson(personId);
+        Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by("id").descending());
+        Page<Person> person = personRepository.getAllByArchivedOrderByIdDesc(0, paging);
+        if (person.hasContent()) {
+            return person.getContent().stream().map(this::getDtoFromPerson).collect(Collectors.toList());
+        }
+        return new ArrayList<>();
+    }
+
 
     public Boolean isPersonExist(Long personId) {
         Optional<Person> person = personRepository.findById (personId);
@@ -344,6 +356,8 @@ public class PersonService {
         else reply = true;
         return reply;
     }
+
+
 }
 
 
