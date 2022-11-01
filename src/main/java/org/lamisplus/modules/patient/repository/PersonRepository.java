@@ -13,6 +13,9 @@ import java.util.Optional;
 public interface PersonRepository extends JpaRepository<Person, Long> {
 
     @Query(
+            value ="SELECT p.* from patient_person p JOIN (select hospital_number FROM patient_person Group by hospital_number HAVING count(hospital_number) > 1) b on p.hospital_number = b.hospital_number ORDER BY hospital_number", nativeQuery = true)
+    List<Person> findDuplicate();
+    @Query(
             value = "SELECT count(*) FROM biometric b WHERE b.person_uuid = ?1",
             nativeQuery = true)
     Integer getBiometricCountByPersonUuid(String uuid);
@@ -39,3 +42,4 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
     Page<Person> getAllByArchivedOrderByIdDesc (Integer archived, Pageable pageable);
 
 }
+

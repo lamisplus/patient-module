@@ -22,7 +22,7 @@
                 created_by                 VARCHAR(255),
                 last_modified_date         TIMESTAMP WITHOUT TIME ZONE,
                 last_modified_by           VARCHAR(255),
-                active                     BOOLEAN NOT NULL,
+                active                     BOOLEAN,
                 contact_point              JSONB,
                 address                    JSONB,
                 gender                     JSONB,
@@ -34,23 +34,21 @@
                 education                  JSONB,
                 organization               JSONB,
                 contact                    JSONB,
-                date_of_birth              date         NOT NULL,
-                date_of_registration       date         NOT NULL,
+                date_of_birth              date,
+                date_of_registration       date,
                 archived                   INTEGER,
                 facility_id                BIGINT,
                 uuid                       VARCHAR(255) NOT NULL,
                 nin_number                 VARCHAR(255),
                 emr_id                     VARCHAR(255),
                 first_name                 VARCHAR(255),
-                sex                        VARCHAR(255) NOT NULL,
-                surname                    VARCHAR(255) NOT NULL ,
+                sex                        VARCHAR(255),
+                surname                    VARCHAR(255),
                 other_name                 VARCHAR(255),
-                hospital_number            VARCHAR(255) NOT NULL,
+                hospital_number            VARCHAR(255),
                 is_date_of_birth_estimated BOOLEAN,
                 CONSTRAINT pk_patient_person PRIMARY KEY (id)
             );
-            ALTER TABLE patient_person
-                ADD CONSTRAINT uc_patient_person_hospital_number UNIQUE (hospital_number);
             ALTER TABLE patient_person
                 ADD CONSTRAINT uc_patient_person_uuid UNIQUE (uuid);
         </sql>

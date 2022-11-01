@@ -357,6 +357,13 @@ public class PersonService {
         return reply;
     }
 
+    public List<PersonResponseDto> getDuplicateHospitalNumbers ()
+    {
+        return personRepository.findDuplicate ()
+                .stream ()
+                .map (this::getDtoFromPerson)
+                .collect (Collectors.toList ());
+    }
 
 }
 

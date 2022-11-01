@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.lamisplus.modules.patient.domain.dto.PersonDto;
 import org.lamisplus.modules.patient.domain.dto.PersonResponseDto;
 import org.lamisplus.modules.patient.domain.entity.PatientCheckPostService;
+import org.lamisplus.modules.patient.domain.entity.Person;
 import org.lamisplus.modules.patient.repository.PatientCheckPostServiceRepository;
 import org.lamisplus.modules.patient.service.PersonService;
 import org.lamisplus.modules.patient.service.ValidationService;
@@ -106,5 +107,8 @@ public class PatientController {
         return new ResponseEntity<> (list, new HttpHeaders(), HttpStatus.OK);
     }
 
-
+    @GetMapping(value = "/get-duplicate-hospital_numbers")
+    public ResponseEntity<List<PersonResponseDto>> getDuplicateHospitalNumbers() {
+        return ResponseEntity.ok(personService.getDuplicateHospitalNumbers());
+    }
 }
