@@ -3,6 +3,7 @@ package org.lamisplus.modules.patient.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.lamisplus.modules.patient.domain.dto.PersonDto;
+import org.lamisplus.modules.patient.domain.dto.PersonMetaDataDto;
 import org.lamisplus.modules.patient.domain.dto.PersonResponseDto;
 import org.lamisplus.modules.patient.domain.entity.PatientCheckPostService;
 import org.lamisplus.modules.patient.domain.entity.Person;
@@ -100,11 +101,21 @@ public class PatientController {
 
 
     @GetMapping(value = "/get-all-patient-pageable", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<PersonResponseDto>> getAllPatientPageable(
+    public ResponseEntity<PersonMetaDataDto> getAllPatientPageable(
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize) {
         List<PersonResponseDto> list = personService.getAllPersonPageable(pageNo, pageSize);
-        return new ResponseEntity<> (list, new HttpHeaders(), HttpStatus.OK);
+        int recordSize = personService.getAllPerson().size();
+        double totalPage = (double) recordSize/pageSize;
+        int totalPage2 = (int) Math.ceil(totalPage);
+        PersonMetaDataDto personMetaDataDto = new PersonMetaDataDto();
+        personMetaDataDto.setTotalRecords(recordSize);
+        personMetaDataDto.setPageSize(pageSize);
+        personMetaDataDto.setTotalPages(totalPage2);
+        personMetaDataDto.setCurrentPage(pageNo);
+        personMetaDataDto.setRecords(list);
+
+        return new ResponseEntity<> (personMetaDataDto, new HttpHeaders(), HttpStatus.OK);
     }
 
     @GetMapping(value = "/get-duplicate-hospital_numbers")

@@ -85,15 +85,15 @@ public class PersonService {
                 .map (this::getDtoFromPerson)
                 .collect (Collectors.toList ());
     }
-    public List<PersonResponseDto> getAllPersonPageable(int pageNo, int pageSize) {
-        //Person person = getPerson(personId);
-        Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by("id").descending());
-        Page<Person> person = personRepository.getAllByArchivedOrderByIdDesc(0, paging);
-        if (person.hasContent()) {
-            return person.getContent().stream().map(this::getDtoFromPerson).collect(Collectors.toList());
-        }
-        return new ArrayList<>();
-    }
+//    public List<PersonResponseDto> getAllPersonPageable(int pageNo, int pageSize) {
+//        //Person person = getPerson(personId);
+//        Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by("id").descending());
+//        Page<Person> person = personRepository.getAllByArchivedOrderByIdDesc(0, paging);
+//        if (person.hasContent()) {
+//            return person.getContent().stream().map(this::getDtoFromPerson).collect(Collectors.toList());
+//        }
+//        return new ArrayList<>();
+//    }
 
 
     public Boolean isPersonExist(Long personId) {
@@ -364,6 +364,24 @@ public class PersonService {
                 .map (this::getDtoFromPerson)
                 .collect (Collectors.toList ());
     }
+
+    public List<PersonResponseDto> getAllPersonPageable(int pageNo, int pageSize) {
+        //Person person = getPerson(personId);
+        Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by("id").descending());
+        Optional<User> currentUser = this.userService.getUserWithRoles();
+        Long facilityId = 0L;
+        if (currentUser.isPresent()) {
+            User user = (User) currentUser.get();
+            facilityId =  user.getCurrentOrganisationUnitId();
+        }
+        Page<Person> person = personRepository.getAllByArchivedAndFacilityIdOrderByIdDesc(0, facilityId, paging);
+        System.out.println("SIZE = "+person.getSize()+"\t facilityId ="+facilityId);
+        if (person.hasContent()) {
+            return person.getContent().stream().map(this::getDtoFromPerson).collect(Collectors.toList());
+        }
+        return new ArrayList<>();
+    }
+
 
 }
 
