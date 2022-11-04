@@ -100,6 +100,14 @@ public class PatientController {
     }
 
 
+//    @GetMapping(value = "/get-all-patient-pageable", produces = MediaType.APPLICATION_JSON_VALUE)
+//    public ResponseEntity<List<PersonResponseDto>> getAllPatientPageable(
+//            @RequestParam(defaultValue = "0") Integer pageNo,
+//            @RequestParam(defaultValue = "10") Integer pageSize) {
+//        List<PersonResponseDto> list = personService.getAllPersonPageable(pageNo, pageSize);
+//        return new ResponseEntity<> (list, new HttpHeaders(), HttpStatus.OK);
+//    }
+
     @GetMapping(value = "/get-all-patient-pageable", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PersonMetaDataDto> getAllPatientPageable(
             @RequestParam(defaultValue = "0") Integer pageNo,

@@ -20,10 +20,6 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
             nativeQuery = true)
     Integer getBiometricCountByPersonUuid(String uuid);
 
-    @Query(value = "SELECT * FROM patient_person WHERE (first_name ilike ?1 OR surname ilike ?1 " +
-            "OR other_name ilike ?1 OR hospital_number ilike ?1) AND archived=?2 AND facility_id=?3", nativeQuery = true)
-    Page<Person> findAllPersonBySearchParameters(String queryParam, Integer archived, Long facilityId, Pageable pageable);
-
     @Override
     Optional<Person> findById(Long aLong);
 
@@ -47,6 +43,10 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
 
     Page<Person> getAllByArchivedAndFacilityIdOrderByIdDesc (Integer archived, Long facilityId, Pageable pageable);
 
+
+    @Query(value = "SELECT * FROM patient_person WHERE (first_name ilike ?1 OR surname ilike ?1 " +
+            "OR other_name ilike ?1 OR hospital_number ilike ?1) AND archived=?2 AND facility_id=?3", nativeQuery = true)
+    Page<Person> findAllPersonBySearchParameters(String queryParam, Integer archived, Long facilityId, Pageable pageable);
 }
 
 
