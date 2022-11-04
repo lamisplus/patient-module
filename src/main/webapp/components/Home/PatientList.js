@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback} from 'react'
+import React, {useState, useEffect, useCallback, useRef} from 'react'
 import MaterialTable from 'material-table';
 import axios from "axios";
 import { url as baseUrl, token } from "../../../../api";
@@ -38,6 +38,7 @@ import ViewColumn from '@material-ui/icons/ViewColumn';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
+import TablePagination from '@mui/material/TablePagination';
 
 
 
@@ -112,6 +113,7 @@ const useStyles = makeStyles(theme => ({
 
 
 const PatientList = (props) => {
+    const tableRef = useRef(null);
     const classes = useStyles();
     const [patients, setPatients] = useState([]);
     const [permissions, setPermissions] = useState([]);
@@ -119,6 +121,8 @@ const PatientList = (props) => {
     const [modal, setModal] = useState(false);
     const [patient, setPatient] = useState(false);
     const [enablePPI, setEnablePPI] = useState(true);
+    const [page, setPage] = useState(1);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
     const toggle = (id) => {
         const patient = patients.find(obj => obj.id == id);
         setPatient(patient);
@@ -141,9 +145,9 @@ const PatientList = (props) => {
             });
 
     }
-    const loadPatients = useCallback(async () => {
+    const loadPatients = useCallback(async (page=1,size=10) => {
         try {
-            const response = await axios.get(`${baseUrl}patient`, { headers: {"Authorization" : `Bearer ${token}`} });
+            const response = await axios.get(`${baseUrl}patient/get-all-patient-pageable?pageNo=${page}&pageSize=${size}`, { headers: {"Authorization" : `Bearer ${token}`} });
             setPatients(response.data);
         } catch (e) {
             console.log(e);
@@ -166,6 +170,7 @@ const PatientList = (props) => {
     }
 
     const calculate_age = dob => {
+
         const today = new Date();
         const dateParts = dob.split("-");
         const birthDate = new Date(dob); // create a date object directlyfrom`dob1`argument
@@ -196,6 +201,7 @@ const PatientList = (props) => {
 
     useEffect(() => {
         loadPatients();
+        tableRef.current.dataManager.changePageSize(rowsPerPage);
     }, [loadPatients]);
     function actionItems(row){
         return  [
@@ -243,6 +249,7 @@ const PatientList = (props) => {
                 )}
         ]
     }
+
     const enablePPIColumns = () =>{
         setEnablePPI(!enablePPI)
     }
@@ -259,10 +266,24 @@ const PatientList = (props) => {
         ):<h5 style={{color:'#3d4465',fontWeight:'bold'}}>Patients</h5>
         }
     </div>;
+
+
+    const handleChangePage = (event, newPage) => {
+        loadPatients(newPage,rowsPerPage);
+        setPage(newPage);
+    };
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        tableRef.current.dataManager.changePageSize(parseInt(event.target.value, 10));
+        setPage(1);
+        loadPatients(1,parseInt(event.target.value, 10));
+
+    };
     return (
         <div className={classes.root}>
             <ToastContainer autoClose={3000} hideProgressBar />
             <MaterialTable
+                tableRef={tableRef}
                 icons={tableIcons}
                 title={<PPISelect/>}
                 columns={[
@@ -315,9 +336,20 @@ const PatientList = (props) => {
                     filtering: false,
                     exportButton: false,
                     searchFieldAlignment: 'left',
-                    pageSizeOptions:[10,20,100],
-                    pageSize:10,
-                    debounceInterval: 400
+                    /*pageSizeOptions:[10,20,100],*/
+                    debounceInterval: 400,
+
+                }}
+                components={{
+                    Pagination: (props) =>
+                        <TablePagination
+                            component="div"
+                            count={100}
+                            page={page}
+                            onPageChange={handleChangePage}
+                            rowsPerPage={rowsPerPage}
+                            onRowsPerPageChange={handleChangeRowsPerPage}
+                        />
                 }}
             />
 {/*            <Card>

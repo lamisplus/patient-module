@@ -18,6 +18,7 @@ import BiometricsList from "./Home/BiometricsList";
 import Typography from '@mui/material/Typography';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import CheckedInPatients from "./Home/CheckedInPatients";
+import MigrationDQA from "./MigrationDQA";
 
 
 const useStyles = makeStyles(theme => ({
@@ -112,6 +113,11 @@ function Index(props) {
         { menuItem: 'Biometrics', render: () =>
                 <Tab.Pane>
                     <BiometricsList/>
+                </Tab.Pane>
+        },
+        { menuItem: 'Migration DQA', render: () =>
+                <Tab.Pane>
+                    <MigrationDQA/>
                 </Tab.Pane>
         },
     ];
