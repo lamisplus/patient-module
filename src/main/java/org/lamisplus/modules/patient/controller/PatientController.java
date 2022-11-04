@@ -113,9 +113,10 @@ public class PatientController {
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize) {
         List<PersonResponseDto> list = personService.getAllPersonPageable(pageNo, pageSize);
-        int recordSize = personService.getAllPerson().size();
+        int recordSize = personService.getTotalRecords();
         double totalPage = (double) recordSize/pageSize;
         int totalPage2 = (int) Math.ceil(totalPage);
+        System.out.println("I was called recordSize using getTotalRecords "+recordSize );
         PersonMetaDataDto personMetaDataDto = new PersonMetaDataDto();
         personMetaDataDto.setTotalRecords(recordSize);
         personMetaDataDto.setPageSize(pageSize);

@@ -372,6 +372,9 @@ public class PersonService {
                 .collect (Collectors.toList ());
     }
 
+    public Integer getTotalRecords(){
+       return personRepository.getTotalRecords();
+    }
 }
 
 
