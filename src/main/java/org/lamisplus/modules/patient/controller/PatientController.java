@@ -39,8 +39,11 @@ public class PatientController {
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<PersonResponseDto>> getAllPatients() {
-        return ResponseEntity.ok(personService.getAllPerson());
+    public ResponseEntity<PersonMetaDataDto> getAllPatients(
+            @RequestParam(defaultValue = "0") Integer pageNo,
+            @RequestParam(defaultValue = "10") Integer pageSize) {
+        PersonMetaDataDto personMetaDataDto = personService.getAllPersonPageable(pageNo, pageSize);
+        return new ResponseEntity<> (personMetaDataDto, new HttpHeaders(), HttpStatus.OK);
     }
 
     @GetMapping(value = "/{id}")
@@ -108,27 +111,48 @@ public class PatientController {
 //        return new ResponseEntity<> (list, new HttpHeaders(), HttpStatus.OK);
 //    }
 
-    @GetMapping(value = "/get-all-patient-pageable", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<PersonMetaDataDto> getAllPatientPageable(
-            @RequestParam(defaultValue = "0") Integer pageNo,
-            @RequestParam(defaultValue = "10") Integer pageSize) {
-        List<PersonResponseDto> list = personService.getAllPersonPageable(pageNo, pageSize);
-        int recordSize = personService.getTotalRecords();
-        double totalPage = (double) recordSize/pageSize;
-        int totalPage2 = (int) Math.ceil(totalPage);
-        System.out.println("I was called recordSize using getTotalRecords "+recordSize );
-        PersonMetaDataDto personMetaDataDto = new PersonMetaDataDto();
-        personMetaDataDto.setTotalRecords(recordSize);
-        personMetaDataDto.setPageSize(pageSize);
-        personMetaDataDto.setTotalPages(totalPage2);
-        personMetaDataDto.setCurrentPage(pageNo);
-        personMetaDataDto.setRecords(list);
+//    @GetMapping(value = "/get-all-patient-pageable", produces = MediaType.APPLICATION_JSON_VALUE)
+//    public ResponseEntity<PersonMetaDataDto> getAllPatientPageable(
+//            @RequestParam(defaultValue = "0") Integer pageNo,
+//            @RequestParam(defaultValue = "10") Integer pageSize) {
+//        List<PersonResponseDto> list = personService.getAllPersonPageable(pageNo, pageSize);
+//
+//        int recordSize = personService.getTotalRecords();
+//        double totalPage = (double) recordSize/pageSize;
+//        int totalPage2 = (int) Math.ceil(totalPage);
+//        System.out.println("I was called recordSize using getTotalRecords "+recordSize );
+//        PersonMetaDataDto personMetaDataDto = new PersonMetaDataDto();
+//        personMetaDataDto.setTotalRecords(recordSize);
+//        personMetaDataDto.setPageSize(pageSize);
+//        personMetaDataDto.setTotalPages(totalPage2);
+//        personMetaDataDto.setCurrentPage(pageNo);
+//        personMetaDataDto.setRecords(list);
+//
+//        return new ResponseEntity<> (personMetaDataDto, new HttpHeaders(), HttpStatus.OK);
+//    }
 
+    @GetMapping(value = "/get-all-patient-pageable", produces = MediaType.APPLICATION_JSON_VALUE)
+   public ResponseEntity<PersonMetaDataDto> getAllPatientPageable2(
+           @RequestParam(defaultValue = "0") Integer pageNo,
+            @RequestParam(defaultValue = "10") Integer pageSize) {
+        PersonMetaDataDto personMetaDataDto = personService.getAllPersonPageable(pageNo, pageSize);
         return new ResponseEntity<> (personMetaDataDto, new HttpHeaders(), HttpStatus.OK);
     }
-
     @GetMapping(value = "/get-duplicate-hospital_numbers")
     public ResponseEntity<List<PersonResponseDto>> getDuplicateHospitalNumbers() {
         return ResponseEntity.ok(personService.getDuplicateHospitalNumbers());
     }
+
+    @GetMapping(value = "/get-patient-by-search-param", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<PersonMetaDataDto> getPatientsBySearchParam(
+            @RequestParam(defaultValue = "*") String searchParam,
+            @RequestParam(defaultValue = "0") Integer pageNo,
+            @RequestParam(defaultValue = "10") Integer pageSize) {
+        PersonMetaDataDto personMetaDataDto = personService.findPersonBySearchParam(searchParam, pageNo, pageSize);
+        return new ResponseEntity<> (personMetaDataDto, new HttpHeaders(), HttpStatus.OK);
+    }
+
+    //    public ResponseEntity<List<PersonResponseDto>> getAllPatients() {
+//        return ResponseEntity.ok(personService.getAllPerson());
+//    }
 }
