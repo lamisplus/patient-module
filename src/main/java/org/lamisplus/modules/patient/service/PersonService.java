@@ -88,7 +88,14 @@ public class PersonService {
     public List<PersonResponseDto> getAllPersonPageable(int pageNo, int pageSize) {
         //Person person = getPerson(personId);
         Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by("id").descending());
-        Page<Person> person = personRepository.getAllByArchivedOrderByIdDesc(0, paging);
+        Optional<User> currentUser = this.userService.getUserWithRoles();
+        Long currentOrganisationUnitId = 0L;
+        if (currentUser.isPresent()) {
+            User user = (User) currentUser.get();
+            currentOrganisationUnitId = user.getCurrentOrganisationUnitId();
+
+        }
+        Page<Person> person = personRepository.getAllByArchivedAndFacilityIdOrderByIdDesc(0,  currentOrganisationUnitId, paging);
         if (person.hasContent()) {
             return person.getContent().stream().map(this::getDtoFromPerson).collect(Collectors.toList());
         }
