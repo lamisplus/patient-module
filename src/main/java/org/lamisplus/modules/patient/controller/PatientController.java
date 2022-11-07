@@ -40,9 +40,10 @@ public class PatientController {
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PersonMetaDataDto> getAllPatients(
+            @RequestParam(defaultValue = "*") String searchParam,
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize) {
-        PersonMetaDataDto personMetaDataDto = personService.getAllPersonPageable(pageNo, pageSize);
+        PersonMetaDataDto personMetaDataDto = personService.findPersonBySearchParam(searchParam, pageNo, pageSize);
         return new ResponseEntity<> (personMetaDataDto, new HttpHeaders(), HttpStatus.OK);
     }
 
