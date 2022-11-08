@@ -111,12 +111,11 @@ const useStyles = makeStyles(theme => ({
 }));
 
 
-let perms = [];
 const PatientList = (props) => {
     const tableRef = useRef(null);
     const classes = useStyles();
     const [patients, setPatients] = useState([]);
-    const [permissions, setPermissions] = useState([]);
+    const [permissions, setPermissions] = useState(props.permissions);
     const [loading, setLoading] = useState('');
     const [modal, setModal] = useState(false);
     const [patient, setPatient] = useState(false);
@@ -132,26 +131,54 @@ const PatientList = (props) => {
         setPatient(patient);
         setModal(!modal);
     }
-    //Get list of user permissions
-    const userPermission =()=>{
-        axios
-            .get(`${baseUrl}account`,
-                { headers: {"Authorization" : `Bearer ${token}`} }
-            )
-            .then((response) => {
-                setPermissions(response.data.permissions);
-                perms=response.data.permissions;
-            })
-            .catch((error) => {
-            });
 
+
+    function actionItems(row){
+        return  [
+            {
+                name:'View',
+                type:'link',
+                icon:<FaEye  size="22"/>,
+                to:{
+                    pathname: "/register-patient",
+                    state: { patientId : row.id, permissions:permissions  }
+                }
+            },
+            {...(permissions.includes('view_patient') || permissions.includes("all_permission")&&
+                    {
+                        name:'Dashboard',
+                        type:'link',
+                        icon:<MdPerson size="20" color='rgb(4, 196, 217)' />,
+                        to:{
+                            pathname: "/patient-dashboard",
+                            state: { patientObj: row, permissions:permissions  }
+                        }
+                    }
+                )},
+            {...(permissions.includes('edit_patient') || permissions.includes("all_permission")&&
+                    {
+                        name:'Edit',
+                        type:'link',
+                        icon:<MdModeEdit size="20" color='rgb(4, 196, 217)' />,
+                        to:{
+                            pathname: "/register-patient",
+                            state: { patientId : row.id, permissions:permissions  }
+                        }
+                    }
+                )},
+            {...(permissions.includes('delete_patient') || permissions.includes("all_permission")&&
+                    {
+                        name:'Delete',
+                        type:'link',
+                        icon:<MdDeleteForever size="20" color='rgb(4, 196, 217)'  />,
+                        to:{
+                            pathname: "/#",
+                            state: { patientObj: row, permissions:permissions  }
+                        }
+                    }
+                )}
+        ]
     }
-
-    useEffect(() => {
-        userPermission();
-    }, []);
-
-
     const handleRemoteData = query =>
         new Promise((resolve, reject) => {
             axios.get(`${baseUrl}patient?pageSize=${query.pageSize}&pageNo=${query.page}&searchParam=${query.search}`, { headers: {"Authorization" : `Bearer ${token}`} })
@@ -171,7 +198,7 @@ const PatientList = (props) => {
                                 : calculate_age(row.dateOfBirth),
                             actions:
                                 <div>
-                                    {perms.includes('view_patient') || perms.includes("all_permission") ? (
+                                    {permissions.includes('view_patient') || permissions.includes("all_permission") ? (
                                         <SplitActionButton actions={actionItems(row)} />
                                     ):""
                                     }
@@ -229,52 +256,7 @@ const PatientList = (props) => {
         return gender.display;
     };
 
-    function actionItems(row){
-        return  [
-            {
-                name:'View',
-                type:'link',
-                icon:<FaEye  size="22"/>,
-                to:{
-                    pathname: "/register-patient",
-                    state: { patientId : row.id, permissions:permissions  }
-                }
-            },
-            {...(permissions.includes('view_patient') || permissions.includes("all_permission")&&
-                    {
-                        name:'Dashboard',
-                        type:'link',
-                        icon:<MdPerson size="20" color='rgb(4, 196, 217)' />,
-                        to:{
-                            pathname: "/patient-dashboard",
-                            state: { patientObj: row, permissions:permissions  }
-                        }
-                    }
-                )},
-            {...(permissions.includes('edit_patient') || permissions.includes("all_permission")&&
-                    {
-                        name:'Edit',
-                        type:'link',
-                        icon:<MdModeEdit size="20" color='rgb(4, 196, 217)' />,
-                        to:{
-                            pathname: "/register-patient",
-                            state: { patientId : row.id, permissions:permissions  }
-                        }
-                    }
-                )},
-            {...(permissions.includes('delete_patient') || permissions.includes("all_permission")&&
-                    {
-                        name:'Delete',
-                        type:'link',
-                        icon:<MdDeleteForever size="20" color='rgb(4, 196, 217)'  />,
-                        to:{
-                            pathname: "/#",
-                            state: { patientObj: row, permissions:permissions  }
-                        }
-                    }
-                )}
-        ]
-    }
+
 
     const enablePPIColumns = () =>{
         setEnablePPI(!enablePPI)
@@ -329,6 +311,7 @@ const PatientList = (props) => {
                     /*{ title: "Status", field: "status", filtering: false },*/
                     {title: "Actions", field: "actions", filtering: false },
                 ]}
+                isLoading={loading}
                 data={handleRemoteData}
 
                 options={{

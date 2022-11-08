@@ -102,22 +102,22 @@ function Index(props) {
     const panes = [
         { menuItem: 'Clients', render: () =>
                 <Tab.Pane>
-                    <PatientList/>
+                    <PatientList permissions={permissions}/>
                 </Tab.Pane>
         },
         { menuItem: 'Checked-In', render: () =>
                 <Tab.Pane>
-                    <CheckedInPatients/>
+                    <CheckedInPatients permissions={permissions}/>
                 </Tab.Pane>
         },
         { menuItem: 'Biometrics', render: () =>
                 <Tab.Pane>
-                    <BiometricsList/>
+                    <BiometricsList permissions={permissions}/>
                 </Tab.Pane>
         },
         { menuItem: 'Migration DQA', render: () =>
                 <Tab.Pane>
-                    <MigrationDQA/>
+                    <MigrationDQA permissions={permissions}/>
                 </Tab.Pane>
         },
     ];
@@ -125,10 +125,10 @@ function Index(props) {
     return (
         <div className={classes.root}>
             <ToastContainer autoClose={3000} hideProgressBar />
-
-            <Card>
-                <CardBody>
-                    <div className="row mb-12 col-md-12">
+            {permissions.length > 0 &&
+                <Card>
+                    <CardBody>
+                        <div className="row mb-12 col-md-12">
                             <div className="mb-6 col-md-6" >
                                 <Breadcrumbs aria-label="breadcrumb">
                                     <Typography style={{color:'#992E62'}}>Patient</Typography>
@@ -152,11 +152,13 @@ function Index(props) {
                                 ):""
                                 }
                             </div>
-                    </div>
+                        </div>
 
-                    <Tab panes={panes} />
-                </CardBody>
-            </Card>
+                        <Tab panes={panes} />
+                    </CardBody>
+                </Card>
+            }
+
         </div>
     );
 }
