@@ -14,6 +14,7 @@ import org.lamisplus.modules.base.domain.repositories.ApplicationCodesetReposito
 import org.lamisplus.modules.base.domain.repositories.OrganisationUnitRepository;
 import org.lamisplus.modules.base.service.MenuService;
 import org.lamisplus.modules.base.service.UserService;
+//import org.lamisplus.modules.base.domain.dto.;
 import org.lamisplus.modules.patient.domain.dto.*;
 import org.lamisplus.modules.patient.domain.entity.Encounter;
 import org.lamisplus.modules.patient.domain.entity.Person;
@@ -52,40 +53,41 @@ public class PersonService {
     private final MenuService menuService;
 
     public PersonResponseDto createPerson(PersonDto personDto) {
-        Person person = getPersonFromDto (personDto);
-        Optional<User> currentUser = userService.getUserWithRoles ();
-        if (currentUser.isPresent ()) {
-            log.info ("currentUser: " + currentUser.get ());
-            User user = currentUser.get ();
-            Long currentOrganisationUnitId = user.getCurrentOrganisationUnitId ();
-            person.setFacilityId (currentOrganisationUnitId);
+        Person person = getPersonFromDto(personDto);
+        Optional<User> currentUser = userService.getUserWithRoles();
+        if (currentUser.isPresent()) {
+            log.info("currentUser: " + currentUser.get());
+            User user = currentUser.get();
+            Long currentOrganisationUnitId = user.getCurrentOrganisationUnitId();
+            person.setFacilityId(currentOrganisationUnitId);
         }
-        String hospitalNumber = getHospitalNumber (personDto);
-        person.setHospitalNumber (hospitalNumber);
-        person.setUuid (UUID.randomUUID ().toString ());
-        return getDtoFromPerson (personRepository.save (person));
+        String hospitalNumber = getHospitalNumber(personDto);
+        person.setHospitalNumber(hospitalNumber);
+        person.setUuid(UUID.randomUUID().toString());
+        return getDtoFromPerson(personRepository.save(person));
     }
 
 
     public PersonResponseDto updatePerson(Long id, PersonDto personDto) {
         Person existPerson = personRepository
-                .findById (id).orElseThrow (() -> new EntityNotFoundException (PersonService.class, PERSON_NOT_FOUND_MESSAGE + id));
-        Person person = getPersonFromDto (personDto);
-        person.setId (existPerson.getId ());
-        person.setUuid (existPerson.getUuid ());
-        person.setCreatedBy (existPerson.getCreatedBy ());
-        person.setCreatedDate (existPerson.getCreatedDate ());
-        return getDtoFromPerson (personRepository.save (person));
+                .findById(id).orElseThrow(() -> new EntityNotFoundException(PersonService.class, PERSON_NOT_FOUND_MESSAGE + id));
+        Person person = getPersonFromDto(personDto);
+        person.setId(existPerson.getId());
+        person.setUuid(existPerson.getUuid());
+        person.setCreatedBy(existPerson.getCreatedBy());
+        person.setCreatedDate(existPerson.getCreatedDate());
+        return getDtoFromPerson(personRepository.save(person));
     }
 
 
     public List<PersonResponseDto> getAllPerson() {
-        return personRepository.getAllByArchivedOrderByDateOfRegistrationDesc (0)
-                .stream ()
-                .map (this::getDtoFromPerson)
-                .collect (Collectors.toList ());
+        return personRepository.getAllByArchivedOrderByDateOfRegistrationDesc(0)
+                .stream()
+                .map(this::getDtoFromPerson)
+                .collect(Collectors.toList());
     }
-    public List<PersonResponseDto> getAllPersonPageable(int pageNo, int pageSize) {
+//ResponseEntity<PersonMetaDataDto>
+    public PersonMetaDataDto getAllPersonPageable(int pageNo, int pageSize) {
         //Person person = getPerson(personId);
         Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by("id").descending());
         Optional<User> currentUser = this.userService.getUserWithRoles();
@@ -95,53 +97,62 @@ public class PersonService {
             currentOrganisationUnitId = user.getCurrentOrganisationUnitId();
 
         }
-        Page<Person> person = personRepository.getAllByArchivedAndFacilityIdOrderByIdDesc(0,  currentOrganisationUnitId, paging);
+        Page<Person> person = personRepository.getAllByArchivedAndFacilityIdOrderByIdDesc(0, currentOrganisationUnitId, paging);
         if (person.hasContent()) {
-            return person.getContent().stream().map(this::getDtoFromPerson).collect(Collectors.toList());
-        }
-        return new ArrayList<>();
+
+        PageDTO pageDTO = this.generatePagination(person);
+        long recordSize = pageDTO.getTotalRecords();
+        double totalPage = pageDTO.getTotalPages();
+        PersonMetaDataDto personMetaDataDto = new PersonMetaDataDto();
+        personMetaDataDto.setTotalRecords(recordSize);
+        personMetaDataDto.setPageSize(pageDTO.getPageSize());
+        personMetaDataDto.setTotalPages(pageDTO.getTotalPages());
+        personMetaDataDto.setCurrentPage(pageDTO.getPageNumber());
+        personMetaDataDto.setRecords(person.getContent().stream().map(this::getDtoFromPerson).collect(Collectors.toList()));
+        return personMetaDataDto;
+    }
+        return null;
     }
 
-
-    public Boolean isPersonExist(Long personId) {
-        Optional<Person> person = personRepository.findById (personId);
-        return person.isPresent ();
+        public Boolean isPersonExist(Long personId) {
+        Optional<Person> person = personRepository.findById(personId);
+        return person.isPresent();
     }
 
     public List<PersonResponseDto> getCheckedInPersonsByServiceCodeAndVisitId(String serviceCode) {
-        List<Encounter> patientEncounters = encounterRepository.findAllByServiceCodeAndStatus (serviceCode, "PENDING");
-        return patientEncounters.stream ()
-                .map (Encounter::getPerson)
-                .map (this::getDtoFromPerson)
-                .collect (Collectors.toList ());
+        List<Encounter> patientEncounters = encounterRepository.findAllByServiceCodeAndStatus(serviceCode, "PENDING");
+        return patientEncounters.stream()
+                .map(Encounter::getPerson)
+                .map(this::getDtoFromPerson)
+                .collect(Collectors.toList());
 
 
     }
 
     public PersonResponseDto getPersonById(Long id) {
         Person person = personRepository
-                .findById (id)
-                .orElseThrow (() -> new EntityNotFoundException (PersonService.class, "errorMessage", PERSON_NOT_FOUND_MESSAGE + id));
-        return getDtoFromPerson (person);
+                .findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(PersonService.class, "errorMessage", PERSON_NOT_FOUND_MESSAGE + id));
+        return getDtoFromPerson(person);
     }
 
 
     public void deletePersonById(Long id) {
         Person person = personRepository
-                .findById (id)
-                .orElseThrow (() -> new EntityNotFoundException (PersonService.class, "errorMessage", PERSON_NOT_FOUND_MESSAGE + id));
-        person.setArchived (1);
-        personRepository.save (person);
+                .findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(PersonService.class, "errorMessage", PERSON_NOT_FOUND_MESSAGE + id));
+        person.setArchived(1);
+        personRepository.save(person);
     }
 
     private String getHospitalNumber(PersonDto personDto) {
-        List<IdentifierDto> identifier = personDto.getIdentifier ();
-        if (! identifier.isEmpty ()) {
-            IdentifierDto identifierDto = identifier.get (0);
-            String type = identifierDto.getType ();
-            if (type.equals ("HospitalNumber")) {
-                String hospitalNumber = identifierDto.getValue ();
-                log.info ("hospitalNumber {} ", hospitalNumber);
+        List<IdentifierDto> identifier = personDto.getIdentifier();
+        if (!identifier.isEmpty()) {
+            IdentifierDto identifierDto = identifier.get(0);
+            String type = identifierDto.getType();
+            if (type.equals("HospitalNumber")) {
+                String hospitalNumber = identifierDto.getValue();
+                log.info("hospitalNumber {} ", hospitalNumber);
                 return hospitalNumber;
             }
         }
@@ -235,52 +246,53 @@ public class PersonService {
     }
 
     private ApplicationCodeDto getAppCodeSet(Long id) {
-        ApplicationCodeSet applicationCodeSet = applicationCodesetRepository.getOne (id);
-        return new ApplicationCodeDto (applicationCodeSet.getId (), applicationCodeSet.getDisplay ());
+        ApplicationCodeSet applicationCodeSet = applicationCodesetRepository.getOne(id);
+        return new ApplicationCodeDto(applicationCodeSet.getId(), applicationCodeSet.getDisplay());
     }
 
     private OrgUnitDto getOrgUnit(Long id) {
-        OrganisationUnit organizationUnit = organisationUnitRepository.getOne (id);
-        return new OrgUnitDto (organizationUnit.getId (), organizationUnit.getName ());
+        OrganisationUnit organizationUnit = organisationUnitRepository.getOne(id);
+        return new OrgUnitDto(organizationUnit.getId(), organizationUnit.getName());
     }
 
 
     public PersonResponseDto getDtoFromPerson(Person person) {
-        Optional<Visit> visit = visitRepository.findVisitByPersonAndVisitStartDateNotNullAndVisitEndDateIsNull (person);
-        PersonResponseDto personResponseDto = new PersonResponseDto ();
-        if (visit.isPresent ()) {
-            personResponseDto.setVisitId (visit.get ().getId ());
+        Optional<Visit> visit = visitRepository.findVisitByPersonAndVisitStartDateNotNullAndVisitEndDateIsNull(person);
+        PersonResponseDto personResponseDto = new PersonResponseDto();
+        if (visit.isPresent()) {
+            personResponseDto.setVisitId(visit.get().getId());
         }
-        personResponseDto.setId (person.getId ());
-        personResponseDto.setIsDateOfBirthEstimated (person.getIsDateOfBirthEstimated ());
-        personResponseDto.setDateOfBirth (person.getDateOfBirth ());
-        personResponseDto.setFirstName (person.getFirstName ());
-        personResponseDto.setSurname (person.getSurname ());
-        personResponseDto.setOtherName (person.getOtherName ());
-        personResponseDto.setContactPoint (person.getContactPoint ());
-        personResponseDto.setAddress (person.getAddress ());
-        personResponseDto.setContact (person.getContact ());
-        personResponseDto.setIdentifier (person.getIdentifier ());
-        personResponseDto.setEducation (person.getEducation ());
-        personResponseDto.setEmploymentStatus (person.getEmploymentStatus ());
-        personResponseDto.setMaritalStatus (person.getMaritalStatus ());
+        personResponseDto.setId(person.getId());
+        personResponseDto.setIsDateOfBirthEstimated(person.getIsDateOfBirthEstimated());
+        personResponseDto.setDateOfBirth(person.getDateOfBirth());
+        personResponseDto.setFirstName(person.getFirstName());
+        personResponseDto.setSurname(person.getSurname());
+        personResponseDto.setOtherName(person.getOtherName());
+        personResponseDto.setContactPoint(person.getContactPoint());
+        personResponseDto.setAddress(person.getAddress());
+        personResponseDto.setContact(person.getContact());
+        personResponseDto.setIdentifier(person.getIdentifier());
+        personResponseDto.setEducation(person.getEducation());
+        personResponseDto.setEmploymentStatus(person.getEmploymentStatus());
+        personResponseDto.setMaritalStatus(person.getMaritalStatus());
         personResponseDto.setSex(person.getSex());
-        personResponseDto.setGender (person.getGender ());
-        personResponseDto.setDeceased (person.getDeceased ());
-        personResponseDto.setDateOfRegistration (person.getDateOfRegistration ());
-        personResponseDto.setActive (person.getActive ());
-        personResponseDto.setDeceasedDateTime (person.getDeceasedDateTime ());
-        personResponseDto.setOrganization (person.getOrganization ());
-        personResponseDto.setBiometricStatus (getPatientBiometricStatus (person.getUuid ()));
+        personResponseDto.setGender(person.getGender());
+        personResponseDto.setDeceased(person.getDeceased());
+        personResponseDto.setDateOfRegistration(person.getDateOfRegistration());
+        personResponseDto.setActive(person.getActive());
+        personResponseDto.setDeceasedDateTime(person.getDeceasedDateTime());
+        personResponseDto.setOrganization(person.getOrganization());
+        personResponseDto.setArchived(person.getArchived());
+        personResponseDto.setBiometricStatus(getPatientBiometricStatus(person.getUuid()));
         return personResponseDto;
     }
 
     Boolean getPatientBiometricStatus(String uuid) {
         String moduleName = "BiometricModule";
-        if (! menuService.exist (moduleName)) {
+        if (!menuService.exist(moduleName)) {
             return false;
         }
-        Integer fingerCount = personRepository.getBiometricCountByPersonUuid (uuid);
+        Integer fingerCount = personRepository.getBiometricCountByPersonUuid(uuid);
         return fingerCount > 0;
     }
 
@@ -311,6 +323,7 @@ public class PersonService {
         personResponseDto.setDeceasedDateTime(person.getDeceasedDateTime());
         personResponseDto.setOrganization(person.getOrganization());
         personResponseDto.setBiometricStatus(status);
+        personResponseDto.setArchived(person.getArchived());
 
 
         return personResponseDto;
@@ -329,14 +342,12 @@ public class PersonService {
         return personResponseDtoList;
     }
 
-    public  String treatNull (String name)
-    {
+    public String treatNull(String name) {
         String newName = "";
-        if (name == null) newName = ""; else newName = name;
+        if (name == null) newName = "";
+        else newName = name;
         return newName;
     }
-
-
 
 
     public PersonResponseDto getPersonByNin(String nin) {
@@ -348,33 +359,90 @@ public class PersonService {
 
     public ArrayList<PersonResponseDto> getAllActiveVisit() {
         List<Visit> visitList = visitRepository.findAllByArchivedOrderByVisitStartDateDesc(0);
-        ArrayList <PersonResponseDto> checkedInPeople = new ArrayList<>();
+        ArrayList<PersonResponseDto> checkedInPeople = new ArrayList<>();
         visitList.forEach(visit -> {
-            if(visit.getVisitEndDate() == null) checkedInPeople.add(this.getDtoFromPersonWithoutBiometric(visit.getPerson(),Boolean.TRUE));
+            if (visit.getVisitEndDate() == null)
+                checkedInPeople.add(this.getDtoFromPersonWithoutBiometric(visit.getPerson(), Boolean.TRUE));
         });
         return checkedInPeople;
     }
 
     public boolean isNINExisting(String nin) {
         List<Person> person = personRepository.getPersonByNinNumber(nin);
-        System.out.println("Size = "+person.size());
+        System.out.println("Size = " + person.size());
         boolean reply = false;
         if (person.isEmpty()) reply = false;
         else reply = true;
         return reply;
     }
 
-    public List<PersonResponseDto> getDuplicateHospitalNumbers ()
-    {
-        return personRepository.findDuplicate ()
-                .stream ()
-                .map (this::getDtoFromPerson)
-                .collect (Collectors.toList ());
+    public List<PersonResponseDto> getDuplicateHospitalNumbers() {
+        return personRepository.findDuplicate()
+                .stream()
+                .map(this::getDtoFromPerson)
+                .collect(Collectors.toList());
     }
 
-    public Integer getTotalRecords(){
-       return personRepository.getTotalRecords();
+    public Integer getTotalRecords() {
+        return personRepository.getTotalRecords();
+    }
+
+    public PageDTO generatePagination(Page page) {
+        long totalRecords = page.getTotalElements();
+        int pageNumber = page.getNumber();
+        int pageSize = page.getSize();
+        int totalPages = page.getTotalPages();
+        return PageDTO.builder().totalRecords(totalRecords)
+                .pageNumber(pageNumber)
+                .pageSize(pageSize)
+                .totalPages(totalPages).build();
+    }
+
+    public PersonMetaDataDto findPersonBySearchParam(String searchValue, int pageNo, int pageSize) {
+        Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by("id").descending());
+        Optional<User> currentUser = this.userService.getUserWithRoles();
+        Long currentOrganisationUnitId = 0L;
+        if (currentUser.isPresent()) {
+            User user = (User) currentUser.get();
+            currentOrganisationUnitId = user.getCurrentOrganisationUnitId();
+
+        }
+        String queryParam = "";
+        Page<Person> person = null;
+        if(!((searchValue== null)  || (searchValue.equals("*")))) {
+            queryParam = "%" + searchValue + "%";
+            person = personRepository.findAllPersonBySearchParameters(queryParam, 0, currentOrganisationUnitId, paging);
+        }else
+        {
+            person = personRepository.getAllByArchivedAndFacilityIdOrderByIdDesc(0, currentOrganisationUnitId, paging);
+        }
+
+        if (person.hasContent()) {
+
+            PageDTO pageDTO = this.generatePagination(person);
+            long recordSize = pageDTO.getTotalRecords();
+            double totalPage = pageDTO.getTotalPages();
+            PersonMetaDataDto personMetaDataDto = new PersonMetaDataDto();
+            personMetaDataDto.setTotalRecords(recordSize);
+            personMetaDataDto.setPageSize(pageDTO.getPageSize());
+            personMetaDataDto.setTotalPages(pageDTO.getTotalPages());
+            personMetaDataDto.setCurrentPage(pageDTO.getPageNumber());
+            personMetaDataDto.setRecords(person.getContent().stream().map(this::getDtoFromPerson).collect(Collectors.toList()));
+            return personMetaDataDto;
+        }
+        return null;
+
+
+//        Long facilityId = currentUserOrganizationService.getCurrentUserOrganization();
+//        Pageable pageable = PageRequest.of(pageNo, pageSize);
+//        if(String.valueOf(searchValue).equals("null") && !searchValue.equals("*")){
+//            String queryParam = "%"+searchValue+"%";
+//            System.out.println("queryParam - " + searchValue);
+//            return personRepository
+//                    .findAllPersonBySearchParameters(queryParam, UN_ARCHIVED, facilityId,  pageable);
+//        }
+//        return personRepository
+//                .getAllByArchivedAndFacilityIdOrderByIdDesc(UN_ARCHIVED, currentUserOrganizationService.getCurrentUserOrganization(),pageable);
     }
 }
-
 

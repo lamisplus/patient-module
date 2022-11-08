@@ -40,6 +40,7 @@ public class PersonResponseDto {
     private String ninNumber;
     private String emrId;
     private Long facilityId;
+    private Integer archived;
 
 
 }

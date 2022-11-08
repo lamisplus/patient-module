@@ -7,7 +7,7 @@ import java.util.List;
 
 @Data
 public class PersonMetaDataDto implements Serializable {
-    private  int totalRecords;
+    private  long totalRecords;
 
     private int totalPages;
 
