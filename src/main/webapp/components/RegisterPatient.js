@@ -229,8 +229,9 @@ const RegisterPatient = (props) => {
         setShowRelative(true);
     };
     const checkHospitalNumber = async (e) =>{
+
         setCheckHospitalNumberError(false)
-        await axios.post(`${baseUrl}patient/exist/hospital-number`,e.target.value,{ responseType: 'text',headers: {"Authorization" : `Bearer ${token}`,'Content-Type': 'text/plain'} }).then(response=>{
+        await axios.post(`${baseUrl}patient/exist/hospital-number`,e,{ responseType: 'text',headers: {"Authorization" : `Bearer ${token}`,'Content-Type': 'text/plain'} }).then(response=>{
             if(response.data){
                 setCheckHospitalNumberError(true)
             }else{
@@ -675,12 +676,13 @@ const RegisterPatient = (props) => {
                                                         id="hospitalNumber"
                                                         autoComplete="off"
                                                         onInput={(e) => {
-                                                            e.target.value = e.target.value.replace(/\D/g,'');
-                                                            checkHospitalNumber(e);
+                                                            e.target.value = e.target.value.replace(/\s/g, '')
+                                                            console.log(e.target.value)
+                                                            checkHospitalNumber( e.target.value);
                                                         }}
                                                         onChange={checkHospitalNumber}
                                                         {...register("hospitalNumber",{
-                                                            onChange:(e)=>{checkHospitalNumber(e)}
+                                                            onChange:(e)=>{ checkHospitalNumber(e.target.value.replace(/\s/g, ''))}
                                                         })}
                                                         style={{border: "1px solid #014d88"}}
                                                     />
@@ -1374,41 +1376,46 @@ const RegisterPatient = (props) => {
                             {saving ? <Spinner /> : ""}
 
                             <br />
+                            {!checkHospitalNumberError &&
+                                <>
+                                    {userDetail ===null ? (
+                                        <MatButton
+                                        type="submit"
+                                        variant="contained"
+                                        color="primary"
+                                        className={classes.button}
+                                        startIcon={<SaveIcon />}
+                                        style={{backgroundColor:'#014d88',color:'#fff'}}
+                                        >
+                                    {!saving ? (
+                                        <span style={{ textTransform: "capitalize" }}>Save</span>
+                                        ) : (
+                                        <span style={{ textTransform: "capitalize" }}>Saving...</span>
+                                        )}
+                                        </MatButton>
+                                        )
+                                        :
+                                        (
+                                        <MatButton
+                                        type="submit"
+                                        variant="contained"
+                                        color="primary"
+                                        className={classes.button}
+                                        startIcon={<SaveIcon />}
+                                        style={{backgroundColor:'#014d88',color:'#fff'}}
+                                        >
+                                    {!saving ? (
+                                        <span style={{ textTransform: "capitalize" }}>Save</span>
+                                        ) : (
+                                        <span style={{ textTransform: "capitalize" }}>Saving...</span>
+                                        )}
+                                        </MatButton>
+                                        )
+                                    }
+                                </>
 
-                            {userDetail ===null ? (
-                                    <MatButton
-                                        type="submit"
-                                        variant="contained"
-                                        color="primary"
-                                        className={classes.button}
-                                        startIcon={<SaveIcon />}
-                                        style={{backgroundColor:'#014d88',color:'#fff'}}
-                                    >
-                                        {!saving ? (
-                                            <span style={{ textTransform: "capitalize" }}>Save</span>
-                                        ) : (
-                                            <span style={{ textTransform: "capitalize" }}>Saving...</span>
-                                        )}
-                                    </MatButton>
-                                )
-                                :
-                                (
-                                    <MatButton
-                                        type="submit"
-                                        variant="contained"
-                                        color="primary"
-                                        className={classes.button}
-                                        startIcon={<SaveIcon />}
-                                        style={{backgroundColor:'#014d88',color:'#fff'}}
-                                    >
-                                        {!saving ? (
-                                            <span style={{ textTransform: "capitalize" }}>Save</span>
-                                        ) : (
-                                            <span style={{ textTransform: "capitalize" }}>Saving...</span>
-                                        )}
-                                    </MatButton>
-                                )
-                            }
+                                }
+
                             <MatButton
                                 variant="contained"
                                 className={classes.button}
