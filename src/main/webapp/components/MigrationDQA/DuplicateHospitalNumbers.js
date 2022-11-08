@@ -179,7 +179,7 @@ function DuplicateHospitalNumbers(props) {
                     { title: "Date Of Birth", field: "dateOfBirth", filtering: false },
                     { title: "Age", field: "age", filtering: false },
                     /*{ title: "Address", field: "address", filtering: false },*/
-                    /*{ title: "Status", field: "status", filtering: false },*/
+                    { title: "Status", field: "status", filtering: false },
                     {title: "Actions", field: "actions", filtering: false },
                 ]}
                 isLoading={loading}
@@ -188,6 +188,7 @@ function DuplicateHospitalNumbers(props) {
                     id: getHospitalNumber(row.identifier),
                     sex: row.sex,
                     dateOfBirth: row.dateOfBirth,
+                    status:row.archived,
                     age: (row.dateOfBirth === 0 ||
                         row.dateOfBirth === undefined ||
                         row.dateOfBirth === null ||

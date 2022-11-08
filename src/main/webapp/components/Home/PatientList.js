@@ -121,7 +121,10 @@ const PatientList = (props) => {
     const [modal, setModal] = useState(false);
     const [patient, setPatient] = useState(false);
     const [enablePPI, setEnablePPI] = useState(true);
-    const [page, setPage] = useState(1);
+    const [searchParams,setSearchParams] = useState('*');
+    const [totalPages,setTotalPages] = useState(0);
+    const [totalRecords,setTotalRecords] = useState(0);
+    const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const toggle = (id) => {
         const patient = patients.find(obj => obj.id == id);
@@ -145,10 +148,19 @@ const PatientList = (props) => {
             });
 
     }
-    const loadPatients = useCallback(async (page=1,size=10) => {
+    const loadPatients = useCallback(async (page=0,size=10, searchValue='*') => {
         try {
-            const response = await axios.get(`${baseUrl}patient/get-all-patient-pageable?pageNo=${page}&pageSize=${size}`, { headers: {"Authorization" : `Bearer ${token}`} });
-            setPatients(response.data);
+            const response = await axios.get(`${baseUrl}patient?pageNo=${page}&pageSize=${size}&searchParam=${searchValue}`, { headers: {"Authorization" : `Bearer ${token}`} });
+             if(response.data.records){
+                 setPatients(response.data.records);
+                 setTotalPages(response.data.totalPages);
+                 setTotalRecords(response.data.totalRecords);
+             }else{
+                 setPatients([]);
+                 setTotalPages(0);
+                 setTotalRecords(0);
+             }
+
         } catch (e) {
             console.log(e);
         }
@@ -269,21 +281,29 @@ const PatientList = (props) => {
 
 
     const handleChangePage = (event, newPage) => {
-        loadPatients(newPage,rowsPerPage);
         setPage(newPage);
+        loadPatients(newPage,rowsPerPage,searchParams);
     };
     const handleChangeRowsPerPage = (event) => {
         setRowsPerPage(parseInt(event.target.value, 10));
         tableRef.current.dataManager.changePageSize(parseInt(event.target.value, 10));
-        setPage(1);
-        loadPatients(1,parseInt(event.target.value, 10));
+        setPage(0);
+        loadPatients(0,parseInt(event.target.value, 10),searchParams);
 
+    };
+    const handleSearchChange = (searchValue) => {
+
+        loadPatients(page,rowsPerPage,searchValue);
+        setSearchParams(searchValue);
     };
     return (
         <div className={classes.root}>
             <ToastContainer autoClose={3000} hideProgressBar />
             <MaterialTable
                 tableRef={tableRef}
+                onSearchChange={(e) => {
+                    handleSearchChange(e);
+                }}
                 icons={tableIcons}
                 title={<PPISelect/>}
                 columns={[
@@ -344,7 +364,7 @@ const PatientList = (props) => {
                     Pagination: (props) =>
                         <TablePagination
                             component="div"
-                            count={100}
+                            count={totalRecords}
                             page={page}
                             onPageChange={handleChangePage}
                             rowsPerPage={rowsPerPage}
@@ -352,39 +372,6 @@ const PatientList = (props) => {
                         />
                 }}
             />
-{/*            <Card>
-                <CardBody>
-                    {permissions.includes('view_patient') || permissions.includes("all_permission") ? (
-                        <Link to={"register-patient"}>
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                className=" float-right mr-1"
-                                startIcon={<FaUserPlus size="25"/>}
-                                style={{backgroundColor:'#014d88'}}
-                            >
-                                <span style={{ textTransform: "capitalize", fontWeight:'bolder' }}>New Client</span>
-                            </Button>
-                        </Link>
-                    ):""
-                    }
-                    {permissions.includes('view_patient') || permissions.includes("all_permission") ? (
-                        <FormGroup className=" float-right mr-1">
-                            <FormControlLabel  control={
-                                <Checkbox
-                                    onChange={enablePPIColumns}
-                                    style={{color:'#014d88',fontWeight:'bold'}}
-                                />
-                            } label="Show PPI" style={{color:'#014d88',fontWeight:'bold'}} />
-                        </FormGroup>
-                    ):""
-                    }
-                    <br/><br/>
-                    <br/>
-
-
-                </CardBody>
-            </Card>*/}
             <Modal isOpen={modal} toggle={onCancelDelete}>
                 <ModalHeader toggle={onCancelDelete}>Delete Patient</ModalHeader>
                 <ModalBody>
