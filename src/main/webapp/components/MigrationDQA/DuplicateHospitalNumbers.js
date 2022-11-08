@@ -188,7 +188,7 @@ function DuplicateHospitalNumbers(props) {
                     id: getHospitalNumber(row.identifier),
                     sex: row.sex,
                     dateOfBirth: row.dateOfBirth,
-                    status:row.archived,
+                    status:row.archived == 1?'Archived':"Active",
                     age: (row.dateOfBirth === 0 ||
                         row.dateOfBirth === undefined ||
                         row.dateOfBirth === null ||
@@ -205,6 +205,17 @@ function DuplicateHospitalNumbers(props) {
                 }))}
 
                 options={{
+                    rowStyle: rowData => {
+                        if(rowData.status === 'Archived') {
+                            console.log(rowData)
+                            return {
+                                backgroundColor: '#ceeef5',
+                                border:'2px solid #fff'
+                            };
+                        }
+
+                        return {border:'2px solid #eee'};
+                    },
                     headerStyle: {
                         backgroundColor: "#014d88",
                         color: "#fff",
