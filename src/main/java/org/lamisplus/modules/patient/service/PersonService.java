@@ -75,6 +75,7 @@ public class PersonService {
         person.setId(existPerson.getId());
         person.setUuid(existPerson.getUuid());
         person.setCreatedBy(existPerson.getCreatedBy());
+        person.setNinNumber(existPerson.getNinNumber());
         person.setCreatedDate(existPerson.getCreatedDate());
         return getDtoFromPerson(personRepository.save(person));
     }
@@ -280,6 +281,7 @@ public class PersonService {
         personResponseDto.setDeceased(person.getDeceased());
         personResponseDto.setDateOfRegistration(person.getDateOfRegistration());
         personResponseDto.setActive(person.getActive());
+        personResponseDto.setNinNumber(person.getNinNumber());
         personResponseDto.setDeceasedDateTime(person.getDeceasedDateTime());
         personResponseDto.setOrganization(person.getOrganization());
         personResponseDto.setArchived(person.getArchived());

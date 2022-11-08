@@ -4,8 +4,13 @@ export const url = '/api/v1/'
 
 /*
 export const url =  'http://localhost:8282/api/v1/';
-export const  token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJndWVzdEBsYW1pc3BsdXMub3JnIiwiYXV0aCI6IlN1cGVyIEFkbWluIiwibmFtZSI6Ikd1ZXN0IEd1ZXN0IiwiZXhwIjoxNjY3NTk0MjU1fQ.bCxZWU2sycrqmw7YhIDGQfUzj4PvfXBM2i6ZbbPiD0LdaPO2NSN3QJHDI6PImMJc-GvmWT6hS0pnx12vmQnt0Q"
+export const  token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJndWVzdEBsYW1pc3BsdXMub3JnIiwiYXV0aCI6IlN1cGVyIEFkbWluIiwibmFtZSI6Ikd1ZXN0IEd1ZXN0IiwiZXhwIjoxNjY3OTM5NjM0fQ.t8gky01AyCWeQnlOGdfFaDIcpbguYn2ZBnOXpgw2rh6AN55XD_WASh8hew4hEmL6DEosKYqsBioIZ3nIdUhk6g"
+
 */
+
+
+
+
 
 
 

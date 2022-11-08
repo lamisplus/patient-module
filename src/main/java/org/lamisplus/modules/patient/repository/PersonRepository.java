@@ -25,7 +25,7 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
 
     Optional<Person> getPersonByHospitalNumberAndFacilityId(String hospitalNumber, Long facility);
 
-    Optional<Person> getPersonByHospitalNumber(String hospitalNumber);
+    List<Person> getPersonByHospitalNumber(String hospitalNumber);
 
     Optional<Person> getPersonByHospitalNumberAndFacilityIdAndArchived(String hospitalNumber, Long facility, Integer archive);
 

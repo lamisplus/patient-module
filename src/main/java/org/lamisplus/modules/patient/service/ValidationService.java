@@ -23,16 +23,13 @@ public class ValidationService {
 
     @Async("taskExecutor")
     public CompletableFuture<Boolean> hospitalNumberExist(String hospitalNumber) throws InterruptedException {
-        Optional<User> currentUser = userService.getUserWithRoles();
-        Thread.sleep(2000L);
-        if (currentUser.isPresent()) {
-            Long currentOrganisationUnitId = currentUser.get().getCurrentOrganisationUnitId();
-            Optional<Person> person = personRepository.getPersonByHospitalNumberAndFacilityIdAndArchived(hospitalNumber, currentOrganisationUnitId, 0);
-            if (person.isPresent()) {
-                return CompletableFuture.completedFuture(true);
+
+            List<Person> person = personRepository.getPersonByHospitalNumber(hospitalNumber);
+            if (person.isEmpty()) {
+                return CompletableFuture.completedFuture(false);
             }
-        }
-        return CompletableFuture.completedFuture(false);
+
+        return CompletableFuture.completedFuture(true);
     }
 
     @Async("taskExecutor")
