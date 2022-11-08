@@ -210,6 +210,7 @@ function BiometricsList(props) {
                 <FormControlLabel  control={
                     <Checkbox
                         onChange={enablePPIColumns}
+                        checked={!enablePPI}
                         style={{color:'#014d88',fontWeight:'bold'}}
                     />
                 } label="Show PPI" style={{color:'#014d88',fontWeight:'bolder'}} />

@@ -111,7 +111,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 
-
+let perms = [];
 const PatientList = (props) => {
     const tableRef = useRef(null);
     const classes = useStyles();
@@ -126,15 +126,13 @@ const PatientList = (props) => {
     const [totalRecords,setTotalRecords] = useState(0);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [currentPage,setCurrentPage] = useState(1);
     const toggle = (id) => {
         const patient = patients.find(obj => obj.id == id);
         setPatient(patient);
         setModal(!modal);
     }
-    useEffect(() => {
-        userPermission();
-    }, []);
-    //Get list of Finger index
+    //Get list of user permissions
     const userPermission =()=>{
         axios
             .get(`${baseUrl}account`,
@@ -142,29 +140,49 @@ const PatientList = (props) => {
             )
             .then((response) => {
                 setPermissions(response.data.permissions);
-
+                perms=response.data.permissions;
             })
             .catch((error) => {
             });
 
     }
-    const loadPatients = useCallback(async (page=0,size=10, searchValue='*') => {
-        try {
-            const response = await axios.get(`${baseUrl}patient?pageNo=${page}&pageSize=${size}&searchParam=${searchValue}`, { headers: {"Authorization" : `Bearer ${token}`} });
-             if(response.data.records){
-                 setPatients(response.data.records);
-                 setTotalPages(response.data.totalPages);
-                 setTotalRecords(response.data.totalRecords);
-             }else{
-                 setPatients([]);
-                 setTotalPages(0);
-                 setTotalRecords(0);
-             }
 
-        } catch (e) {
-            console.log(e);
-        }
+    useEffect(() => {
+        userPermission();
     }, []);
+
+
+    const handleRemoteData = query =>
+        new Promise((resolve, reject) => {
+            axios.get(`${baseUrl}patient?pageSize=${query.pageSize}&pageNo=${query.page}&searchParam=${query.search}`, { headers: {"Authorization" : `Bearer ${token}`} })
+                .then(response => response)
+                .then(result => {
+                    resolve({
+                        data: result.data.records.map((row) => ({
+                            name: [row.firstName, row.otherName, row.surname].filter(Boolean).join(", "),
+                            id: getHospitalNumber(row.identifier),
+                            sex: row.sex,
+                            dateOfBirth: row.dateOfBirth,
+                            age: (row.dateOfBirth === 0 ||
+                                row.dateOfBirth === undefined ||
+                                row.dateOfBirth === null ||
+                                row.dateOfBirth === "" )
+                                ? 0
+                                : calculate_age(row.dateOfBirth),
+                            actions:
+                                <div>
+                                    {perms.includes('view_patient') || perms.includes("all_permission") ? (
+                                        <SplitActionButton actions={actionItems(row)} />
+                                    ):""
+                                    }
+                                </div>
+                        })),
+                        page: query.page,
+                        totalCount: result.data.totalRecords
+                    });
+                });
+        })
+
 
     const onDelete = async (id) => {
         try {
@@ -211,10 +229,6 @@ const PatientList = (props) => {
         return gender.display;
     };
 
-    useEffect(() => {
-        loadPatients();
-        tableRef.current.dataManager.changePageSize(rowsPerPage);
-    }, [loadPatients]);
     function actionItems(row){
         return  [
             {
@@ -271,6 +285,7 @@ const PatientList = (props) => {
                 <FormControlLabel  control={
                     <Checkbox
                         onChange={enablePPIColumns}
+                        checked={!enablePPI}
                         style={{color:'#014d88',fontWeight:'bold'}}
                     />
                 } label="Show PPI" style={{color:'#014d88',fontWeight:'bolder'}} />
@@ -280,30 +295,23 @@ const PatientList = (props) => {
     </div>;
 
 
-    const handleChangePage = (event, newPage) => {
-        setPage(newPage);
-        loadPatients(newPage,rowsPerPage,searchParams);
+    const handleChangePage = (page) => {
+        setCurrentPage(page + 1);
     };
-    const handleChangeRowsPerPage = (event) => {
-        setRowsPerPage(parseInt(event.target.value, 10));
-        tableRef.current.dataManager.changePageSize(parseInt(event.target.value, 10));
-        setPage(0);
-        loadPatients(0,parseInt(event.target.value, 10),searchParams);
+    const localization = {
+        pagination: {
+            labelDisplayedRows: `Page: ${currentPage}`
+        }
+    }
 
-    };
-    const handleSearchChange = (searchValue) => {
-
-        loadPatients(page,rowsPerPage,searchValue);
-        setSearchParams(searchValue);
-    };
     return (
         <div className={classes.root}>
             <ToastContainer autoClose={3000} hideProgressBar />
             <MaterialTable
                 tableRef={tableRef}
-                onSearchChange={(e) => {
+                /*onSearchChange={(e) => {
                     handleSearchChange(e);
-                }}
+                }}*/
                 icons={tableIcons}
                 title={<PPISelect/>}
                 columns={[
@@ -321,26 +329,7 @@ const PatientList = (props) => {
                     /*{ title: "Status", field: "status", filtering: false },*/
                     {title: "Actions", field: "actions", filtering: false },
                 ]}
-                isLoading={loading}
-                data={patients.map((row) => ({
-                    name: [row.firstName, row.otherName, row.surname].filter(Boolean).join(", "),
-                    id: getHospitalNumber(row.identifier),
-                    sex: row.sex,
-                    dateOfBirth: row.dateOfBirth,
-                    age: (row.dateOfBirth === 0 ||
-                        row.dateOfBirth === undefined ||
-                        row.dateOfBirth === null ||
-                        row.dateOfBirth === "" )
-                        ? 0
-                        : calculate_age(row.dateOfBirth),
-                    actions:
-                        <div>
-                            {permissions.includes('view_patient') || permissions.includes("all_permission") ? (
-                                <SplitActionButton actions={actionItems(row)} />
-                            ):""
-                            }
-                        </div>
-                }))}
+                data={handleRemoteData}
 
                 options={{
                     headerStyle: {
@@ -356,21 +345,14 @@ const PatientList = (props) => {
                     filtering: false,
                     exportButton: false,
                     searchFieldAlignment: 'left',
-                    /*pageSizeOptions:[10,20,100],*/
+                    pageSizeOptions:[10,20,100],
+                    pageSize:10,
                     debounceInterval: 400,
 
                 }}
-                components={{
-                    Pagination: (props) =>
-                        <TablePagination
-                            component="div"
-                            count={totalRecords}
-                            page={page}
-                            onPageChange={handleChangePage}
-                            rowsPerPage={rowsPerPage}
-                            onRowsPerPageChange={handleChangeRowsPerPage}
-                        />
-                }}
+                onChangePage={handleChangePage}
+                localization={localization}
+
             />
             <Modal isOpen={modal} toggle={onCancelDelete}>
                 <ModalHeader toggle={onCancelDelete}>Delete Patient</ModalHeader>
