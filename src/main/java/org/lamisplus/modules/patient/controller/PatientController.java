@@ -97,11 +97,7 @@ public class PatientController {
         return ResponseEntity.ok(personService.getPersonByNin(nin));
     }
 
-    @GetMapping(value = "/list-of-checked-in-persons")
-    public ArrayList<PersonResponseDto> listOfCheckedinPersons()
-    {
-        return personService.getAllActiveVisit();
-    }
+
 
 
 //    @GetMapping(value = "/get-all-patient-pageable", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -137,6 +133,14 @@ public class PatientController {
            @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize) {
         PersonMetaDataDto personMetaDataDto = personService.getAllPersonPageable(pageNo, pageSize);
+        return new ResponseEntity<> (personMetaDataDto, new HttpHeaders(), HttpStatus.OK);
+    }
+    @GetMapping(value = "/checked-in")
+    public ResponseEntity<PersonMetaDataDto> listOfCheckedinPersons(
+            @RequestParam(defaultValue = "0") Integer pageNo,
+            @RequestParam(defaultValue = "10") Integer pageSize)
+    {
+        PersonMetaDataDto personMetaDataDto = personService.getAllActiveVisit(pageNo, pageSize);
         return new ResponseEntity<> (personMetaDataDto, new HttpHeaders(), HttpStatus.OK);
     }
     @GetMapping(value = "/get-duplicate-hospital_numbers")

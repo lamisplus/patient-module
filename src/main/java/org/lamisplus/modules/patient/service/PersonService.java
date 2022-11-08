@@ -359,15 +359,7 @@ public class PersonService {
         return getDtoFromPerson(person);
     }
 
-    public ArrayList<PersonResponseDto> getAllActiveVisit() {
-        List<Visit> visitList = visitRepository.findAllByArchivedOrderByVisitStartDateDesc(0);
-        ArrayList<PersonResponseDto> checkedInPeople = new ArrayList<>();
-        visitList.forEach(visit -> {
-            if (visit.getVisitEndDate() == null)
-                checkedInPeople.add(this.getDtoFromPersonWithoutBiometric(visit.getPerson(), Boolean.TRUE));
-        });
-        return checkedInPeople;
-    }
+
 
     public boolean isNINExisting(String nin) {
         List<Person> person = personRepository.getPersonByNinNumber(nin);
@@ -399,6 +391,16 @@ public class PersonService {
                 .pageSize(pageSize)
                 .totalPages(totalPages).build();
     }
+//    public ArrayList<PersonResponseDto> getAllActiveVisit() {
+//        List<Visit> visitList = visitRepository.findAllByArchivedOrderByVisitStartDateDesc(0);
+//        ArrayList<PersonResponseDto> checkedInPeople = new ArrayList<>();
+//        visitList.forEach(visit -> {
+//            if (visit.getVisitEndDate() == null)
+//                checkedInPeople.add(this.getDtoFromPersonWithoutBiometric(visit.getPerson(), Boolean.TRUE));
+//        });
+//        return checkedInPeople;
+//    }
+
 
     public PersonMetaDataDto findPersonBySearchParam(String searchValue, int pageNo, int pageSize) {
         Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by("id").descending());
@@ -434,17 +436,25 @@ public class PersonService {
         }
         return null;
 
+    }
+    public PersonMetaDataDto getAllActiveVisit(int pageNo, int pageSize) {
+        Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by("id").descending());
+        Page<Visit> visitList = visitRepository.findAllByArchivedAndVisitStartDateNotNullAndVisitEndDateIsNull(0, paging);
+        ArrayList<PersonResponseDto> checkedInPeople = new ArrayList<>();
 
-//        Long facilityId = currentUserOrganizationService.getCurrentUserOrganization();
-//        Pageable pageable = PageRequest.of(pageNo, pageSize);
-//        if(String.valueOf(searchValue).equals("null") && !searchValue.equals("*")){
-//            String queryParam = "%"+searchValue+"%";
-//            System.out.println("queryParam - " + searchValue);
-//            return personRepository
-//                    .findAllPersonBySearchParameters(queryParam, UN_ARCHIVED, facilityId,  pageable);
-//        }
-//        return personRepository
-//                .getAllByArchivedAndFacilityIdOrderByIdDesc(UN_ARCHIVED, currentUserOrganizationService.getCurrentUserOrganization(),pageable);
+        visitList.forEach(visit -> {
+            if (visit.getVisitEndDate() == null)
+                checkedInPeople.add(this.getDtoFromPersonWithoutBiometric(visit.getPerson(), Boolean.TRUE));
+        });
+        PageDTO pageDTO = this.generatePagination(visitList);
+        PersonMetaDataDto personMetaDataDto = new PersonMetaDataDto();
+        personMetaDataDto.setTotalRecords(pageDTO.getTotalRecords());
+        personMetaDataDto.setPageSize(pageDTO.getPageSize());
+        personMetaDataDto.setTotalPages(pageDTO.getTotalPages());
+        personMetaDataDto.setCurrentPage(pageDTO.getPageNumber());
+        personMetaDataDto.setRecords(checkedInPeople);
+        return personMetaDataDto;
+        //return checkedInPeople;
     }
 }
 

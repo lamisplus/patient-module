@@ -2,6 +2,8 @@ package org.lamisplus.modules.patient.repository;
 
 import org.lamisplus.modules.patient.domain.entity.Person;
 import org.lamisplus.modules.patient.domain.entity.Visit;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -16,7 +18,9 @@ public interface VisitRepository extends JpaRepository<Visit, Long> {
 
    /// Visit findByPersonAndStatus(Person person);
 
-    Optional<Visit> findAllByIdAndVisitStartDateNotNullAndVisitEndDateIsNull(Long id);
+    List<Visit> findAllByIdAndVisitStartDateNotNullAndVisitEndDateIsNull(Long id);
 
-    List<Visit> findAllByArchivedOrderByVisitStartDateDesc(Integer archived);
+    Page<Visit> findAllByArchivedAndVisitStartDateNotNullAndVisitEndDateIsNull(Integer archived, Pageable pageable);
+
+   // List<Visit> findAllByArchivedOrderByVisitStartDateDesc(Integer archived);
 }
