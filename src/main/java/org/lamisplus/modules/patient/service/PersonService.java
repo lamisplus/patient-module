@@ -22,10 +22,7 @@ import org.lamisplus.modules.patient.domain.entity.Visit;
 import org.lamisplus.modules.patient.repository.EncounterRepository;
 import org.lamisplus.modules.patient.repository.PersonRepository;
 import org.lamisplus.modules.patient.repository.VisitRepository;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -331,18 +328,6 @@ public class PersonService {
         return personResponseDto;
     }
 
-    public List<PersonResponseDto> getAllPatientWithoutBiomentic(Pageable pageable) {
-
-        Page<Person> personList = this.personRepository.findAll(pageable);
-        List<PersonResponseDto> personResponseDtoList = new ArrayList<>();
-        personList.getContent().forEach(person -> {
-            Integer checkIfUserHasBiometric = this.personRepository.getBiometricCountByPersonUuid(person.getUuid());
-            if (checkIfUserHasBiometric == 0) {
-                personResponseDtoList.add(getDtoFromPersonWithoutBiometric(person, Boolean.FALSE));
-            }
-        });
-        return personResponseDtoList;
-    }
 
     public String treatNull(String name) {
         String newName = "";
@@ -369,14 +354,6 @@ public class PersonService {
         else reply = true;
         return reply;
     }
-
-    public List<PersonResponseDto> getDuplicateHospitalNumbers() {
-        return personRepository.findDuplicate()
-                .stream()
-                .map(this::getDtoFromPerson)
-                .collect(Collectors.toList());
-    }
-
     public Integer getTotalRecords() {
         return personRepository.getTotalRecords();
     }
@@ -391,17 +368,6 @@ public class PersonService {
                 .pageSize(pageSize)
                 .totalPages(totalPages).build();
     }
-//    public ArrayList<PersonResponseDto> getAllActiveVisit() {
-//        List<Visit> visitList = visitRepository.findAllByArchivedOrderByVisitStartDateDesc(0);
-//        ArrayList<PersonResponseDto> checkedInPeople = new ArrayList<>();
-//        visitList.forEach(visit -> {
-//            if (visit.getVisitEndDate() == null)
-//                checkedInPeople.add(this.getDtoFromPersonWithoutBiometric(visit.getPerson(), Boolean.TRUE));
-//        });
-//        return checkedInPeople;
-//    }
-
-
     public PersonMetaDataDto findPersonBySearchParam(String searchValue, int pageNo, int pageSize) {
         Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by("id").descending());
         Optional<User> currentUser = this.userService.getUserWithRoles();
@@ -471,5 +437,91 @@ public class PersonService {
         return personMetaDataDto;
         //return checkedInPeople;
     }
+    public PersonMetaDataDto getAllPatientWithoutBiomentic(String searchValue, int pageNo, int pageSize) {
+        Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by("id").descending());
+        Optional<User> currentUser = this.userService.getUserWithRoles();
+        Long currentOrganisationUnitId = 0L;
+        if (currentUser.isPresent()) {
+            User user = (User) currentUser.get();
+            currentOrganisationUnitId = user.getCurrentOrganisationUnitId();
+
+        }
+        Page<Person> persons = null;
+        if(!((searchValue== null)  || (searchValue.equals("*")))) {
+            String queryParam = "%" + searchValue + "%";
+            persons = personRepository.findAllPersonBySearchParameters(queryParam, 0, currentOrganisationUnitId, paging);
+        }else
+        {
+            persons = personRepository.getAllByArchivedAndFacilityIdOrderByIdDesc(0, currentOrganisationUnitId, paging);
+
+        }
+        List<PersonResponseDto> personResponseDtoList = new ArrayList<>();
+        persons.getContent().forEach(person -> {
+            Integer checkIfUserHasBiometric = this.personRepository.getBiometricCountByPersonUuid(person.getUuid());
+            if (checkIfUserHasBiometric == 0) {
+                personResponseDtoList.add(getDtoFromPersonWithoutBiometric(person, Boolean.FALSE));
+            }
+        });
+
+        Page toPage2 = this.toPage(personResponseDtoList, paging);
+        PageDTO pageDTO = this.generatePagination(toPage2);
+        PersonMetaDataDto personMetaDataDto = new PersonMetaDataDto();
+        personMetaDataDto.setTotalRecords(pageDTO.getTotalRecords());
+        personMetaDataDto.setPageSize(pageDTO.getPageSize());
+        personMetaDataDto.setTotalPages(pageDTO.getTotalPages());
+        personMetaDataDto.setCurrentPage(pageDTO.getPageNumber());
+        personMetaDataDto.setRecords(personResponseDtoList);
+        return personMetaDataDto;
+        //return checkedInPeople;
+    }
+
+    private Page toPage(List list, Pageable pageable) {
+        System.out.println("List Size Before= "+ list.size());
+        if (pageable.getOffset() >= list.size()) {
+            return Page.empty();
+        }
+        int startIndex = (int)pageable.getOffset();
+        int endIndex = (int) ((pageable.getOffset() + pageable.getPageSize()) > list.size() ?
+                list.size() :
+                pageable.getOffset() + pageable.getPageSize());
+        List subList = list.subList(startIndex, endIndex);
+        System.out.println("SubList Size After= "+ subList.size());
+        return new PageImpl(subList, pageable, list.size());
+    }
+
+    public PersonMetaDataDto getDuplicateHospitalNumbers(String searchValue, int pageNo, int pageSize) {
+        Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by("id").descending());
+        Optional<User> currentUser = this.userService.getUserWithRoles();
+        Long currentOrganisationUnitId = 0L;
+        if (currentUser.isPresent()) {
+            User user = (User) currentUser.get();
+            currentOrganisationUnitId = user.getCurrentOrganisationUnitId();
+
+        }
+        Page<Person> persons = null;
+        if(!((searchValue== null)  || (searchValue.equals("*")))) {
+            String queryParam = "%" + searchValue + "%";
+            persons = personRepository.findDuplicatePersonBySearchParameters(queryParam, currentOrganisationUnitId, paging);
+        }else
+        {
+            persons = personRepository.findDuplicatePerson(currentOrganisationUnitId, paging);
+
+        }
+        if (persons.hasContent()) {
+
+            PageDTO pageDTO = this.generatePagination(persons);
+            long recordSize = pageDTO.getTotalRecords();
+            double totalPage = pageDTO.getTotalPages();
+            PersonMetaDataDto personMetaDataDto = new PersonMetaDataDto();
+            personMetaDataDto.setTotalRecords(recordSize);
+            personMetaDataDto.setPageSize(pageDTO.getPageSize());
+            personMetaDataDto.setTotalPages(pageDTO.getTotalPages());
+            personMetaDataDto.setCurrentPage(pageDTO.getPageNumber());
+            personMetaDataDto.setRecords(persons.getContent().stream().map(this::getDtoFromPerson).collect(Collectors.toList()));
+            return personMetaDataDto;
+        }
+        return null;
+    }
+
 }
 

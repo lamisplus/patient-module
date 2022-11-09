@@ -82,10 +82,7 @@ public class PatientController {
 
 
 
-    @GetMapping(value = "/getall-patients-without-biometric")
-    public ResponseEntity<List<PersonResponseDto>> getAllPatientWithoutBiomentic(Pageable pageable) {
-        return ResponseEntity.ok(personService.getAllPatientWithoutBiomentic(pageable));
-    }
+
 
     @PostMapping("/exist/nin-number/{nin}")
     public boolean isNinNumberExisting(@PathVariable("nin") String nin) {
@@ -145,8 +142,12 @@ public class PatientController {
         return new ResponseEntity<> (personMetaDataDto, new HttpHeaders(), HttpStatus.OK);
     }
     @GetMapping(value = "/get-duplicate-hospital_numbers")
-    public ResponseEntity<List<PersonResponseDto>> getDuplicateHospitalNumbers() {
-        return ResponseEntity.ok(personService.getDuplicateHospitalNumbers());
+    public ResponseEntity<PersonMetaDataDto> getDuplicateHospitalNumbers(
+            @RequestParam(defaultValue = "*") String searchParam,
+            @RequestParam(defaultValue = "0") Integer pageNo,
+            @RequestParam(defaultValue = "10") Integer pageSize)  {
+        PersonMetaDataDto personMetaDataDto = personService.getDuplicateHospitalNumbers(searchParam, pageNo, pageSize);
+        return new ResponseEntity<> (personMetaDataDto, new HttpHeaders(), HttpStatus.OK);
     }
 
     @GetMapping(value = "/get-patient-by-search-param", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -157,8 +158,13 @@ public class PatientController {
         PersonMetaDataDto personMetaDataDto = personService.findPersonBySearchParam(searchParam, pageNo, pageSize);
         return new ResponseEntity<> (personMetaDataDto, new HttpHeaders(), HttpStatus.OK);
     }
+    @GetMapping(value = "/getall-patients-without-biometric")
+    public ResponseEntity<PersonMetaDataDto> getAllPatientWithoutBiomentic(
+            @RequestParam(defaultValue = "*") String searchParam,
+            @RequestParam(defaultValue = "0") Integer pageNo,
+            @RequestParam(defaultValue = "10") Integer pageSize) {
 
-    //    public ResponseEntity<List<PersonResponseDto>> getAllPatients() {
-//        return ResponseEntity.ok(personService.getAllPerson());
-//    }
+        PersonMetaDataDto personMetaDataDto = personService.getAllPatientWithoutBiomentic(searchParam, pageNo, pageSize);
+        return new ResponseEntity<> (personMetaDataDto, new HttpHeaders(), HttpStatus.OK);
+    }
 }

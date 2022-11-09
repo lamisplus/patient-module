@@ -12,14 +12,6 @@ import java.util.Optional;
 
 public interface PersonRepository extends JpaRepository<Person, Long> {
 
-    @Query(
-            value ="SELECT p.* from patient_person p JOIN (select hospital_number FROM patient_person Group by hospital_number HAVING count(hospital_number) > 1) b on p.hospital_number = b.hospital_number ORDER BY hospital_number", nativeQuery = true)
-    List<Person> findDuplicate();
-    @Query(
-            value = "SELECT count(*) FROM biometric b WHERE b.person_uuid = ?1",
-            nativeQuery = true)
-    Integer getBiometricCountByPersonUuid(String uuid);
-
     @Override
     Optional<Person> findById(Long aLong);
 
@@ -48,6 +40,12 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
             "OR other_name ilike ?1 OR hospital_number ilike ?1) AND archived=?2 AND facility_id=?3", nativeQuery = true)
     Page<Person> findAllPersonBySearchParameters(String queryParam, Integer archived, Long facilityId, Pageable pageable);
 
+    @Query(value ="SELECT p.* from patient_person p JOIN (select hospital_number FROM patient_person b Group by hospital_number HAVING count(hospital_number) > 1) b on p.hospital_number = b.hospital_number WHERE (p.first_name ilike ?1 OR p.surname ilike ?1 OR p.other_name ilike ?1 OR p.hospital_number ilike ?1) AND p.facility_id=?2 ORDER BY p.hospital_number", nativeQuery = true)
+    Page<Person> findDuplicatePersonBySearchParameters(String queryParam, Long facilityId, Pageable pageable);
+
+    @Query(value ="SELECT p.* from patient_person p JOIN (select hospital_number FROM patient_person b Group by hospital_number HAVING count(hospital_number) > 1) b on p.hospital_number = b.hospital_number WHERE p.facility_id=?1 ORDER BY p.hospital_number", nativeQuery = true)
+    Page<Person> findDuplicatePerson(Long facilityId, Pageable pageable);
+
     @Query(value = "SELECT count(*) FROM patient_person p WHERE p.archived = 0", nativeQuery = true)
     Integer getTotalRecords();
 
@@ -56,6 +54,11 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
 
     @Query(value = "SELECT * FROM patient_person pp INNER JOIN patient_visit pv ON pp.uuid=pv.person_uuid WHERE pv.archived=?1 AND pp.archived=?1 AND pp.facility_id=?2 AND pv.visit_end_date is null", nativeQuery = true)
     Page<Person> findAllCheckedInPerson(Integer archived, Long facilityId, Pageable pageable);
+
+    @Query(
+            value = "SELECT count(*) FROM biometric b WHERE b.person_uuid = ?1",
+            nativeQuery = true)
+    Integer getBiometricCountByPersonUuid(String uuid);
 
 }
 
