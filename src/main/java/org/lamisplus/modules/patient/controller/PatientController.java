@@ -137,10 +137,11 @@ public class PatientController {
     }
     @GetMapping(value = "/checked-in")
     public ResponseEntity<PersonMetaDataDto> listOfCheckedinPersons(
+            @RequestParam(defaultValue = "*") String searchParam,
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize)
     {
-        PersonMetaDataDto personMetaDataDto = personService.getAllActiveVisit(pageNo, pageSize);
+        PersonMetaDataDto personMetaDataDto = personService.getAllActiveVisit(searchParam, pageNo, pageSize);
         return new ResponseEntity<> (personMetaDataDto, new HttpHeaders(), HttpStatus.OK);
     }
     @GetMapping(value = "/get-duplicate-hospital_numbers")

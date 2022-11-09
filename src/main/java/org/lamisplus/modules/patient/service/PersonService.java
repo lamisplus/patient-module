@@ -437,16 +437,31 @@ public class PersonService {
         return null;
 
     }
-    public PersonMetaDataDto getAllActiveVisit(int pageNo, int pageSize) {
+    public PersonMetaDataDto getAllActiveVisit(String searchValue, int pageNo, int pageSize) {
         Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by("id").descending());
-        Page<Visit> visitList = visitRepository.findAllByArchivedAndVisitStartDateNotNullAndVisitEndDateIsNull(0, paging);
         ArrayList<PersonResponseDto> checkedInPeople = new ArrayList<>();
+        Optional<User> currentUser = this.userService.getUserWithRoles();
+        Long currentOrganisationUnitId = 0L;
+        if (currentUser.isPresent()) {
+            User user = (User) currentUser.get();
+            currentOrganisationUnitId = user.getCurrentOrganisationUnitId();
 
-        visitList.forEach(visit -> {
-            if (visit.getVisitEndDate() == null)
-                checkedInPeople.add(this.getDtoFromPersonWithoutBiometric(visit.getPerson(), Boolean.TRUE));
+        }
+        Page<Person> person = null;
+        if(!((searchValue== null)  || (searchValue.equals("*")))) {
+            String queryParam = "%" + searchValue + "%";
+            person = personRepository.findCheckedInPersonBySearchParameters(queryParam, 0, currentOrganisationUnitId, paging);
+        }else
+        {
+            person = personRepository.findAllCheckedInPerson(0, currentOrganisationUnitId, paging);
+
+        }
+
+        person.forEach(visit -> {
+
+                checkedInPeople.add(this.getDtoFromPersonWithoutBiometric(visit, Boolean.TRUE));
         });
-        PageDTO pageDTO = this.generatePagination(visitList);
+        PageDTO pageDTO = this.generatePagination(person);
         PersonMetaDataDto personMetaDataDto = new PersonMetaDataDto();
         personMetaDataDto.setTotalRecords(pageDTO.getTotalRecords());
         personMetaDataDto.setPageSize(pageDTO.getPageSize());
