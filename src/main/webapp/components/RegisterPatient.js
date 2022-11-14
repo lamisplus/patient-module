@@ -170,11 +170,17 @@ const RegisterPatient = (props) => {
         return relationship ? relationship.display : '';
     };
     const getPhoneContactPoint = (contactPoint) => {
-        return contactPoint ? contactPoint.value : '';
+        return contactPoint ? phoneNumberFormatCheck(contactPoint).value : '';
     };
     const getAddress = (address) => {
         return address && address.line && address.line.length > 0 ? address.line[0] : '';
     };
+    const phoneNumberFormatCheck = (phone) =>{
+        if( phone != undefined && phone.value.charAt(0) === '0'){
+              phone.value = phone.value.replace('0','234');
+        }
+        return phone
+    }
     const getPatient = useCallback(async () => {
         if (patientId) {
             const response = await axios.get(`${baseUrl}patient/${patientId}`, { headers: {"Authorization" : `Bearer ${token}`} });
@@ -186,12 +192,14 @@ const RegisterPatient = (props) => {
             const address = patient.address;
             const contactPoint = patient.contactPoint;
             const hospitalNumber = identifiers.identifier.find(obj => obj.type == 'HospitalNumber');
-            const phone = contactPoint.contactPoint.find(obj => obj.type == 'phone');
+            const phone = phoneNumberFormatCheck(contactPoint.contactPoint.find(obj => obj.type == 'phone')) ;
             const email = contactPoint.contactPoint.find(obj => obj.type == 'email');
-            const altphone = contactPoint.contactPoint.find(obj => obj.type == 'altphone');
+            const altphone = phoneNumberFormatCheck(contactPoint.contactPoint.find(obj => obj.type == 'altphone'));
             const country = address && address.address && address.address.length > 0 ? address.address[0] : null;
             const gender = patient.gender;
-            const sex = _.find(sexCodeset.data, {'display':patient.sex}).id;
+            console.log(sexCodeset.data)
+            console.log(_.upperFirst(_.lowerCase(patient.sex)))
+            const sex = _.find(sexCodeset.data, {'display':_.upperFirst(_.lowerCase(patient.sex))}).id;
             const employmentStatus = patient.employmentStatus;
             const education = patient.education;
             const maritalStatus = patient.maritalStatus;
@@ -412,7 +420,7 @@ const RegisterPatient = (props) => {
         setValue("cfirstName", relative.firstName);
         setValue("cmiddleName", relative.otherName);
         setValue("clastName", relative.surname);
-        setValue("contactPhoneNumber", relative.contactPoint ? relative.contactPoint.value : '');
+        setValue("contactPhoneNumber", relative.contactPoint ? phoneNumberFormatCheck(relative.contactPoint).value : '');
         setValue("contactAddress", relative.address && relative.address.line && relative.address.line.length > 0 ? relative.address.line[0] : '');
         setShowRelative(true);
         setEditRelative(index);
