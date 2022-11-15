@@ -126,11 +126,13 @@ public class PatientController {
 //    }
 
     @GetMapping(value = "/get-all-patient-pageable", produces = MediaType.APPLICATION_JSON_VALUE)
-   public ResponseEntity<PersonMetaDataDto> getAllPatientPageable2(
-           @RequestParam(defaultValue = "0") Integer pageNo,
+    public ResponseEntity<PersonMetaDataDto> getAllPatientsPageable(
+            @RequestParam(defaultValue = "*") String searchParam,
+            @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize) {
-        PersonMetaDataDto personMetaDataDto = personService.getAllPersonPageable(pageNo, pageSize);
+        PersonMetaDataDto personMetaDataDto = personService.findPersonBySearchParam(searchParam, pageNo, pageSize);
         return new ResponseEntity<> (personMetaDataDto, new HttpHeaders(), HttpStatus.OK);
+
     }
     @GetMapping(value = "/checked-in")
     public ResponseEntity<PersonMetaDataDto> listOfCheckedinPersons(
