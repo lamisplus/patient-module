@@ -41,6 +41,6 @@ public class PersonResponseDto {
     private String emrId;
     private Long facilityId;
     private Integer archived;
-
-
+    private String uuid;
+    private String ancNo;
 }

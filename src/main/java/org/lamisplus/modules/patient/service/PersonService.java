@@ -61,7 +61,7 @@ public class PersonService {
         String hospitalNumber = getHospitalNumber(personDto);
         person.setHospitalNumber(hospitalNumber);
         person.setUuid(UUID.randomUUID().toString());
-        person.setFullName(this.getFullName(personDto.getFirstName(), personDto.getOtherName(), personDto.getSurname()));
+        person.setFullName(this.getFullName(personDto.getFirstName(), personDto.getSurname()));
         return getDtoFromPerson(personRepository.save(person));
     }
 
@@ -534,11 +534,10 @@ public class PersonService {
         return null;
     }
 
-    private String getFullName(String fn, String on, String sn) {
+    public String getFullName(String fn, String sn) {
         String fullName = "";
         if (fn == null) fn = "";
         if (sn == null) sn = "";
-        if (on == null) on = "";
         fullName = fn.trim() + sn.trim();
         fullName = fullName.replaceAll("\\s", "");
         fullName = fullName.replaceAll(",", "");
