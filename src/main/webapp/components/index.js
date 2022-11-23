@@ -110,7 +110,7 @@ function Index(props) {
                     <CheckedInPatients permissions={permissions}/>
                 </Tab.Pane>
         },
-        { menuItem: 'Biometrics', render: () =>
+        { menuItem: 'Missing Biometrics', render: () =>
                 <Tab.Pane>
                     <BiometricsList permissions={permissions}/>
                 </Tab.Pane>

@@ -195,7 +195,7 @@ function BiometricsList(props) {
                         data: result.data.records.map((row) => ({
                             name: [row.firstName, row.otherName, row.surname].filter(Boolean).join(", "),
                             id: getHospitalNumber(row.identifier),
-                            sex: row.sex,
+                            sex: row.sex.toLowerCase().charAt(0).toUpperCase() + row.sex.slice(1).toLowerCase(),
                             dateOfBirth: row.dateOfBirth,
                             age: (row.dateOfBirth === 0 ||
                                 row.dateOfBirth === undefined ||
@@ -253,7 +253,7 @@ function BiometricsList(props) {
                         checked={!enablePPI}
                         style={{color:'#014d88',fontWeight:'bold'}}
                     />
-                } label="Show PPI" style={{color:'#014d88',fontWeight:'bolder'}} />
+                } label="Show PII" style={{color:'#014d88',fontWeight:'bolder'}} />
             </FormGroup>
         ):<h5 style={{color:'#3d4465',fontWeight:'bold'}}>Patients</h5>
         }
@@ -307,7 +307,7 @@ function BiometricsList(props) {
 
                 }}
                 onChangePage={handleChangePage}
-                localization={localization}
+                //localization={localization}
             />
         </div>
     );

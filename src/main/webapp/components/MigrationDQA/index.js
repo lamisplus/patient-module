@@ -76,7 +76,7 @@ function Index(props) {
 
     }
     const panes = [
-        { menuItem: 'Hospital Numbers', render: () =>
+        { menuItem: 'Duplicate Hospital Numbers', render: () =>
                 <Tab.Pane>
                     <DuplicateHospitalNumbers permissions={permissions}/>
                 </Tab.Pane>
