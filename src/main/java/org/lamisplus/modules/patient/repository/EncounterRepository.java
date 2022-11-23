@@ -10,7 +10,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface EncounterRepository extends JpaRepository<Encounter, Long> {
-    List<Encounter> findAllByArchived(Integer archived);
+    List<Encounter> findAllByArchivedAndFacilityId(Integer archived, Long facilityId);
+
 
     List<Encounter> findAllByServiceCodeAndStatus(String serviceCode, String status);
 

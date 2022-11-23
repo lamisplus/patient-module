@@ -20,6 +20,7 @@ public class VisitController {
 
 
 
+
     @PostMapping
     public ResponseEntity<Visit> createVisit(@RequestBody VisitRequest visitDto) {
         return ResponseEntity.ok (visitService.createVisit (visitDto));

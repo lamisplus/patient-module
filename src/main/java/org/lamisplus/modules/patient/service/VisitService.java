@@ -6,6 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.lamisplus.modules.base.controller.apierror.EntityNotFoundException;
 import org.lamisplus.modules.base.controller.apierror.RecordExistException;
+import org.lamisplus.modules.base.domain.entities.User;
+import org.lamisplus.modules.base.service.UserService;
 import org.lamisplus.modules.patient.domain.dto.*;
 import org.lamisplus.modules.patient.domain.entity.Encounter;
 import org.lamisplus.modules.patient.domain.entity.PatientCheckPostService;
@@ -40,6 +42,8 @@ public class VisitService {
     private final EncounterRepository encounterRepository;
 
     private final PatientCheckPostServiceRepository patientCheckPostServiceRepository;
+
+    private final UserService userService;
 
 
     public Visit createVisit(VisitRequest visitDto) {
@@ -97,8 +101,15 @@ public class VisitService {
     }
 
     public List<VisitDto> getAllVisit() {
+        Optional<User> currentUser = this.userService.getUserWithRoles();
+        Long currentOrganisationUnitId = 0L;
+        if (currentUser.isPresent()) {
+            User user = (User) currentUser.get();
+            currentOrganisationUnitId = user.getCurrentOrganisationUnitId();
+
+        }
         return visitRepository
-                .findAllByArchived(0)
+                .findAllByArchivedAndFacilityId(0, currentOrganisationUnitId)
                 .stream()
                 .map(this::convertEntityToDto)
                 .collect(Collectors.toList());

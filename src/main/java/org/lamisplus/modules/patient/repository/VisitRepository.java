@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface VisitRepository extends JpaRepository<Visit, Long> {
-    List<Visit> findAllByArchived(Integer archived);
+    List<Visit> findAllByArchivedAndFacilityId(Integer archived, Long facilityId);
 
     List<Visit> getAllByVisitStartDateNotNullAndVisitEndDateIsNull();
 
