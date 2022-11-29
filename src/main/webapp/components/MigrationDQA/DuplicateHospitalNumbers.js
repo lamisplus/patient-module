@@ -270,7 +270,7 @@ function DuplicateHospitalNumbers(props) {
                         checked={!enablePPI}
                         style={{color:'#014d88',fontWeight:'bold'}}
                     />
-                } label="Show PPI" style={{color:'#014d88',fontWeight:'bolder'}} />
+                } label="Show PII" style={{color:'#014d88',fontWeight:'bolder'}} />
             </FormGroup>
         ):<h5 style={{color:'#3d4465',fontWeight:'bold'}}>Patients</h5>
         }
@@ -344,7 +344,7 @@ function DuplicateHospitalNumbers(props) {
 
                 }}
                 onChangePage={handleChangePage}
-                localization={localization}
+                //localization={localization}
 
             />
             <Modal isOpen={modal} toggle={onCancelDelete}>

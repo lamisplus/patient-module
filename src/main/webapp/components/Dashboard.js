@@ -272,7 +272,7 @@ const PatientList = (props) => {
                                 onChange={enablePPIColumns}
                                 style={{color:'#014d88',fontWeight:'bold'}}
                             />
-                        } label="Show PPI" style={{color:'#014d88',fontWeight:'bold'}} />
+                        } label="Show PII" style={{color:'#014d88',fontWeight:'bold'}} />
                     </FormGroup>
                 ):""
                 }

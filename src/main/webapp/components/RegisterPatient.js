@@ -4,6 +4,7 @@ import {format} from 'date-fns';
 import MatButton from "@material-ui/core/Button";
 import Button from "@material-ui/core/Button";
 import {Form, FormGroup, Label, Spinner,} from "reactstrap";
+import {  Modal } from "react-bootstrap";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {library} from '@fortawesome/fontawesome-svg-core'
 import {faCheckSquare, faCoffee, faEdit, faTrash} from '@fortawesome/free-solid-svg-icons'
@@ -101,12 +102,12 @@ const schema = yup.object().shape({
     lastName: yup.string().required(),
     sex: yup.number().required(),
     employmentStatus: yup.number().required(),
-    highestQualification: yup.number().required(),
+    //highestQualification: yup.number().nullable(),
     maritalStatus: yup.number().required(),
     dob: yup.date().required(),
     dateOfBirth: yup.string().required(),
     age: yup.number(),
-    ninNumber:yup.number().nullable(),
+    ninNumber:yup.string().nullable(),
     pnumber: yup.string().required(),
     altPhonenumber: yup.string().nullable(),
     email: yup.string().nullable(),
@@ -124,14 +125,17 @@ const isValidEmail = email =>
     );
 
 const RegisterPatient = (props) => {
-    const { register, watch, setValue, getValues, clearErrors, setError, handleSubmit, formState: { errors } } = useForm({
+    const { register, watch, setValue, getValues, clearErrors, setError, handleSubmit, formState} = useForm({
         resolver: yupResolver(schema),
     });
+    const { errors, isSubmitting } = formState;
     const watchPnumber= watch("pnumber", false);
     const watchAltPhonenumber= watch("altPhonenumber", false);
     const watchContactPhoneNumber= watch("contactPhoneNumber", false);
     const watchShowAge = watch("age", false);
     const [today, setToday] = useState(new Date().toISOString().substr(0, 10).replace('T', ' '));
+    const [minDOB,setMinDOB] = useState(new Date('1/1/1930').toISOString().substr(0, 10).replace('T', ' '));
+    const [maxDOB,setMaxDOB] = useState(new Date().toISOString().substr(0, 10).replace('T', ' '));
     const [contacts, setContacts] = useState([]);
     const [saving, setSaving] = useState(false);
     const [ageDisabled, setAgeDisabled] = useState(true);
@@ -152,7 +156,8 @@ const RegisterPatient = (props) => {
     const[patientFacilityId,setPatientFacilityId]=useState(null);
     const classes = useStyles();
     const history = useHistory();
-
+    const [open, setOpen] = React.useState(false)
+    const toggle = () => setOpen(!open);
     const location = useLocation();
     const locationState = location.state;
     let patientId = null;
@@ -177,10 +182,24 @@ const RegisterPatient = (props) => {
     };
     const phoneNumberFormatCheck = (phone) =>{
         if( phone != undefined && phone.value.charAt(0) === '0'){
-              phone.value = phone.value.replace('0','234');
+            phone.value = phone.value.replace('0','234');
         }
         return phone
     }
+    const calculate_age = dob => {
+        const today = new Date();
+        const dateParts = dob.split("-");
+        const birthDate = new Date(dob); // create a date object directlyfrom`dob1`argument
+        let age_now = today.getFullYear() - birthDate.getFullYear();
+        const m = today.getMonth() - birthDate.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+            age_now--;
+        }
+        if (age_now === 0) {
+            return m;
+        }
+        return age_now;
+    };
     const getPatient = useCallback(async () => {
         if (patientId) {
             const response = await axios.get(`${baseUrl}patient/${patientId}`, { headers: {"Authorization" : `Bearer ${token}`} });
@@ -213,10 +232,12 @@ const RegisterPatient = (props) => {
             setValue('hospitalNumber', hospitalNumber ? hospitalNumber.value : '');
             setValue('maritalStatus', maritalStatus?maritalStatus.id:'');
             setValue('employmentStatus', employmentStatus?employmentStatus.id:'');
+
             //setValue('gender', gender.id);
             setValue('sex', sex);
             setValue('highestQualification', education?education.id:'');
             setValue('dob', format(new Date(patient.dateOfBirth), 'yyyy-MM-dd'));
+            setValue('age', calculate_age(patient.dateOfBirth) );
             if (country) {
                 setValue('countryId', country.countryId);
                 const stateOptions = country.countryId?await loadOrganisationUnitsByParentId(country.countryId):'';
@@ -251,15 +272,18 @@ const RegisterPatient = (props) => {
     }
     const checkNIN = async (e) =>{
         setCheckNINError(false)
-        await axios.post(`${baseUrl}patient/exist/nin-number/${e.target.value}`,e.target.value,{ responseType: 'text',headers: {"Authorization" : `Bearer ${token}`,'Content-Type': 'text/plain'} }).then(response=>{
-            if(response.data){
-                setCheckNINError(true)
-            }else{
-                setCheckNINError(false)
-            }
-        }).catch((error)=>{
-            console.log(error)
-        })
+        if(e.target.value.length > 0){
+            await axios.post(`${baseUrl}patient/exist/nin-number/${e.target.value}`,e.target.value,{ responseType: 'text',headers: {"Authorization" : `Bearer ${token}`,'Content-Type': 'text/plain'} }).then(response=>{
+                if(response.data){
+                    setCheckNINError(true)
+                }else{
+                    setCheckNINError(false)
+                }
+            }).catch((error)=>{
+                console.log(error)
+            })
+        }
+
     }
     const handleSaveRelationship = (e) => {
         const relationshipType = getValues("relationshipType");
@@ -475,14 +499,14 @@ const RegisterPatient = (props) => {
         }
     }, []);
     const loadRelationships = useCallback(async () => {
-      try {
-          const response = await axios.get(`${baseUrl}application-codesets/v2/RELATIONSHIP`, { headers: {"Authorization" : `Bearer ${token}`} });
-          setRelationshipOptions(response.data);
-      } catch (e) {
-          toast.error("An error occured while fetching relationship codesets !", {
-              position: toast.POSITION.TOP_RIGHT
-          });
-      }
+        try {
+            const response = await axios.get(`${baseUrl}application-codesets/v2/RELATIONSHIP`, { headers: {"Authorization" : `Bearer ${token}`} });
+            setRelationshipOptions(response.data);
+        } catch (e) {
+            toast.error("An error occured while fetching relationship codesets !", {
+                position: toast.POSITION.TOP_RIGHT
+            });
+        }
     }, []);
     const loadTopLevelCountry = useCallback(async () => {
         const response = await axios.get(`${baseUrl}organisation-units/parent-organisation-units/0`, { headers: {"Authorization" : `Bearer ${token}`} });
@@ -508,7 +532,7 @@ const RegisterPatient = (props) => {
             setDistrictUnitOptions([]);
         }
     };
-    
+
     const handleDobChange = (e) => {
         if (e.target.value) {
             const today = new Date();
@@ -541,6 +565,9 @@ const RegisterPatient = (props) => {
             const estDob = moment(currentDate.toISOString());
             const dob = estDob.add((e.target.value * -1), 'years');
             setValue('dob', format(new Date(dob.toDate()), 'yyyy-MM-dd'));
+            if(calculate_age(format(new Date(dob.toDate()), 'yyyy-MM-dd'))>=60){
+                toggle()
+            }
         }
     }
 
@@ -612,10 +639,10 @@ const RegisterPatient = (props) => {
         setValue(inputName,e);
     }
 
-     const alphabetOnly=(e, inputName)=>{
-         const result = e.target.value.replace(/[^a-z]/gi, '');
-         setValue(inputName,result);
-     }
+    const alphabetOnly=(e, inputName)=>{
+        const result = e.target.value.replace(/[^a-z]/gi, '');
+        setValue(inputName,result);
+    }
 
     return (
         <>
@@ -668,6 +695,13 @@ const RegisterPatient = (props) => {
                                                         id="dateOfRegistration"
                                                         max={today}
                                                         {...register("dateOfRegistration")}
+                                                        onChange={(e)=>{
+                                                            if(new Date(e.target.value) instanceof Date && e.target.value != "" ){
+                                                                setMaxDOB(new Date(e.target.value).toISOString().substr(0, 10).replace('T', ' '))
+                                                            }else{
+                                                                setMaxDOB(new Date().toISOString().substr(0, 10).replace('T', ' '))
+                                                            }
+                                                        }}
                                                         style={{border: "1px solid #014d88"}}
                                                     />
                                                     {errors.dateOfRegistration && <p>Enter the registration date</p>}
@@ -700,15 +734,18 @@ const RegisterPatient = (props) => {
                                             </div>
                                             <div className="form-group mb-3 col-md-3">
                                                 <FormGroup>
-                                                    <Label for="ninNumber">National Identification Number (NIN)</Label>
+                                                    <Label for="ninNumber">National Identification Number (NIN)3</Label>
                                                     <input
                                                         className="form-control"
-                                                        type="text"
                                                         name="ninNumber"
+                                                        type="number"
+                                                        {...register('ninNumber')}
                                                         id="ninNumber"
                                                         autoComplete="off"
-                                                        onInput={(e) => {
-                                                           e.target.value = e.target.value.replace(/\D/g,'');
+                                                        onChange={(e) => {
+                                                            console.log("here")
+                                                            clearErrors('ninNumber');
+                                                            e.target.value = e.target.value.replace(/\D/g,'');
                                                             checkNIN(e);
                                                             if (e.target.value.length > e.target.maxLength){
                                                                 e.target.value = e.target.value.slice(0,e.target.maxLength);
@@ -723,14 +760,13 @@ const RegisterPatient = (props) => {
                                                         minLength={11}
                                                         maxLength={11}
                                                         style={{border: "1px solid #014d88"}}
-                                                        {...register("ninNumber")}
                                                     />
                                                     {checkNINError && <p>NIN has been registered before</p> }
                                                     {!checkNINError && errors.ninNumber && <p>Enter a valid NIN Number</p>}
 
                                                 </FormGroup>
                                             </div>
-{/*                                            <div className="form-group mb-3 col-md-3">
+                                            {/*                                            <div className="form-group mb-3 col-md-3">
                                                 <FormGroup>
                                                     <Label for="emrId">EMR ID *</Label>
                                                     <input
@@ -854,9 +890,20 @@ const RegisterPatient = (props) => {
                                                         type="date"
                                                         name="dob"
                                                         id="dob"
-                                                        max={today}
+                                                        min={minDOB}
+                                                        max={maxDOB}
                                                         {...register("dob")}
-                                                        onChange={(e) => handleDobChange(e)}
+                                                        onChange={(e) => {
+                                                            clearErrors('dob')
+                                                            if(new Date(e.target.value) instanceof Date ){
+                                                                console.log("date")
+                                                                handleDobChange(e)
+                                                                clearErrors('dob')
+                                                            }else{
+                                                                setError('dob')
+                                                            }
+
+                                                        }}
                                                         style={{border: "1px solid #014d88"}}
                                                     />
                                                     {errors.dob && <p>Enter a valid date of birth (dd/mm/yyyy)</p>}
@@ -881,42 +928,42 @@ const RegisterPatient = (props) => {
                                         </div>
 
                                         <div className={"row"}>
-{/*                                            {watchShowAge >=0 &&
+                                            {/*                                            {watchShowAge >=0 &&
                                             <>*/}
-                                                <div className="form-group mb-3 col-md-3">
-                                                    <FormGroup>
-                                                        <Label>Marital Status</Label>
-                                                        <select
-                                                            className="form-control"
-                                                            name="maritalStatus"
-                                                            id="maritalStatus"
-                                                            {...register("maritalStatus")}
-                                                            style={{border: "1px solid #014d88"}}
-                                                        >
-                                                            <option value={""}>Select Marital Status</option>
-                                                            {maritalStatusRows}
-                                                        </select>
-                                                        {errors.maritalStatus && <p>Select Marital Status</p>}
-                                                    </FormGroup>
-                                                </div>
+                                            <div className="form-group mb-3 col-md-3">
+                                                <FormGroup>
+                                                    <Label>Marital Status</Label>
+                                                    <select
+                                                        className="form-control"
+                                                        name="maritalStatus"
+                                                        id="maritalStatus"
+                                                        {...register("maritalStatus")}
+                                                        style={{border: "1px solid #014d88"}}
+                                                    >
+                                                        <option value={""}>Select Marital Status</option>
+                                                        {maritalStatusRows}
+                                                    </select>
+                                                    {errors.maritalStatus && <p>Select Marital Status</p>}
+                                                </FormGroup>
+                                            </div>
 
-                                                <div className="form-group  col-md-4">
-                                                    <FormGroup>
-                                                        <Label>Employment Status *</Label>
-                                                        <select
-                                                            className="form-control"
-                                                            name="employmentStatus"
-                                                            id="employmentStatus"
-                                                            {...register("employmentStatus")}
-                                                            style={{border: "1px solid #014d88"}}
-                                                        >
-                                                            <option value={""}>Select Employment Status</option>
-                                                            {occupationRows}
-                                                        </select>
-                                                        {errors.employmentStatus && <p>Select Employment Status</p>}
-                                                    </FormGroup>
-                                                </div>
-{/*
+                                            <div className="form-group  col-md-4">
+                                                <FormGroup>
+                                                    <Label>Employment Status *</Label>
+                                                    <select
+                                                        className="form-control"
+                                                        name="employmentStatus"
+                                                        id="employmentStatus"
+                                                        {...register("employmentStatus")}
+                                                        style={{border: "1px solid #014d88"}}
+                                                    >
+                                                        <option value={""}>Select Employment Status</option>
+                                                        {occupationRows}
+                                                    </select>
+                                                    {errors.employmentStatus && <p>Select Employment Status</p>}
+                                                </FormGroup>
+                                            </div>
+                                            {/*
                                             </>
                                             }
 */}
@@ -924,7 +971,7 @@ const RegisterPatient = (props) => {
 
                                             <div className="form-group  col-md-4">
                                                 <FormGroup>
-                                                    <Label>Education Level *</Label>
+                                                    <Label>Education Level</Label>
                                                     <select
                                                         className="form-control"
                                                         name="highestQualification"
@@ -976,7 +1023,7 @@ const RegisterPatient = (props) => {
                                                     }}
                                                 />
 
-{/*                                                <input
+                                                {/*                                                <input
                                                     className="form-control"
                                                     type="tel"
                                                     name="pnumber"
@@ -1016,7 +1063,7 @@ const RegisterPatient = (props) => {
                                                         }
                                                     }}
                                                 />
-{/*                                                <input
+                                                {/*                                                <input
                                                     className="form-control"
                                                     type="tel"
                                                     name="altPhoneNumber"
@@ -1287,7 +1334,7 @@ const RegisterPatient = (props) => {
                                                                                 }
                                                                             }}
                                                                         />
-{/*                                                                        <input
+                                                                        {/*                                                                        <input
                                                                             className="form-control"
                                                                             type="text"
                                                                             name="contactPhoneNumber"
@@ -1387,42 +1434,42 @@ const RegisterPatient = (props) => {
                             {!checkHospitalNumberError &&
                                 <>
                                     {userDetail ===null ? (
-                                        <MatButton
-                                        type="submit"
-                                        variant="contained"
-                                        color="primary"
-                                        className={classes.button}
-                                        startIcon={<SaveIcon />}
-                                        style={{backgroundColor:'#014d88',color:'#fff'}}
-                                        >
-                                    {!saving ? (
-                                        <span style={{ textTransform: "capitalize" }}>Save</span>
-                                        ) : (
-                                        <span style={{ textTransform: "capitalize" }}>Saving...</span>
-                                        )}
-                                        </MatButton>
+                                            <MatButton
+                                                type="submit"
+                                                variant="contained"
+                                                color="primary"
+                                                className={classes.button}
+                                                startIcon={<SaveIcon />}
+                                                style={{backgroundColor:'#014d88',color:'#fff'}}
+                                            >
+                                                {!saving ? (
+                                                    <span style={{ textTransform: "capitalize" }}>Save</span>
+                                                ) : (
+                                                    <span style={{ textTransform: "capitalize" }}>Saving...</span>
+                                                )}
+                                            </MatButton>
                                         )
                                         :
                                         (
-                                        <MatButton
-                                        type="submit"
-                                        variant="contained"
-                                        color="primary"
-                                        className={classes.button}
-                                        startIcon={<SaveIcon />}
-                                        style={{backgroundColor:'#014d88',color:'#fff'}}
-                                        >
-                                    {!saving ? (
-                                        <span style={{ textTransform: "capitalize" }}>Save</span>
-                                        ) : (
-                                        <span style={{ textTransform: "capitalize" }}>Saving...</span>
-                                        )}
-                                        </MatButton>
+                                            <MatButton
+                                                type="submit"
+                                                variant="contained"
+                                                color="primary"
+                                                className={classes.button}
+                                                startIcon={<SaveIcon />}
+                                                style={{backgroundColor:'#014d88',color:'#fff'}}
+                                            >
+                                                {!saving ? (
+                                                    <span style={{ textTransform: "capitalize" }}>Save</span>
+                                                ) : (
+                                                    <span style={{ textTransform: "capitalize" }}>Saving...</span>
+                                                )}
+                                            </MatButton>
                                         )
                                     }
                                 </>
 
-                                }
+                            }
 
                             <MatButton
                                 variant="contained"
@@ -1437,6 +1484,22 @@ const RegisterPatient = (props) => {
                     </div>
                 </CardContent>
             </Card>
+            <Modal show={open} toggle={toggle} className="fade" size="sm"
+                   aria-labelledby="contained-modal-title-vcenter"
+                   centered backdrop="static">
+                <Modal.Header >
+                    <Modal.Title id="contained-modal-title-vcenter">
+                        Notification!
+                    </Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <h4>Are you Sure of the Age entered?</h4>
+
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button onClick={toggle} style={{backgroundColor:"#014d88", color:"#fff"}}>Yes</Button>
+                </Modal.Footer>
+            </Modal>
         </>
     );
 };
