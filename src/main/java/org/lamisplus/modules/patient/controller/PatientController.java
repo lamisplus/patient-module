@@ -64,6 +64,12 @@ public class PatientController {
         return ResponseEntity.accepted().build();
     }
 
+    @DeleteMapping(value = "delete/{id}",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> deletePerson2(@PathVariable("id") Long id) {
+        personService.deletePersonById2(id);
+        return ResponseEntity.accepted().build();
+    }
     @GetMapping(value = "/post-service")
     public ResponseEntity<List<PatientCheckPostService>> getPatientService() {
         return ResponseEntity.ok(patientCheckPostServiceRepository.findAll());

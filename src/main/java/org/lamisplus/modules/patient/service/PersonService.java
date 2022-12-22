@@ -145,6 +145,14 @@ public class PersonService {
         personRepository.save(person);
     }
 
+    public void deletePersonById2(Long id) {
+        Person person = personRepository
+                .findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(PersonService.class, "errorMessage", PERSON_NOT_FOUND_MESSAGE + id));
+        person.setArchived(2);
+        personRepository.save(person);
+    }
+
     private String getHospitalNumber(PersonDto personDto) {
         List<IdentifierDto> identifier = personDto.getIdentifier();
         if (!identifier.isEmpty()) {

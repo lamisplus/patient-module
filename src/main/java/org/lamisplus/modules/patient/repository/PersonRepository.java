@@ -39,10 +39,10 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
     @Query(value = "SELECT * FROM patient_person WHERE (first_name ilike ?1 OR surname ilike ?1 OR other_name ilike ?1 OR full_name ilike ?1 OR hospital_number ilike ?1)  AND archived=?2 AND facility_id=?3", nativeQuery = true)
     Page<Person> findAllPersonBySearchParameters(String queryParam, Integer archived, Long facilityId, Pageable pageable);
 
-    @Query(value ="SELECT p.* from patient_person p JOIN (select hospital_number FROM patient_person b Group by hospital_number HAVING count(hospital_number) > 1) b on p.hospital_number = b.hospital_number WHERE (p.first_name ilike ?1 OR p.surname ilike ?1 OR p.other_name ilike ?1 OR full_name ilike ?1 OR p.hospital_number ilike ?1) AND p.facility_id=?2 ORDER BY p.hospital_number", nativeQuery = true)
+    @Query(value ="SELECT p.* from patient_person p JOIN (select hospital_number, archived FROM patient_person b Group by hospital_number, archived HAVING count(hospital_number) > 1) b on p.hospital_number = b.hospital_number WHERE (p.first_name ilike ?1 OR p.surname ilike ?1 OR p.other_name ilike ?1 OR full_name ilike ?1 OR p.hospital_number ilike ?1) AND p.facility_id=?2 and p.archived != 2 ORDER BY p.hospital_number", nativeQuery = true)
     Page<Person> findDuplicatePersonBySearchParameters(String queryParam, Long facilityId, Pageable pageable);
 
-    @Query(value ="SELECT p.* from patient_person p JOIN (select hospital_number FROM patient_person b Group by hospital_number HAVING count(hospital_number) > 1) b on p.hospital_number = b.hospital_number WHERE p.facility_id=?1 ORDER BY p.hospital_number", nativeQuery = true)
+    @Query(value ="SELECT p.* from patient_person p JOIN (select hospital_number, archived FROM patient_person b Group by hospital_number, archived HAVING count(hospital_number) > 1) b on p.hospital_number = b.hospital_number WHERE p.facility_id=?1 and p.archived != 2 ORDER BY p.hospital_number", nativeQuery = true)
     Page<Person> findDuplicatePerson(Long facilityId, Pageable pageable);
 
     @Query(value = "SELECT count(*) FROM patient_person p WHERE p.archived = 0", nativeQuery = true)
