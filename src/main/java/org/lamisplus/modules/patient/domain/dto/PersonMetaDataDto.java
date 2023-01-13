@@ -3,6 +3,7 @@ package org.lamisplus.modules.patient.domain.dto;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -15,5 +16,6 @@ public class PersonMetaDataDto implements Serializable {
 
     private int currentPage;
 
-    private List<PersonResponseDto> records;
+    private List records = new ArrayList<>();
+
 }

@@ -86,6 +86,9 @@ public class Person extends PatientAuditEntity implements Persistable<Long>  , S
     @Column(name = "is_date_of_birth_estimated")
     private Boolean isDateOfBirthEstimated;
 
+    @Column(name = "full_name")
+    private String fullName;
+
 
 
     @Override

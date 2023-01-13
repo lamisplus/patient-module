@@ -104,6 +104,8 @@ function BiometricsList(props) {
     const [loading, setLoading] = useState('');
     const [patient, setPatient] = useState(false);
     const [enablePPI, setEnablePPI] = useState(true);
+    const [currentPage,setCurrentPage] = useState(1);
+
 
     //Get list of Finger index
     const userPermission =()=>{
@@ -132,28 +134,10 @@ function BiometricsList(props) {
             console.log(e);
         }
     }, []);
-    useEffect(() => {
-        userPermission();
-        loadPatients();
-    }, []);
-    const calculate_age = dob => {
-        const today = new Date();
-        const dateParts = dob.split("-");
-        const birthDate = new Date(dob); // create a date object directlyfrom`dob1`argument
-        let age_now = today.getFullYear() - birthDate.getFullYear();
-        const m = today.getMonth() - birthDate.getMonth();
-        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-            age_now--;
-        }
-        if (age_now === 0) {
-            return m + " month(s)";
-        }
-        return age_now + " year(s)";
-    };
-    const getHospitalNumber = (identifier) => {
-        const hospitalNumber = identifier.identifier.find(obj => obj.type == 'HospitalNumber');
-        return hospitalNumber ? hospitalNumber.value : '';
-    };
+
+
+
+
 
     function actionItems(row){
         return  [
@@ -201,6 +185,62 @@ function BiometricsList(props) {
                 )}
         ]
     }
+
+    const handleRemoteData = query =>
+        new Promise((resolve, reject) => {
+            axios.get(`${baseUrl}patient?pageSize=${query.pageSize}&pageNo=${query.page}&searchParam=${query.search}`, { headers: {"Authorization" : `Bearer ${token}`} })
+                .then(response => response)
+                .then(result => {
+                    resolve({
+                        data: result.data.records.map((row) => ({
+                            name: [row.firstName, row.otherName, row.surname].filter(Boolean).join(", "),
+                            id: getHospitalNumber(row.identifier),
+                            sex: row.sex.toLowerCase().charAt(0).toUpperCase() + row.sex.slice(1).toLowerCase(),
+                            dateOfBirth: row.dateOfBirth,
+                            age: (row.dateOfBirth === 0 ||
+                                row.dateOfBirth === undefined ||
+                                row.dateOfBirth === null ||
+                                row.dateOfBirth === "" )
+                                ? 0
+                                : calculate_age(row.dateOfBirth),
+                            actions:
+                                <div>
+                                    {permissions.includes('view_patient') || permissions.includes("all_permission") ? (
+                                        <SplitActionButton actions={actionItems(row)} />
+                                    ):""
+                                    }
+                                </div>
+                        })),
+                        page: query.page,
+                        totalCount: result.data.totalRecords
+                    });
+                });
+        })
+    useEffect(() => {
+        userPermission();
+        loadPatients();
+    }, []);
+    const calculate_age = dob => {
+        const today = new Date();
+        const dateParts = dob.split("-");
+        const birthDate = new Date(dob); // create a date object directlyfrom`dob1`argument
+        let age_now = today.getFullYear() - birthDate.getFullYear();
+        const m = today.getMonth() - birthDate.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+            age_now--;
+        }
+        if (age_now === 0) {
+            return m + " month(s)";
+        }
+        return age_now + " year(s)";
+    };
+    const getHospitalNumber = (identifier) => {
+        const hospitalNumber = identifier.identifier.find(obj => obj.type == 'HospitalNumber');
+        return hospitalNumber ? hospitalNumber.value : '';
+    };
+
+
+    
     const enablePPIColumns = () =>{
         setEnablePPI(!enablePPI)
     }
@@ -213,11 +253,19 @@ function BiometricsList(props) {
                         checked={!enablePPI}
                         style={{color:'#014d88',fontWeight:'bold'}}
                     />
-                } label="Show PPI" style={{color:'#014d88',fontWeight:'bolder'}} />
+                } label="Show PII" style={{color:'#014d88',fontWeight:'bolder'}} />
             </FormGroup>
         ):<h5 style={{color:'#3d4465',fontWeight:'bold'}}>Patients</h5>
         }
     </div>;
+    const handleChangePage = (page) => {
+        setCurrentPage(page + 1);
+    };
+    const localization = {
+        pagination: {
+            labelDisplayedRows: `Page: ${currentPage}`
+        }
+    }
     return (
         <div className={classes.root}>
             <ToastContainer autoClose={3000} hideProgressBar />
@@ -237,18 +285,7 @@ function BiometricsList(props) {
                     { title: "Age", field: "age", filtering: false }
                 ]}
                 isLoading={loading}
-                data={patients.map((row) => ({
-                    name: [row.firstName, row.otherName, row.surname].filter(Boolean).join(", "),
-                    id: getHospitalNumber(row.identifier),
-                    sex: row.sex,
-                    dateOfBirth: row.dateOfBirth,
-                    age: (row.dateOfBirth === 0 ||
-                        row.dateOfBirth === undefined ||
-                        row.dateOfBirth === null ||
-                        row.dateOfBirth === "" )
-                        ? 0
-                        : calculate_age(row.dateOfBirth),
-                }))}
+                data={handleRemoteData}
 
                 options={{
                     headerStyle: {
@@ -266,8 +303,11 @@ function BiometricsList(props) {
                     searchFieldAlignment: 'left',
                     pageSizeOptions:[10,20,100],
                     pageSize:10,
-                    debounceInterval: 400
+                    debounceInterval: 400,
+
                 }}
+                onChangePage={handleChangePage}
+                //localization={localization}
             />
         </div>
     );

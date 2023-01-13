@@ -61,6 +61,7 @@ public class PersonService {
         String hospitalNumber = getHospitalNumber(personDto);
         person.setHospitalNumber(hospitalNumber);
         person.setUuid(UUID.randomUUID().toString());
+        person.setFullName(this.getFullName(personDto.getFirstName(), personDto.getSurname()));
         return getDtoFromPerson(personRepository.save(person));
     }
 
@@ -84,7 +85,8 @@ public class PersonService {
                 .map(this::getDtoFromPerson)
                 .collect(Collectors.toList());
     }
-//ResponseEntity<PersonMetaDataDto>
+
+    //ResponseEntity<PersonMetaDataDto>
     public PersonMetaDataDto getAllPersonPageable(int pageNo, int pageSize) {
         //Person person = getPerson(personId);
         Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by("id").descending());
@@ -98,21 +100,21 @@ public class PersonService {
         Page<Person> person = personRepository.getAllByArchivedAndFacilityIdOrderByIdDesc(0, currentOrganisationUnitId, paging);
         if (person.hasContent()) {
 
-        PageDTO pageDTO = this.generatePagination(person);
-        long recordSize = pageDTO.getTotalRecords();
-        double totalPage = pageDTO.getTotalPages();
-        PersonMetaDataDto personMetaDataDto = new PersonMetaDataDto();
-        personMetaDataDto.setTotalRecords(recordSize);
-        personMetaDataDto.setPageSize(pageDTO.getPageSize());
-        personMetaDataDto.setTotalPages(pageDTO.getTotalPages());
-        personMetaDataDto.setCurrentPage(pageDTO.getPageNumber());
-        personMetaDataDto.setRecords(person.getContent().stream().map(this::getDtoFromPerson).collect(Collectors.toList()));
-        return personMetaDataDto;
-    }
+            PageDTO pageDTO = this.generatePagination(person);
+            long recordSize = pageDTO.getTotalRecords();
+            double totalPage = pageDTO.getTotalPages();
+            PersonMetaDataDto personMetaDataDto = new PersonMetaDataDto();
+            personMetaDataDto.setTotalRecords(recordSize);
+            personMetaDataDto.setPageSize(pageDTO.getPageSize());
+            personMetaDataDto.setTotalPages(pageDTO.getTotalPages());
+            personMetaDataDto.setCurrentPage(pageDTO.getPageNumber());
+            personMetaDataDto.setRecords(person.getContent().stream().map(this::getDtoFromPerson).collect(Collectors.toList()));
+            return personMetaDataDto;
+        }
         return null;
     }
 
-        public Boolean isPersonExist(Long personId) {
+    public Boolean isPersonExist(Long personId) {
         Optional<Person> person = personRepository.findById(personId);
         return person.isPresent();
     }
@@ -140,6 +142,14 @@ public class PersonService {
                 .findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(PersonService.class, "errorMessage", PERSON_NOT_FOUND_MESSAGE + id));
         person.setArchived(1);
+        personRepository.save(person);
+    }
+
+    public void deletePersonById2(Long id) {
+        Person person = personRepository
+                .findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(PersonService.class, "errorMessage", PERSON_NOT_FOUND_MESSAGE + id));
+        person.setArchived(2);
         personRepository.save(person);
     }
 
@@ -283,6 +293,7 @@ public class PersonService {
         personResponseDto.setOrganization(person.getOrganization());
         personResponseDto.setArchived(person.getArchived());
         personResponseDto.setBiometricStatus(getPatientBiometricStatus(person.getUuid()));
+
         return personResponseDto;
     }
 
@@ -345,7 +356,6 @@ public class PersonService {
     }
 
 
-
     public boolean isNINExisting(String nin) {
         List<Person> person = personRepository.getPersonByNinNumber(nin);
         System.out.println("Size = " + person.size());
@@ -354,6 +364,7 @@ public class PersonService {
         else reply = true;
         return reply;
     }
+
     public Integer getTotalRecords() {
         return personRepository.getTotalRecords();
     }
@@ -368,6 +379,7 @@ public class PersonService {
                 .pageSize(pageSize)
                 .totalPages(totalPages).build();
     }
+
     public PersonMetaDataDto findPersonBySearchParam(String searchValue, int pageNo, int pageSize) {
         Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by("id").descending());
         Optional<User> currentUser = this.userService.getUserWithRoles();
@@ -379,11 +391,13 @@ public class PersonService {
         }
         String queryParam = "";
         Page<Person> person = null;
-        if(!((searchValue== null)  || (searchValue.equals("*")))) {
+        if (!((searchValue == null) || (searchValue.equals("*")))) {
+            searchValue = searchValue.replaceAll("\\s", "");
+            searchValue = searchValue.replaceAll(",", "");
+
             queryParam = "%" + searchValue + "%";
             person = personRepository.findAllPersonBySearchParameters(queryParam, 0, currentOrganisationUnitId, paging);
-        }else
-        {
+        } else {
             person = personRepository.getAllByArchivedAndFacilityIdOrderByIdDesc(0, currentOrganisationUnitId, paging);
         }
 
@@ -403,6 +417,7 @@ public class PersonService {
         return null;
 
     }
+
     public PersonMetaDataDto getAllActiveVisit(String searchValue, int pageNo, int pageSize) {
         Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by("id").descending());
         ArrayList<PersonResponseDto> checkedInPeople = new ArrayList<>();
@@ -414,18 +429,19 @@ public class PersonService {
 
         }
         Page<Person> person = null;
-        if(!((searchValue== null)  || (searchValue.equals("*")))) {
+        if (!((searchValue == null) || (searchValue.equals("*")))) {
+            searchValue = searchValue.replaceAll("\\s", "");
+            searchValue = searchValue.replaceAll(",", "");
             String queryParam = "%" + searchValue + "%";
             person = personRepository.findCheckedInPersonBySearchParameters(queryParam, 0, currentOrganisationUnitId, paging);
-        }else
-        {
+        } else {
             person = personRepository.findAllCheckedInPerson(0, currentOrganisationUnitId, paging);
 
         }
 
         person.forEach(visit -> {
 
-                checkedInPeople.add(this.getDtoFromPersonWithoutBiometric(visit, Boolean.TRUE));
+            checkedInPeople.add(this.getDtoFromPersonWithoutBiometric(visit, Boolean.TRUE));
         });
         PageDTO pageDTO = this.generatePagination(person);
         PersonMetaDataDto personMetaDataDto = new PersonMetaDataDto();
@@ -437,6 +453,7 @@ public class PersonService {
         return personMetaDataDto;
         //return checkedInPeople;
     }
+
     public PersonMetaDataDto getAllPatientWithoutBiomentic(String searchValue, int pageNo, int pageSize) {
         Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by("id").descending());
         Optional<User> currentUser = this.userService.getUserWithRoles();
@@ -447,11 +464,12 @@ public class PersonService {
 
         }
         Page<Person> persons = null;
-        if(!((searchValue== null)  || (searchValue.equals("*")))) {
+        if (!((searchValue == null) || (searchValue.equals("*")))) {
+            searchValue = searchValue.replaceAll("\\s", "");
+            searchValue = searchValue.replaceAll(",", "");
             String queryParam = "%" + searchValue + "%";
             persons = personRepository.findAllPersonBySearchParameters(queryParam, 0, currentOrganisationUnitId, paging);
-        }else
-        {
+        } else {
             persons = personRepository.getAllByArchivedAndFacilityIdOrderByIdDesc(0, currentOrganisationUnitId, paging);
 
         }
@@ -475,17 +493,17 @@ public class PersonService {
         //return checkedInPeople;
     }
 
-    private Page toPage(List list, Pageable pageable) {
-        System.out.println("List Size Before= "+ list.size());
+    public Page toPage(List list, Pageable pageable) {
+        System.out.println("List Size Before= " + list.size());
         if (pageable.getOffset() >= list.size()) {
             return Page.empty();
         }
-        int startIndex = (int)pageable.getOffset();
+        int startIndex = (int) pageable.getOffset();
         int endIndex = (int) ((pageable.getOffset() + pageable.getPageSize()) > list.size() ?
                 list.size() :
                 pageable.getOffset() + pageable.getPageSize());
         List subList = list.subList(startIndex, endIndex);
-        System.out.println("SubList Size After= "+ subList.size());
+        System.out.println("SubList Size After= " + subList.size());
         return new PageImpl(subList, pageable, list.size());
     }
 
@@ -499,11 +517,12 @@ public class PersonService {
 
         }
         Page<Person> persons = null;
-        if(!((searchValue== null)  || (searchValue.equals("*")))) {
+        if (!((searchValue == null) || (searchValue.equals("*")))) {
+            searchValue = searchValue.replaceAll("\\s", "");
+            searchValue = searchValue.replaceAll(",", "");
             String queryParam = "%" + searchValue + "%";
             persons = personRepository.findDuplicatePersonBySearchParameters(queryParam, currentOrganisationUnitId, paging);
-        }else
-        {
+        } else {
             persons = personRepository.findDuplicatePerson(currentOrganisationUnitId, paging);
 
         }
@@ -523,5 +542,16 @@ public class PersonService {
         return null;
     }
 
-}
+    public String getFullName(String fn, String sn) {
+        String fullName = "";
+        if (fn == null) fn = "";
+        if (sn == null) sn = "";
+        fullName = fn.trim() + sn.trim();
+        fullName = fullName.replaceAll("\\s", "");
+        fullName = fullName.replaceAll(",", "");
 
+        return fullName;
+
+    }
+
+}

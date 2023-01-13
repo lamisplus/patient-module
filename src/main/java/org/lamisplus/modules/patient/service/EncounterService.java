@@ -3,6 +3,8 @@ package org.lamisplus.modules.patient.service;
 import lombok.RequiredArgsConstructor;
 import org.audit4j.core.util.Log;
 import org.lamisplus.modules.base.controller.apierror.EntityNotFoundException;
+import org.lamisplus.modules.base.domain.entities.User;
+import org.lamisplus.modules.base.service.UserService;
 import org.lamisplus.modules.patient.domain.dto.EncounterRequestDto;
 import org.lamisplus.modules.patient.domain.dto.EncounterResponseDto;
 import org.lamisplus.modules.patient.domain.dto.EncounterStatusResponseDto;
@@ -26,6 +28,8 @@ public class EncounterService {
     private final VisitRepository visitRepository;
     private final EncounterRepository encounterRepository;
     private final PersonRepository personRepository;
+
+    private final UserService userService;
     public List<EncounterResponseDto> registerEncounter(EncounterRequestDto encounterRequestDto) {
         Long visitId = encounterRequestDto.getVisitId();
         Visit visit = visitRepository.findById(visitId).orElseThrow(() -> new EntityNotFoundException(EncounterService.class, "errorMessage", "No visit found with Id " + visitId));
@@ -65,7 +69,14 @@ public class EncounterService {
         return encounterRequestDtos;
     }
     public List<EncounterResponseDto> getAllEncounters() {
-        return encounterRepository.findAllByArchived(0)
+        Optional<User> currentUser = this.userService.getUserWithRoles();
+        Long currentOrganisationUnitId = 0L;
+        if (currentUser.isPresent()) {
+            User user = (User) currentUser.get();
+            currentOrganisationUnitId = user.getCurrentOrganisationUnitId();
+
+        }
+        return encounterRepository.findAllByArchivedAndFacilityId(0, currentOrganisationUnitId)
                 .stream()
                 .map(this::convertEntityToResponseDto)
                 .collect(Collectors.toList());
