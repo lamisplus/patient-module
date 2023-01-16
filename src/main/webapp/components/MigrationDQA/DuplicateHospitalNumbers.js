@@ -131,7 +131,7 @@ function DuplicateHospitalNumbers(props) {
                  });
             })
             .catch((error) => {
-                 await Swal.fire({
+                 Swal.fire({
                     icon: 'error',
                     title: 'Oops...',
                     text: 'An error occurred while deleting!!!',
