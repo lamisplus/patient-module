@@ -180,7 +180,7 @@ const Biometrics = (props) => {
     }
     const handleRemoteData = query =>
         new Promise((resolve, reject) => {
-            axios.get(`${baseUrl}patient?pageSize=${query.pageSize}&pageNo=${query.page}&searchParam=${query.search}`, { headers: {"Authorization" : `Bearer ${token}`} })
+            axios.get(`${baseUrl}patient/getall-patients-with-biometric?pageSize=${query.pageSize}&pageNo=${query.page}&searchParam=${query.search}`, { headers: {"Authorization" : `Bearer ${token}`} })
                 .then(response => response)
                 .then(result => {
                     resolve({

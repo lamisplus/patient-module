@@ -2,6 +2,7 @@ import React, {forwardRef, useCallback, useEffect, useRef, useState} from 'react
 import axios from "axios";
 import {token, url as baseUrl} from "../../../../api";
 import MaterialTable from "material-table";
+import Swal from "sweetalert2";
 
 import {FaEye} from "react-icons/fa";
 import {MdDeleteForever, MdModeEdit, MdPerson} from "react-icons/md";
@@ -117,6 +118,26 @@ function DuplicateHospitalNumbers(props) {
         setModal(!modal);
     }
 
+    const handleDelete = (id) => {
+        axios
+            .delete(`${baseUrl}patient/delete/${id}`,
+                { headers: {"Authorization" : `Bearer ${token}`} }
+            )
+            .then((response) => {
+                Swal.fire({
+                      icon: 'success',
+                      text: 'DQA Deleted Successfully',
+                      timer: 1500
+                 });
+            })
+            .catch((error) => {
+                 await Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'An error occurred while deleting!!!',
+                });
+            });
+    }
 
     function actionItems(row){
         return  [
@@ -140,7 +161,18 @@ function DuplicateHospitalNumbers(props) {
                         }
                     }
                 )},
-
+             {...(permissions.includes('delete_patient') || permissions.includes("all_permission")&&
+                    {
+                        name:'Delete',
+                        type:'link',
+                        icon:<MdDeleteForever size="20" color='rgb(4, 196, 217)'  />,
+                        deleteAction: () => {handleDelete(row.id)},
+                        to:{
+                            pathname: "/#",
+                            state: { patientObj: row, permissions:permissions  }
+                        }
+                    }
+                )}
 
 
 /*            {...(permissions.includes('view_patient') || permissions.includes("all_permission")&&

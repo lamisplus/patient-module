@@ -95,10 +95,10 @@ export default function SplitActionButton(props) {
                                         >
                                             <Link
                                                 to={option.to}
+                                                onClick={option.deleteAction}
                                             >
                                                 {option.icon}<span style={{color: 'rgb(153, 46, 98)', fontWeight:'bolder', fontSize:'12px'}}>{option.name}</span>
                                             </Link>
-
                                         </MenuItem>
                                     ))}
                                 </MenuList>

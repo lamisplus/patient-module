@@ -1,5 +1,7 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {useHistory} from "react-router-dom";
+import {Link, useHistory} from "react-router-dom";
+import MatButton from "@material-ui/core/Button";
+import {TiArrowBack} from "react-icons/ti";
 import {useForm} from "react-hook-form";
 import {Button, Card, CardContent, FormControl, Grid, MenuItem, Paper, TextField, Typography} from "@mui/material";
 import axios from "axios";
@@ -99,7 +101,7 @@ function Index(props) {
     let history = useHistory();
     const classes = useStyles();
     const patientObj = history.location && history.location.state ? history.location.state.patientObj : {};
-    //console.log("data",patientObj)
+    console.log("data",patientObj)
     const permissions = history.location && history.location.state ? history.location.state.permissions : [];
     const [patientBiometricStatus, setPatientBiometricStatus]= useState(patientObj.biometricStatus);
     const [biometricsModuleInstalled,setBiometricsModuleInstalled]=useState(false);
@@ -112,11 +114,11 @@ function Index(props) {
         setPatientBiometricStatus(bioStatus);
     }
     const panes = [
-        { menuItem: 'Patient Biometric Details', render: () =>
-                <Tab.Pane>
-                    <p>Patient biometric captured finger prints </p>
-                </Tab.Pane>
-        },
+//        { menuItem: 'Patient Biometric Details', render: () =>
+//                <Tab.Pane>
+//                    <p>Patient biometric captured finger prints </p>
+//                </Tab.Pane>
+//        },
 
         { menuItem: permissions.includes('view_patient_appointment') && biometricsModuleInstalled || permissions.includes("all_permission")  && biometricsModuleInstalled? 'Biometrics' : "", render: () =>
                 permissions.includes('view_patient_appointment') || permissions.includes("all_permission") ?
@@ -146,28 +148,8 @@ function Index(props) {
             });
 
     }
-    const loadPatientVisits = useCallback(async () => {
-        try {
-            const response = await axios.get(`${baseUrl}patient/visit/visit-by-patient/${patientObj.id}`, { headers: {"Authorization" : `Bearer ${token}`} });
-            setPatientVisits(response.data);
-            response.data.map((visits)=> {
-                if(visits.checkOutDate===null){
-                    setCheckinStatus(true)
-                }
-            })
-
-
-        } catch (e) {
-            await Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: 'An error occurred fetching services!',
-            });
-        }
-    }, []);
 
     useEffect(() => {
-        loadPatientVisits();
         checkForBiometricsModule();
     }, []);
     return (
@@ -183,6 +165,19 @@ function Index(props) {
                 <CardContent>
                     <PersonDemographics patientObj={patientObj} permissions={permissions} patientBiometricStatus={patientObj.biometricStatus}/>
                     <Card style={{marginTop:'5px'}}>
+                       <div>
+                            <Link to={"/"} >
+                                <MatButton
+                                    className=" float-right mr-1"
+                                    variant="contained"
+                                    floated="left"
+                                    startIcon={<TiArrowBack  />}
+                                    style={{backgroundColor:"rgb(153, 46, 98)", color:'#fff', height:'35px'}}
+                                >
+                                    <span style={{ textTransform: "capitalize" }}>Back</span>
+                                </MatButton>
+                            </Link>
+                        </div>
                         <CardContent>
                             <Tab panes={panes} />
                         </CardContent>
