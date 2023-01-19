@@ -73,6 +73,11 @@ let checkUrl=""
 const CaptureBiometric = (props) => {
     const classes = useStyles()
     const biometricDevices = props.biometricDevices
+    //Get the default device
+    const selectedDevice=biometricDevices.find((x)=> x.active ==="true" )
+    console.log(biometricDevices)
+    checkUrl= selectedDevice.url===null? baseUrl : selectedDevice.url
+    
     const [objValues, setObjValues]= useState({biometricType: "FINGERPRINT", patientId:props.patientId, templateType:"", device:""})
     const [fingerType, setFingerType] = useState([]);
     const [devices, setDevices] = useState(props.biometricDevices);
@@ -83,7 +88,7 @@ const CaptureBiometric = (props) => {
     const [errors, setErrors] = useState({});
    // const [responseImage, setResponseImage] = useState("")
     const [capturedFingered, setCapturedFingered]= useState([])
-     console.log(biometricDevices)
+     //console.log(biometricDevices)
     const buttonSx = {
       ...(success && {
         bgcolor: green[500],
@@ -123,7 +128,8 @@ const CaptureBiometric = (props) => {
         console.log(checkUrl)
         setObjValues({...objValues, device:deviceName})
         axios
-           .get(`${checkUrl}biometrics/secugen/boot?reader=${deviceName}`,
+           // .get(`${checkUrl}biometrics/secugen/boot?reader=${deviceName}`,
+            .get(`${checkUrl}`,
                { headers: {"Authorization" : `Bearer ${token}`} }
            )
            .then((response) => {
@@ -156,7 +162,8 @@ const CaptureBiometric = (props) => {
     const captureFinger = (e) => {        
         e.preventDefault();
         if(validate()){
-            axios.post(`${checkUrl}biometrics/secugen/enrollment?reader=SG_DEV_AUTO`,objValues,
+            // axios.post(`${checkUrl}biometrics/secugen/enrollment?reader=SG_DEV_AUTO`,objValues,
+            axios.post(`${checkUrl}`,objValues,
             { headers: {"Authorization" : `Bearer ${token}`}},           
             )
               .then(response => {
@@ -235,13 +242,14 @@ const CaptureBiometric = (props) => {
                                                     type="select"
                                                     name="device"
                                                     id="device"
-                                                    onChange={checkDevice}
+                                                    //onChange={checkDevice}
                                                     value={objValues.device}
                                                     required
+                                                    disabled
                                                 >
                                                 <option value="">Select Device </option>
                                                 {biometricDevices.map(({ id, name }) => (
-                                                    <option key={id} value={name}>
+                                                    <option key={id} value={name} >
                                                         {name}
                                                     </option>
                                                 ))}

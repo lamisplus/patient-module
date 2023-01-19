@@ -271,7 +271,8 @@ function Biometrics(props) {
     const captureFinger = (e) => {
         e.preventDefault();
         if(validate()){
-            axios.post(`${checkUrl}biometrics/secugen/enrollment?reader=SG_DEV_AUTO`,objValues,
+            // axios.post(`${checkUrl}biometrics/secugen/enrollment?reader=SG_DEV_AUTO`,objValues,
+            axios.post(`${objValues.device}`,objValues,
                 { headers: {"Authorization" : `Bearer ${token}`}},
             )
                 .then(response => {
@@ -325,7 +326,6 @@ function Biometrics(props) {
 
         })
     }
-
     //Save Biometric capture
     const saveBiometrics = (e) => {
         e.preventDefault();
@@ -462,10 +462,11 @@ function Biometrics(props) {
                                         onChange={checkDevice}
                                         value={objValues.device}
                                         required
+                                        disabled
                                     >
                                         <option value="">Select Device </option>
-                                        {biometricDevices.map(({ id, name }) => (
-                                            <option key={id} value={name}>
+                                        {biometricDevices.map(({ id, name,active, url }) => (
+                                            <option key={id} value={url} selected={active===true?"selected" : ""}>
                                                 {name}
                                             </option>
                                         ))}
