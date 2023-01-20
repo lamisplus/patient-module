@@ -403,15 +403,16 @@ public class PersonService {
 
         if (person.hasContent()) {
 
-            PageDTO pageDTO = this.generatePagination(person);
-            long recordSize = pageDTO.getTotalRecords();
-            double totalPage = pageDTO.getTotalPages();
+//            PageDTO pageDTO = this.generatePagination(person);
+//            long recordSize = pageDTO.getTotalRecords();
+//            double totalPage = pageDTO.getTotalPages();
             PersonMetaDataDto personMetaDataDto = new PersonMetaDataDto();
-            personMetaDataDto.setTotalRecords(recordSize);
-            personMetaDataDto.setPageSize(pageDTO.getPageSize());
-            personMetaDataDto.setTotalPages(pageDTO.getTotalPages());
-            personMetaDataDto.setCurrentPage(pageDTO.getPageNumber());
-            personMetaDataDto.setRecords(person.getContent().stream().map(this::getDtoFromPerson).collect(Collectors.toList()));
+            personMetaDataDto.setTotalRecords(person.getTotalElements());
+            personMetaDataDto.setPageSize(person.getSize());
+            personMetaDataDto.setTotalPages(person.getTotalPages());
+            personMetaDataDto.setCurrentPage(person.getNumber());
+            personMetaDataDto.setRecords(person.getContent());
+            //personMetaDataDto.setRecords(person.getContent().stream().map(this::getDtoFromPerson).collect(Collectors.toList()));
             return personMetaDataDto;
         }
         return null;
@@ -553,5 +554,46 @@ public class PersonService {
         return fullName;
 
     }
+
+    public PersonMetaDataDto getAllPatientWithBiomentic(String searchValue, int pageNo, int pageSize) {
+        Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by("id").descending());
+        Optional<User> currentUser = this.userService.getUserWithRoles();
+        Long currentOrganisationUnitId = 0L;
+        if (currentUser.isPresent()) {
+            User user = (User) currentUser.get();
+            currentOrganisationUnitId = user.getCurrentOrganisationUnitId();
+
+        }
+        Page<Person> persons = null;
+        if (!((searchValue == null) || (searchValue.equals("*")))) {
+            searchValue = searchValue.replaceAll("\\s", "");
+            searchValue = searchValue.replaceAll(",", "");
+            String queryParam = "%" + searchValue + "%";
+            persons = personRepository.findPersonWithBiometrics2(queryParam, 0, currentOrganisationUnitId, paging);
+        } else {
+            persons = personRepository.findPersonWithBiometrics(0, currentOrganisationUnitId, paging);
+            System.out.println("Testng the number of records "+persons.getNumberOfElements());
+
+        }
+//        List<PersonResponseDto> personResponseDtoList = new ArrayList<>();
+//        persons.getContent().forEach(person -> {
+//            Integer checkIfUserHasBiometric = this.personRepository.getBiometricCountByPersonUuid(person.getUuid());
+//            if (checkIfUserHasBiometric > 0) {
+//                personResponseDtoList.add(getDtoFromPersonWithoutBiometric(person, Boolean.TRUE));
+//            }
+//        });
+
+        //Page toPage2 = this.toPage(persons, paging);
+        PageDTO pageDTO = this.generatePagination(persons);
+        PersonMetaDataDto personMetaDataDto = new PersonMetaDataDto();
+        personMetaDataDto.setTotalRecords(pageDTO.getTotalRecords());
+        personMetaDataDto.setPageSize(pageDTO.getPageSize());
+        personMetaDataDto.setTotalPages(pageDTO.getTotalPages());
+        personMetaDataDto.setCurrentPage(pageDTO.getPageNumber());
+        personMetaDataDto.setRecords(persons.getContent());
+        return personMetaDataDto;
+        //return checkedInPeople;
+    }
+
 
 }
