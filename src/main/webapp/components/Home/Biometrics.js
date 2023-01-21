@@ -1,33 +1,46 @@
-//List of patients without biometrics
-import React, {forwardRef, useCallback, useEffect, useState} from 'react';
-import {ToastContainer} from "react-toastify";
-import MaterialTable from "material-table";
-import SplitActionButton from "../SplitActionButton";
-import {Modal, ModalBody, ModalFooter, ModalHeader} from "reactstrap";
-import Button from "@material-ui/core/Button";
-import FormGroup from "@mui/material/FormGroup";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
-import AddBox from "@material-ui/icons/AddBox";
-import Check from "@material-ui/icons/Check";
-import Clear from "@material-ui/icons/Clear";
-import DeleteOutline from "@material-ui/icons/DeleteOutline";
-import ChevronRight from "@material-ui/icons/ChevronRight";
-import Edit from "@material-ui/icons/Edit";
-import SaveAlt from "@material-ui/icons/SaveAlt";
-import FilterList from "@material-ui/icons/FilterList";
-import FirstPage from "@material-ui/icons/FirstPage";
-import LastPage from "@material-ui/icons/LastPage";
-import ChevronLeft from "@material-ui/icons/ChevronLeft";
-import Search from "@material-ui/icons/Search";
-import ArrowUpward from "@material-ui/icons/ArrowUpward";
-import Remove from "@material-ui/icons/Remove";
-import ViewColumn from "@material-ui/icons/ViewColumn";
-import {makeStyles} from "@material-ui/core/styles";
+import React, {useState, useEffect, useCallback, useRef} from 'react'
+import MaterialTable from 'material-table';
 import axios from "axios";
-import {token, url as baseUrl} from "../../../../api";
-import {FaEye} from "react-icons/fa";
-import {MdDeleteForever, MdModeEdit, MdPerson} from "react-icons/md";
+import { url as baseUrl, token } from "../../../../api";
+import { Link } from 'react-router-dom'
+import { Card,CardBody,} from 'reactstrap';
+import { Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
+import Button from "@material-ui/core/Button";
+import 'react-toastify/dist/ReactToastify.css';
+import 'react-widgets/dist/css/react-widgets.css';
+import {FaEye, FaUserPlus} from "react-icons/fa";
+import { MdDashboard, MdDeleteForever, MdModeEdit,MdPerson} from "react-icons/md";
+import {Menu,MenuList,MenuButton,MenuItem,} from "@reach/menu-button";
+import "@reach/menu-button/styles.css";
+import { ToastContainer } from "react-toastify";
+import { Label } from 'semantic-ui-react';
+import { makeStyles } from '@material-ui/core/styles';
+import "../patient.css";
+import SplitActionButton from '../SplitActionButton';
+
+import { forwardRef } from 'react';
+//import { Button} from "react-bootstrap";
+import AddBox from '@material-ui/icons/AddBox';
+import ArrowUpward from '@material-ui/icons/ArrowUpward';
+import Check from '@material-ui/icons/Check';
+import ChevronLeft from '@material-ui/icons/ChevronLeft';
+import ChevronRight from '@material-ui/icons/ChevronRight';
+import Clear from '@material-ui/icons/Clear';
+import DeleteOutline from '@material-ui/icons/DeleteOutline';
+import Edit from '@material-ui/icons/Edit';
+import FilterList from '@material-ui/icons/FilterList';
+import FirstPage from '@material-ui/icons/FirstPage';
+import LastPage from '@material-ui/icons/LastPage';
+import Remove from '@material-ui/icons/Remove';
+import SaveAlt from '@material-ui/icons/SaveAlt';
+import Search from '@material-ui/icons/Search';
+import ViewColumn from '@material-ui/icons/ViewColumn';
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
+import TablePagination from '@mui/material/TablePagination';
+
+
 
 
 const tableIcons = {
@@ -49,6 +62,7 @@ const tableIcons = {
     ThirdStateCheck: forwardRef((props, ref) => <Remove {...props} ref={ref} />),
     ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />)
 };
+
 
 const useStyles = makeStyles(theme => ({
     card: {
@@ -97,47 +111,26 @@ const useStyles = makeStyles(theme => ({
 }));
 
 
-function BiometricsList(props) {
+const Biometrics = (props) => {
+    const tableRef = useRef(null);
     const classes = useStyles();
     const [patients, setPatients] = useState([]);
-    const [permissions, setPermissions] = useState([]);
+    const [permissions, setPermissions] = useState(props.permissions);
     const [loading, setLoading] = useState('');
+    const [modal, setModal] = useState(false);
     const [patient, setPatient] = useState(false);
     const [enablePPI, setEnablePPI] = useState(true);
+    const [searchParams,setSearchParams] = useState('*');
+    const [totalPages,setTotalPages] = useState(0);
+    const [totalRecords,setTotalRecords] = useState(0);
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
     const [currentPage,setCurrentPage] = useState(1);
-
-
-    //Get list of Finger index
-    const userPermission =()=>{
-        axios
-            .get(`${baseUrl}account`,
-                { headers: {"Authorization" : `Bearer ${token}`} }
-            )
-            .then((response) => {
-                setPermissions(response.data.permissions);
-
-            })
-            .catch((error) => {
-            });
-
+    const toggle = (id) => {
+        const patient = patients.find(obj => obj.id == id);
+        setPatient(patient);
+        setModal(!modal);
     }
-    const loadPatients = useCallback(async () => {
-        try {
-            await axios.get(`${baseUrl}patient/getall-patients-without-biometric`, { headers: {"Authorization" : `Bearer ${token}`} })
-                .then((response)=>{
-                    if(response.data){
-                        setPatients(response.data);
-                    }
-                })
-
-        } catch (e) {
-            console.log(e);
-        }
-    }, []);
-
-
-
-
 
     function actionItems(row){
         return  [
@@ -146,8 +139,8 @@ function BiometricsList(props) {
                 type:'link',
                 icon:<FaEye  size="22"/>,
                 to:{
-                    pathname: "/register-patient",
-                    state: { patientId : row.id, permissions:permissions  }
+                    pathname: "/patient-biometrics",
+                    state: { patientObj: row, permissions:permissions  }
                 }
             },
             {...(permissions.includes('view_patient') || permissions.includes("all_permission")&&
@@ -156,46 +149,45 @@ function BiometricsList(props) {
                         type:'link',
                         icon:<MdPerson size="20" color='rgb(4, 196, 217)' />,
                         to:{
-                            pathname: "/patient-dashboard",
+                            pathname: "/patient-biometrics",
                             state: { patientObj: row, permissions:permissions  }
                         }
                     }
                 )},
-            {...(permissions.includes('edit_patient') || permissions.includes("all_permission")&&
-                    {
-                        name:'Edit',
-                        type:'link',
-                        icon:<MdModeEdit size="20" color='rgb(4, 196, 217)' />,
-                        to:{
-                            pathname: "/register-patient",
-                            state: { patientId : row.id, permissions:permissions  }
-                        }
-                    }
-                )},
-            {...(permissions.includes('delete_patient') || permissions.includes("all_permission")&&
-                    {
-                        name:'Delete',
-                        type:'link',
-                        icon:<MdDeleteForever size="20" color='rgb(4, 196, 217)'  />,
-                        to:{
-                            pathname: "/#",
-                            state: { patientObj: row, permissions:permissions  }
-                        }
-                    }
-                )}
+//            {...(permissions.includes('edit_patient') || permissions.includes("all_permission")&&
+//                    {
+//                        name:'Edit',
+//                        type:'link',
+//                        icon:<MdModeEdit size="20" color='rgb(4, 196, 217)' />,
+//                        to:{
+//                            pathname: "/register-patient",
+//                            state: { patientId : row.id, permissions:permissions  }
+//                        }
+//                    }
+//                )},
+//            {...(permissions.includes('delete_patient') || permissions.includes("all_permission")&&
+//                    {
+//                        name:'Delete',
+//                        type:'link',
+//                        icon:<MdDeleteForever size="20" color='rgb(4, 196, 217)'  />,
+//                        to:{
+//                            pathname: "/#",
+//                            state: { patientObj: row, permissions:permissions  }
+//                        }
+//                    }
+//                )}
         ]
     }
-
     const handleRemoteData = query =>
         new Promise((resolve, reject) => {
-            axios.get(`${baseUrl}patient/getall-patients-without-biometric?pageSize=${query.pageSize}&pageNo=${query.page}&searchParam=${query.search}`, { headers: {"Authorization" : `Bearer ${token}`} })
+            axios.get(`${baseUrl}patient/getall-patients-with-biometric?pageSize=${query.pageSize}&pageNo=${query.page}&searchParam=${query.search}`, { headers: {"Authorization" : `Bearer ${token}`} })
                 .then(response => response)
                 .then(result => {
                     resolve({
                         data: result.data.records.map((row) => ({
                             name: [row.firstName, row.otherName, row.surname].filter(Boolean).join(", "),
                             id: getHospitalNumber(row.identifier),
-                            sex: row.sex.toLowerCase().charAt(0).toUpperCase() + row.sex.slice(1).toLowerCase(),
+                            sex:row.sex.toLowerCase().charAt(0).toUpperCase() + row.sex.slice(1).toLowerCase(),
                             dateOfBirth: row.dateOfBirth,
                             age: (row.dateOfBirth === 0 ||
                                 row.dateOfBirth === undefined ||
@@ -212,15 +204,29 @@ function BiometricsList(props) {
                                 </div>
                         })),
                         page: query.page,
-                        totalCount: result.data.totalRecords
+                        totalCount:result.data.totalRecords
                     });
                 });
         })
-    useEffect(() => {
-        userPermission();
-        loadPatients();
-    }, []);
+
+
+    const onDelete = async (id) => {
+        try {
+            if (id) {
+                const response = await axios.delete(`${baseUrl}patient/${id}`, { headers: {"Authorization" : `Bearer ${token}`} });
+                window.location.reload();
+            }
+        } catch (e) {
+
+        }
+    }
+
+    const onCancelDelete = () => {
+        setModal(false);
+    }
+
     const calculate_age = dob => {
+
         const today = new Date();
         const dateParts = dob.split("-");
         const birthDate = new Date(dob); // create a date object directlyfrom`dob1`argument
@@ -234,13 +240,23 @@ function BiometricsList(props) {
         }
         return age_now + " year(s)";
     };
+
     const getHospitalNumber = (identifier) => {
         const hospitalNumber = identifier.identifier.find(obj => obj.type == 'HospitalNumber');
         return hospitalNumber ? hospitalNumber.value : '';
     };
 
+    const getAddress = (address) => {
+        const city = address && address.address && address.address.length > 0 ? address.address[0].city : null;
+        return city;
+    };
 
-    
+    const getGender = (gender) => {
+        return gender.display;
+    };
+
+
+
     const enablePPIColumns = () =>{
         setEnablePPI(!enablePPI)
     }
@@ -258,18 +274,25 @@ function BiometricsList(props) {
         ):<h5 style={{color:'#3d4465',fontWeight:'bold'}}>Patients</h5>
         }
     </div>;
+
+
     const handleChangePage = (page) => {
         setCurrentPage(page + 1);
     };
     const localization = {
         pagination: {
-            labelDisplayedRows: `Page: ${currentPage}`
+            labelDisplayedRows: `${currentPage} - 10 of 2022`
         }
     }
+
     return (
         <div className={classes.root}>
             <ToastContainer autoClose={3000} hideProgressBar />
             <MaterialTable
+                tableRef={tableRef}
+                /*onSearchChange={(e) => {
+                    handleSearchChange(e);
+                }}*/
                 icons={tableIcons}
                 title={<PPISelect/>}
                 columns={[
@@ -282,7 +305,10 @@ function BiometricsList(props) {
                     { title: "Hosp. Number", field: "id" , filtering: false},
                     { title: "Sex", field: "sex", filtering: false },
                     { title: "Date Of Birth", field: "dateOfBirth", filtering: false },
-                    { title: "Age", field: "age", filtering: false }
+                    { title: "Age", field: "age", filtering: false },
+                    /*{ title: "Address", field: "address", filtering: false },*/
+                    /*{ title: "Status", field: "status", filtering: false },*/
+                    {title: "Actions", field: "actions", filtering: false },
                 ]}
                 isLoading={loading}
                 data={handleRemoteData}
@@ -308,9 +334,22 @@ function BiometricsList(props) {
                 }}
                 onChangePage={handleChangePage}
                 //localization={localization}
+
             />
+            <Modal isOpen={modal} toggle={onCancelDelete}>
+                <ModalHeader toggle={onCancelDelete}>Delete Patient</ModalHeader>
+                <ModalBody>
+                    Are you sure to delete this record? { patient ? patient.surname +  ', ' + patient.firstname +  ' ' + patient.otherName : '' }
+                </ModalBody>
+                <ModalFooter>
+                    <Button color="primary" type="button" onClick={(e) => onDelete(patient.id)}>Yes</Button>{' '}
+                    <Button color="secondary" type="button" onClick={(e) => onCancelDelete()}>No</Button>
+                </ModalFooter>
+            </Modal>
         </div>
     );
 }
 
-export default BiometricsList;
+export default Biometrics;
+
+

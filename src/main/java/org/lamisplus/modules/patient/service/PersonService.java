@@ -273,9 +273,9 @@ public class PersonService {
         personResponseDto.setId(person.getId());
         personResponseDto.setIsDateOfBirthEstimated(person.getIsDateOfBirthEstimated());
         personResponseDto.setDateOfBirth(person.getDateOfBirth());
-        personResponseDto.setFirstName(this.treatNull(person.getFirstName()));
-        personResponseDto.setSurname(this.treatNull(person.getSurname()));
-        personResponseDto.setOtherName(this.treatNull(person.getOtherName()));
+        personResponseDto.setFirstName(person.getFirstName());
+        personResponseDto.setSurname(person.getSurname());
+        personResponseDto.setOtherName(person.getOtherName());
         personResponseDto.setContactPoint(person.getContactPoint());
         personResponseDto.setAddress(person.getAddress());
         personResponseDto.setContact(person.getContact());
@@ -403,15 +403,16 @@ public class PersonService {
 
         if (person.hasContent()) {
 
-            PageDTO pageDTO = this.generatePagination(person);
-            long recordSize = pageDTO.getTotalRecords();
-            double totalPage = pageDTO.getTotalPages();
+//            PageDTO pageDTO = this.generatePagination(person);
+//            long recordSize = pageDTO.getTotalRecords();
+//            double totalPage = pageDTO.getTotalPages();
             PersonMetaDataDto personMetaDataDto = new PersonMetaDataDto();
-            personMetaDataDto.setTotalRecords(recordSize);
-            personMetaDataDto.setPageSize(pageDTO.getPageSize());
-            personMetaDataDto.setTotalPages(pageDTO.getTotalPages());
-            personMetaDataDto.setCurrentPage(pageDTO.getPageNumber());
-            personMetaDataDto.setRecords(person.getContent().stream().map(this::getDtoFromPerson).collect(Collectors.toList()));
+            personMetaDataDto.setTotalRecords(person.getTotalElements());
+            personMetaDataDto.setPageSize(person.getSize());
+            personMetaDataDto.setTotalPages(person.getTotalPages());
+            personMetaDataDto.setCurrentPage(person.getNumber());
+            personMetaDataDto.setRecords(person.getContent());
+            //personMetaDataDto.setRecords(person.getContent().stream().map(this::getDtoFromPerson).collect(Collectors.toList()));
             return personMetaDataDto;
         }
         return null;
@@ -593,5 +594,6 @@ public class PersonService {
         return personMetaDataDto;
         //return checkedInPeople;
     }
+
 
 }

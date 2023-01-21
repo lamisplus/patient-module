@@ -44,7 +44,7 @@ public class PatientController {
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize) {
         PersonMetaDataDto personMetaDataDto = personService.findPersonBySearchParam(searchParam, pageNo, pageSize);
-        return new ResponseEntity<> (personMetaDataDto, new HttpHeaders(), HttpStatus.OK);
+        return new ResponseEntity<>(personMetaDataDto, new HttpHeaders(), HttpStatus.OK);
     }
 
     @GetMapping(value = "/{id}")
@@ -70,6 +70,7 @@ public class PatientController {
         personService.deletePersonById2(id);
         return ResponseEntity.accepted().build();
     }
+
     @GetMapping(value = "/post-service")
     public ResponseEntity<List<PatientCheckPostService>> getPatientService() {
         return ResponseEntity.ok(patientCheckPostServiceRepository.findAll());
@@ -87,9 +88,6 @@ public class PatientController {
     }
 
 
-
-
-
     @PostMapping("/exist/nin-number/{nin}")
     public boolean isNinNumberExisting(@PathVariable("nin") String nin) {
         return personService.isNINExisting(nin);
@@ -99,8 +97,6 @@ public class PatientController {
     public ResponseEntity<PersonResponseDto> getPatientByNin(@PathVariable("nin") String nin) {
         return ResponseEntity.ok(personService.getPersonByNin(nin));
     }
-
-
 
 
 //    @GetMapping(value = "/get-all-patient-pageable", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -137,25 +133,26 @@ public class PatientController {
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize) {
         PersonMetaDataDto personMetaDataDto = personService.findPersonBySearchParam(searchParam, pageNo, pageSize);
-        return new ResponseEntity<> (personMetaDataDto, new HttpHeaders(), HttpStatus.OK);
+        return new ResponseEntity<>(personMetaDataDto, new HttpHeaders(), HttpStatus.OK);
 
     }
+
     @GetMapping(value = "/checked-in")
     public ResponseEntity<PersonMetaDataDto> listOfCheckedinPersons(
             @RequestParam(defaultValue = "*") String searchParam,
             @RequestParam(defaultValue = "0") Integer pageNo,
-            @RequestParam(defaultValue = "10") Integer pageSize)
-    {
+            @RequestParam(defaultValue = "10") Integer pageSize) {
         PersonMetaDataDto personMetaDataDto = personService.getAllActiveVisit(searchParam, pageNo, pageSize);
-        return new ResponseEntity<> (personMetaDataDto, new HttpHeaders(), HttpStatus.OK);
+        return new ResponseEntity<>(personMetaDataDto, new HttpHeaders(), HttpStatus.OK);
     }
+
     @GetMapping(value = "/get-duplicate-hospital_numbers")
     public ResponseEntity<PersonMetaDataDto> getDuplicateHospitalNumbers(
             @RequestParam(defaultValue = "*") String searchParam,
             @RequestParam(defaultValue = "0") Integer pageNo,
-            @RequestParam(defaultValue = "10") Integer pageSize)  {
+            @RequestParam(defaultValue = "10") Integer pageSize) {
         PersonMetaDataDto personMetaDataDto = personService.getDuplicateHospitalNumbers(searchParam, pageNo, pageSize);
-        return new ResponseEntity<> (personMetaDataDto, new HttpHeaders(), HttpStatus.OK);
+        return new ResponseEntity<>(personMetaDataDto, new HttpHeaders(), HttpStatus.OK);
     }
 
     @GetMapping(value = "/get-patient-by-search-param", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -164,8 +161,9 @@ public class PatientController {
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize) {
         PersonMetaDataDto personMetaDataDto = personService.findPersonBySearchParam(searchParam, pageNo, pageSize);
-        return new ResponseEntity<> (personMetaDataDto, new HttpHeaders(), HttpStatus.OK);
+        return new ResponseEntity<>(personMetaDataDto, new HttpHeaders(), HttpStatus.OK);
     }
+
     @GetMapping(value = "/getall-patients-without-biometric")
     public ResponseEntity<PersonMetaDataDto> getAllPatientWithoutBiomentic(
             @RequestParam(defaultValue = "*") String searchParam,
@@ -173,8 +171,9 @@ public class PatientController {
             @RequestParam(defaultValue = "10") Integer pageSize) {
 
         PersonMetaDataDto personMetaDataDto = personService.getAllPatientWithoutBiomentic(searchParam, pageNo, pageSize);
-        return new ResponseEntity<> (personMetaDataDto, new HttpHeaders(), HttpStatus.OK);
+        return new ResponseEntity<>(personMetaDataDto, new HttpHeaders(), HttpStatus.OK);
     }
+
     @GetMapping(value = "/getall-patients-with-biometric")
     public ResponseEntity<PersonMetaDataDto> getAllPatientWithBiomentic(
             @RequestParam(defaultValue = "*") String searchParam,
@@ -182,7 +181,7 @@ public class PatientController {
             @RequestParam(defaultValue = "10") Integer pageSize) {
 
         PersonMetaDataDto personMetaDataDto = personService.getAllPatientWithBiomentic(searchParam, pageNo, pageSize);
-        return new ResponseEntity<> (personMetaDataDto, new HttpHeaders(), HttpStatus.OK);
+        return new ResponseEntity<>(personMetaDataDto, new HttpHeaders(), HttpStatus.OK);
     }
 
 }

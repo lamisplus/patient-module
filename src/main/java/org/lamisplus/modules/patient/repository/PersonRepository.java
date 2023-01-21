@@ -33,6 +33,8 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
 
     Page<Person> getAllByArchivedOrderByIdDesc (Integer archived, Pageable pageable);
 
+    //@Query(value = "SELECT p.id as id, p.first_name as firstName, p.surname as surname, p.other_name as otherName, p.hospital_number as hospitalNumber, p.created_by as createdBy, CAST (EXTRACT(YEAR from AGE(NOW(),  date_of_birth)) AS INTEGER) as age, INITCAP(p.sex) as gender, p.date_of_birth as dateOfBirth FROM patient_person p WHERE p.archived=?1 AND p.facility_id=?2 GROUP BY p.id, p.first_name, p.surname, p.other_name, p.hospital_number, p.date_of_birth", nativeQuery = true)
+    @Query(value = "SELECT p.*, CAST (EXTRACT(YEAR from AGE(NOW(),  date_of_birth)) AS INTEGER) as age, INITCAP(p.sex) as gender, p.date_of_birth as dateOfBirth FROM patient_person p WHERE p.archived=?1 AND p.facility_id=?2 GROUP BY p.id, p.first_name, p.surname, p.other_name, p.hospital_number, p.date_of_birth", nativeQuery = true)
     Page<Person> getAllByArchivedAndFacilityIdOrderByIdDesc (Integer archived, Long facilityId, Pageable pageable);
 
 

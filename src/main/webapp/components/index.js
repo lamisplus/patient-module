@@ -14,6 +14,7 @@ import {token, url as baseUrl} from "../../../api";
 import {Tab} from "semantic-ui-react";
 import Biometrics from "./Biometrics";
 import PatientList from "./Home/PatientList";
+import BiometricsCapture from "./Home/Biometrics";
 import BiometricsList from "./Home/BiometricsList";
 import Typography from '@mui/material/Typography';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
@@ -108,6 +109,11 @@ function Index(props) {
         { menuItem: 'Checked-In', render: () =>
                 <Tab.Pane>
                     <CheckedInPatients permissions={permissions}/>
+                </Tab.Pane>
+        },
+       { menuItem: 'Biometrics', render: () =>
+                <Tab.Pane>
+                    <BiometricsCapture permissions={permissions}/>
                 </Tab.Pane>
         },
         { menuItem: 'Missing Biometrics', render: () =>
