@@ -161,8 +161,8 @@ function Biometrics(props) {
             }
 
         }).catch(async (error)=>{
-            console.log("getPersonBiometrics error")
-            console.log(error)
+            // console.log("getPersonBiometrics error")
+            // console.log(error)
 
             let biometricItems =  _.map(fingersCodeset.data, (item)=>{
                 return _.extend({}, item, {captured: false});
@@ -198,10 +198,11 @@ function Biometrics(props) {
             .then((response) => {
                 if(response.data===true){
                     axios
-                        .get(`${baseUrl}biometrics/devices`,
+                        .get(`${baseUrl}biometrics/devices?active=true`,
                             { headers: {"Authorization" : `Bearer ${token}`} }
                         )
                         .then((response) => {
+                            console.log(response.data.find((x) => x.active===true))
                             setDevices(response.data);
                             setbiometricDevices(response.data);
 
@@ -271,8 +272,10 @@ function Biometrics(props) {
     const captureFinger = (e) => {
         e.preventDefault();
         if(validate()){
+            console.log(biometricDevices)
+            console.log(biometricDevices[0])
             // axios.post(`${checkUrl}biometrics/secugen/enrollment?reader=SG_DEV_AUTO`,objValues,
-            axios.post(`${objValues.device}`,objValues,
+            axios.post(`${biometricDevices[0].url}??reader=${biometricDevices[0].name}`,objValues,
                 { headers: {"Authorization" : `Bearer ${token}`}},
             )
                 .then(response => {
@@ -459,14 +462,13 @@ function Biometrics(props) {
                                         type="select"
                                         name="device"
                                         id="device"
-                                        onChange={checkDevice}
+                                        //onChange={checkDevice}
                                         value={objValues.device}
                                         required
                                         disabled
                                     >
-                                        <option value="">Select Device </option>
                                         {biometricDevices.map(({ id, name,active, url }) => (
-                                            <option key={id} value={url} selected={active===true?"selected" : ""}>
+                                            <option key={id} value={url} >
                                                 {name}
                                             </option>
                                         ))}
