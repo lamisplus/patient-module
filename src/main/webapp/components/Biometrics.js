@@ -479,7 +479,7 @@ function Biometrics(props) {
                                     ) : "" }
                                 </FormGroup>
                             </Col>
-                            {showCapture ? (
+
                                     <div className="row col-12">
                                         <Col md={6}>
                                             <FormGroup>
@@ -523,12 +523,6 @@ function Biometrics(props) {
 
                                         </Col>
                                         <br/>
-
-                                    </div>
-                                )
-                                :
-                                ""
-                            }
 
                             <Row>
                                 {capturedFingered.length >=1 ? (
