@@ -524,6 +524,9 @@ function Biometrics(props) {
                                         </Col>
                                         <br/>
 
+                                    </div>
+
+
                             <Row>
                                 {capturedFingered.length >=1 ? (
                                         <>
