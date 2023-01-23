@@ -203,7 +203,7 @@ function Biometrics(props) {
                         )
                         .then((response) => {
                             console.log(response.data.find((x) => x.active===true))
-                            setDevices(response.data);
+                            setDevices(response.data.find((x) => x.active===true));
                             setbiometricDevices(response.data);
 
                         })
@@ -262,7 +262,7 @@ function Biometrics(props) {
     const validate = () => {
         let temp = { ...errors }
         temp.templateType = objValues.templateType ? "" : "This field is required"
-        temp.device = objValues.device ? "" : "This field is required"
+        //temp.device = objValues.device ? "" : "This field is required"
         setErrors({
             ...temp
         })
@@ -272,14 +272,15 @@ function Biometrics(props) {
     const captureFinger = (e) => {
         e.preventDefault();
         if(validate()){
-            console.log(biometricDevices)
-            console.log(biometricDevices[0])
+            setLoading(true);
+            // console.log(biometricDevices)
+            // console.log(devices)
             // axios.post(`${checkUrl}biometrics/secugen/enrollment?reader=SG_DEV_AUTO`,objValues,
-            axios.post(`${biometricDevices[0].url}??reader=${biometricDevices[0].name}`,objValues,
+            axios.post(`${devices.url}??reader=${devices.name}`,objValues,
                 { headers: {"Authorization" : `Bearer ${token}`}},
             )
                 .then(response => {
-                    setLoading(true);
+                    setLoading(false);
                     if(response.data.type ==="ERROR"){
                         setLoading(false);
                         setTryAgain(true);
@@ -308,6 +309,7 @@ function Biometrics(props) {
                     //toast.success("Record save successful");
                 })
                 .catch(error => {
+                    setLoading(false);
                 });
         }
     }
@@ -457,7 +459,7 @@ function Biometrics(props) {
                             <ToastContainer />
                             <Col md={12}>
                                 <FormGroup>
-                                    <Label for='device' style={{color:'#014d88',fontWeight:'bold',fontSize:'14px' }}>Select Device </Label>
+                                    <Label for='device' style={{color:'#014d88',fontWeight:'bold',fontSize:'14px' }}> Device </Label>
                                     <Input
                                         type="select"
                                         name="device"
@@ -481,7 +483,7 @@ function Biometrics(props) {
                             </Col>
 
                                     <div className="row col-12">
-                                        <Col md={6}>
+                                        <Col md={12}>
                                             <FormGroup>
                                                 <Label for='device' style={{color:'#014d88',fontWeight:'bold',fontSize:'14px' }}>Select Finger</Label>
                                                 <Input
@@ -507,7 +509,7 @@ function Biometrics(props) {
                                         </Col>
 
 
-                                        <Col md={6}>
+                                        <Col md={12}>
 
                                             <MatButton
                                                 type='button'
@@ -517,6 +519,7 @@ function Biometrics(props) {
                                                 className={'mt-4'}
                                                 style={{backgroundColor:'#992E62'}}
                                                 startIcon={<FingerprintIcon />}
+                                                disabled={loading}
                                             >
                                                 Capture Finger
                                             </MatButton>
