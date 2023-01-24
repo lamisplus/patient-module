@@ -39,9 +39,7 @@ import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import TablePagination from '@mui/material/TablePagination';
-
-
-
+import Swal from "sweetalert2";
 
 const tableIcons = {
     Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -62,7 +60,6 @@ const tableIcons = {
     ThirdStateCheck: forwardRef((props, ref) => <Remove {...props} ref={ref} />),
     ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />)
 };
-
 
 const useStyles = makeStyles(theme => ({
     card: {
@@ -110,7 +107,6 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-
 const PatientList = (props) => {
     const tableRef = useRef(null);
     const classes = useStyles();
@@ -127,9 +123,35 @@ const PatientList = (props) => {
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [currentPage,setCurrentPage] = useState(1);
     const toggle = (id) => {
-        const patient = patients.find(obj => obj.id == id);
-        setPatient(patient);
+//        const patient = patients.find(obj => obj.id == id);
+//        setPatient(patient);
+        localStorage.setItem("patientID", JSON.stringify(id));
         setModal(!modal);
+    }
+
+    const handleDelete = () => {
+        const patientId = localStorage.getItem("patientID");
+        axios
+            .delete(`${baseUrl}patient/${patientId}`,
+                { headers: {"Authorization" : `Bearer ${token}`} }
+            )
+            .then((response) => {
+                localStorage.removeItem("patientID")
+                Swal.fire({
+                      icon: 'success',
+                      text: 'Patient Deleted Successfully',
+                      timer: 1500
+                 });
+
+                setModal(false);
+            })
+            .catch((error) => {
+                 Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'An error occurred while deleting!!!',
+                });
+            });
     }
 
     function actionItems(row){
@@ -170,6 +192,7 @@ const PatientList = (props) => {
                         name:'Delete',
                         type:'link',
                         icon:<MdDeleteForever size="20" color='rgb(4, 196, 217)'  />,
+                        deleteAction: () => {toggle(row.id)},
                         to:{
                             pathname: "/#",
                             state: { patientObj: row, permissions:permissions  }
@@ -339,10 +362,10 @@ const PatientList = (props) => {
             <Modal isOpen={modal} toggle={onCancelDelete}>
                 <ModalHeader toggle={onCancelDelete}>Delete Patient</ModalHeader>
                 <ModalBody>
-                    Are you sure to delete this record? { patient ? patient.surname +  ', ' + patient.firstname +  ' ' + patient.otherName : '' }
+                    Are you sure you want to delete this record? { patient ? patient.surname +  ', ' + patient.firstname +  ' ' + patient.otherName : '' }
                 </ModalBody>
                 <ModalFooter>
-                    <Button color="primary" type="button" onClick={(e) => onDelete(patient.id)}>Yes</Button>{' '}
+                    <Button color="primary" type="button" onClick={handleDelete}>Yes</Button>{' '}
                     <Button color="secondary" type="button" onClick={(e) => onCancelDelete()}>No</Button>
                 </ModalFooter>
             </Modal>
