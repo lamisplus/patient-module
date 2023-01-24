@@ -2,7 +2,7 @@ import React, {useState, useEffect, useCallback, useRef} from 'react'
 import MaterialTable from 'material-table';
 import axios from "axios";
 import { url as baseUrl, token } from "../../../../api";
-import { Link } from 'react-router-dom'
+import { Link, useHistory } from 'react-router-dom'
 import { Card,CardBody,} from 'reactstrap';
 import { Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import Button from "@material-ui/core/Button";
@@ -122,6 +122,7 @@ const PatientList = (props) => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [currentPage,setCurrentPage] = useState(1);
+    const history = useHistory();
     const toggle = (id) => {
 //        const patient = patients.find(obj => obj.id == id);
 //        setPatient(patient);
@@ -144,6 +145,7 @@ const PatientList = (props) => {
                  });
 
                 setModal(false);
+                history.push('/')
             })
             .catch((error) => {
                  Swal.fire({
@@ -206,29 +208,37 @@ const PatientList = (props) => {
             axios.get(`${baseUrl}patient?pageSize=${query.pageSize}&pageNo=${query.page}&searchParam=${query.search}`, { headers: {"Authorization" : `Bearer ${token}`} })
                 .then(response => response)
                 .then(result => {
-                    resolve({
-                        data: result.data.records.map((row) => ({
-                            name: [row.firstName, row.otherName, row.surname].filter(Boolean).join(", "),
-                            id: getHospitalNumber(row.identifier),
-                            sex:row.sex.toLowerCase().charAt(0).toUpperCase() + row.sex.slice(1).toLowerCase(),
-                            dateOfBirth: row.dateOfBirth,
-                            age: (row.dateOfBirth === 0 ||
-                                row.dateOfBirth === undefined ||
-                                row.dateOfBirth === null ||
-                                row.dateOfBirth === "" )
-                                ? 0
-                                : calculate_age(row.dateOfBirth),
-                            actions:
-                                <div>
-                                    {permissions.includes('view_patient') || permissions.includes("all_permission") ? (
-                                        <SplitActionButton actions={actionItems(row)} />
-                                    ):""
-                                    }
-                                </div>
-                        })),
-                        page: query.page,
-                        totalCount:result.data.totalRecords
-                    });
+                     if (result.data === "") {
+                        resolve({
+                          data: [],
+                          page: 0,
+                          totalCount: 0,
+                        });
+                      } else {
+                        resolve({
+                            data: result.data.records.map((row) => ({
+                                name: [row.firstName, row.otherName, row.surname].filter(Boolean).join(", "),
+                                id: getHospitalNumber(row.identifier),
+                                sex:row.sex.toLowerCase().charAt(0).toUpperCase() + row.sex.slice(1).toLowerCase(),
+                                dateOfBirth: row.dateOfBirth,
+                                age: (row.dateOfBirth === 0 ||
+                                    row.dateOfBirth === undefined ||
+                                    row.dateOfBirth === null ||
+                                    row.dateOfBirth === "" )
+                                    ? 0
+                                    : calculate_age(row.dateOfBirth),
+                                actions:
+                                    <div>
+                                        {permissions.includes('view_patient') || permissions.includes("all_permission") ? (
+                                            <SplitActionButton actions={actionItems(row)} />
+                                        ):""
+                                        }
+                                    </div>
+                            })),
+                            page: query.page,
+                            totalCount:result.data.totalRecords
+                        });
+                      }
                 });
         })
 

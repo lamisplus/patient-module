@@ -189,7 +189,7 @@ function Index(props) {
                                 <div >
                                     <Typography variant="caption">
                                         <Label  style={{height:'30px', fontSize:'14px'}} color={patientBiometricStatus===true? "green" : "red"} size={"large"}>
-                                            Biometrics {patientBiometricStatus===true? "Captured" : "Not Capture"}
+                                            Biometrics {patientBiometricStatus===true? "Captured" : "Not Captured"}
                                         </Label>
                                     </Typography>
                                 </div>

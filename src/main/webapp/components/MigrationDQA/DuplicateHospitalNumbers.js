@@ -180,7 +180,7 @@ function DuplicateHospitalNumbers(props) {
             axios.get(`${baseUrl}patient/get-duplicate-hospital_numbers?pageSize=${query.pageSize}&pageNo=${query.page}&searchParam=${query.search}`, { headers: {"Authorization" : `Bearer ${token}`} })
                 .then(response => response)
                 .then(result => {
-                  if (result.data.records === null) {
+                  if (result.data === "") {
                     resolve({
                       data: [],
                       page: 0,
