@@ -5,6 +5,7 @@ import {
   Route,
 } from "react-router-dom";
 import RegisterPatient from './main/webapp/components/RegisterPatient';
+import ViewPatient from './main/webapp/components/ViewPatient';
 import PatientDashboard from './main/webapp/components/PatientDashboard';
 import Dashboard from './main/webapp/components/ClientDashboard';
 import ClientDashboard from "./main/webapp/components/ClientDashboard";
@@ -32,6 +33,9 @@ export default function App() {
           <Route path="/register-patient">
             <RegisterPatientPage />
           </Route>
+          <Route path="/view-patient">
+              <ViewPatient />
+            </Route>
           <Route path="/patient-dashboard">
             <PatientDashboardPage />
           </Route>

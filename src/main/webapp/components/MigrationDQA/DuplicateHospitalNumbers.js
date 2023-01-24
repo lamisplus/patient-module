@@ -173,41 +173,6 @@ function DuplicateHospitalNumbers(props) {
                         }
                     }
                 )}
-
-
-/*            {...(permissions.includes('view_patient') || permissions.includes("all_permission")&&
-                    {
-                        name:'Dashboard',
-                        type:'link',
-                        icon:<MdPerson size="20" color='rgb(4, 196, 217)' />,
-                        to:{
-                            pathname: "/patient-dashboard",
-                            state: { patientObj: row, permissions:permissions  }
-                        }
-                    }
-                )},*/
-/*            {...(permissions.includes('edit_patient') || permissions.includes("all_permission")&&
-                    {
-                        name:'Edit',
-                        type:'link',
-                        icon:<MdModeEdit size="20" color='rgb(4, 196, 217)' />,
-                        to:{
-                            pathname: "/register-patient",
-                            state: { patientId : row.id, permissions:permissions  }
-                        }
-                    }
-                )},
-            {...(permissions.includes('delete_patient') || permissions.includes("all_permission")&&
-                    {
-                        name:'Delete',
-                        type:'link',
-                        icon:<MdDeleteForever size="20" color='rgb(4, 196, 217)'  />,
-                        to:{
-                            pathname: "/#",
-                            state: { patientObj: row, permissions:permissions  }
-                        }
-                    }
-                )}*/
         ]
     }
     const handleRemoteData = query =>
@@ -215,7 +180,14 @@ function DuplicateHospitalNumbers(props) {
             axios.get(`${baseUrl}patient/get-duplicate-hospital_numbers?pageSize=${query.pageSize}&pageNo=${query.page}&searchParam=${query.search}`, { headers: {"Authorization" : `Bearer ${token}`} })
                 .then(response => response)
                 .then(result => {
+                  if (result.data === "") {
                     resolve({
+                      data: [],
+                      page: 0,
+                      totalCount: 0,
+                    });
+                  } else {
+                      resolve({
                         data: result.data.records.map((row) => ({
                             name: [row.firstName, row.otherName, row.surname].filter(Boolean).join(", "),
                             id: getHospitalNumber(row.identifier),
@@ -239,6 +211,7 @@ function DuplicateHospitalNumbers(props) {
                         page: query.page,
                         totalCount: result.data.totalRecords
                     });
+                  }
                 });
         })
 

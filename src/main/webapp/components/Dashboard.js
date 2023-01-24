@@ -246,6 +246,7 @@ const PatientList = (props) => {
     const enablePPIColumns = () =>{
         setEnablePPI(!enablePPI)
     }
+
   return (
     <div className={classes.root}>
         <ToastContainer autoClose={3000} hideProgressBar />

@@ -141,7 +141,7 @@ function PatientCard(props) {
                             <Row className={"mt-1"}>
                                 <Col md={12} className={classes.root2} >
                                     <b style={{fontSize: "25px", color:'rgb(153, 46, 98)'}}>
-                                        {patientObj.surname + ", " + patientObj.firstName + " " + patientObj.otherName}
+                                        {patientObj.surname + ", " + patientObj.firstName + " " + patientObj.otherName !== null ? patientObj.otherName : " "}
                                     </b>
 
                                 </Col>
@@ -201,7 +201,7 @@ function PatientCard(props) {
                                     <Typography variant="caption">
                                         <Label  style={{height:'30px', fontSize:'14px'}} color={patientBiometricStatus===true? "green" : "red"} size={"large"}>
                                             Biometric Status
-                                            <Label.Detail>{patientBiometricStatus===true? "Captured" : "Not Capture"}</Label.Detail>
+                                            <Label.Detail>{patientBiometricStatus===true? "Captured" : "Not Captured"}</Label.Detail>
                                         </Label>
                                         {patientBiometricStatus!==true ? (
 
