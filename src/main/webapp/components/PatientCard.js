@@ -201,7 +201,7 @@ function PatientCard(props) {
                                     <Typography variant="caption">
                                         <Label  style={{height:'30px', fontSize:'14px'}} color={patientBiometricStatus===true? "green" : "red"} size={"large"}>
                                             Biometric Status
-                                            <Label.Detail>{patientBiometricStatus===true? "Captured" : "Not Capture"}</Label.Detail>
+                                            <Label.Detail>{patientBiometricStatus===true? "Captured" : "Not Captured"}</Label.Detail>
                                         </Label>
                                         {patientBiometricStatus!==true ? (
 
