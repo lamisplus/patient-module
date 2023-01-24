@@ -75,6 +75,7 @@ public class PersonService {
         person.setCreatedBy(existPerson.getCreatedBy());
         person.setNinNumber(existPerson.getNinNumber());
         person.setCreatedDate(existPerson.getCreatedDate());
+        person.setArchived(existPerson.getArchived());
         return getDtoFromPerson(personRepository.save(person));
     }
 
