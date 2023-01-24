@@ -161,7 +161,7 @@ const PatientList = (props) => {
                 type:'link',
                 icon:<FaEye  size="22"/>,
                 to:{
-                    pathname: "/register-patient",
+                    pathname: "/view-patient",
                     state: { patientId : row.id, permissions:permissions  }
                 }
             },
