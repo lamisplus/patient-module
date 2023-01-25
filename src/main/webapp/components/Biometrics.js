@@ -276,7 +276,7 @@ function Biometrics(props) {
             // console.log(biometricDevices)
             // console.log(devices)
             // axios.post(`${checkUrl}biometrics/secugen/enrollment?reader=SG_DEV_AUTO`,objValues,
-            axios.post(`${devices.url}??reader=${devices.name}`,objValues,
+            axios.post(`${devices.url}?reader=${devices.name}`,objValues,
                 { headers: {"Authorization" : `Bearer ${token}`}},
             )
                 .then(response => {
