@@ -207,7 +207,7 @@ const ViewPatient = (props) => {
             const response = await axios.get(`${baseUrl}patient/${patientId}`, { headers: {"Authorization" : `Bearer ${token}`} });
             const sexCodeset = await axios.get(`${baseUrl}application-codesets/v2/SEX`, { headers: {"Authorization" : `Bearer ${token}`} });
             const patient = response.data;
-            //console.log(patient)
+            console.log(patient)
             setPatientData(patient)
             const contacts = patient.contact ? patient.contact : [];
             setContacts(contacts.contact);
@@ -1129,7 +1129,7 @@ const ViewPatient = (props) => {
                                                     type="text"
                                                     name="country"
                                                     id="country"
-                                                    value={Object.keys(patientData).length !== 0 &&  patientData.address.address[0]?.countryId === "1" ? "Nigeria" : ""}
+                                                    value={Object.keys(patientData).length !== 0 &&  patientData.address.address[0]?.countryId === 1 ? "Nigeria" : ""}
                                                     style={{border: "1px solid #014d88"}}
                                                     readOnly
                                                 />
