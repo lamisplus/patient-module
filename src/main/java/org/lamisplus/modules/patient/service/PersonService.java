@@ -61,7 +61,7 @@ public class PersonService {
         String hospitalNumber = getHospitalNumber(personDto);
         person.setHospitalNumber(hospitalNumber);
         person.setUuid(UUID.randomUUID().toString());
-        person.setFullName(this.getFullName(personDto.getFirstName(), personDto.getSurname()));
+        person.setFullName(this.getFullName(personDto.getFirstName(), personDto.getOtherName(), personDto.getSurname()));
         return getDtoFromPerson(personRepository.save(person));
     }
 
@@ -73,8 +73,9 @@ public class PersonService {
         person.setId(existPerson.getId());
         person.setUuid(existPerson.getUuid());
         person.setCreatedBy(existPerson.getCreatedBy());
-        person.setNinNumber(existPerson.getNinNumber());
         person.setCreatedDate(existPerson.getCreatedDate());
+        person.setArchived(existPerson.getArchived());
+        person.setFacilityId(existPerson.getFacilityId());
         return getDtoFromPerson(personRepository.save(person));
     }
 
@@ -183,9 +184,9 @@ public class PersonService {
         Person person = new Person();
         String hospitalNumber = getHospitalNumber(personDto);
         person.setHospitalNumber(hospitalNumber);
-        person.setFirstName(personDto.getFirstName());
-        person.setSurname(personDto.getSurname());
-        person.setOtherName(personDto.getOtherName());
+        person.setFirstName(this.treatNull(personDto.getFirstName()));
+        person.setSurname(this.treatNull(personDto.getSurname()));
+        person.setOtherName(this.treatNull(personDto.getOtherName()));
         person.setDateOfBirth(personDto.getDateOfBirth());
         person.setDateOfRegistration(personDto.getDateOfRegistration());
         person.setActive(personDto.getActive());
@@ -273,9 +274,9 @@ public class PersonService {
         personResponseDto.setId(person.getId());
         personResponseDto.setIsDateOfBirthEstimated(person.getIsDateOfBirthEstimated());
         personResponseDto.setDateOfBirth(person.getDateOfBirth());
-        personResponseDto.setFirstName(this.treatNull(person.getFirstName()));
-        personResponseDto.setSurname(this.treatNull(person.getSurname()));
-        personResponseDto.setOtherName(this.treatNull(person.getOtherName()));
+        personResponseDto.setFirstName(person.getFirstName());
+        personResponseDto.setSurname(person.getSurname());
+        personResponseDto.setOtherName(person.getOtherName());
         personResponseDto.setContactPoint(person.getContactPoint());
         personResponseDto.setAddress(person.getAddress());
         personResponseDto.setContact(person.getContact());
@@ -403,14 +404,15 @@ public class PersonService {
 
         if (person.hasContent()) {
 
-            PageDTO pageDTO = this.generatePagination(person);
-            long recordSize = pageDTO.getTotalRecords();
-            double totalPage = pageDTO.getTotalPages();
+//            PageDTO pageDTO = this.generatePagination(person);
+//            long recordSize = pageDTO.getTotalRecords();
+//            double totalPage = pageDTO.getTotalPages();
             PersonMetaDataDto personMetaDataDto = new PersonMetaDataDto();
-            personMetaDataDto.setTotalRecords(recordSize);
-            personMetaDataDto.setPageSize(pageDTO.getPageSize());
-            personMetaDataDto.setTotalPages(pageDTO.getTotalPages());
-            personMetaDataDto.setCurrentPage(pageDTO.getPageNumber());
+            personMetaDataDto.setTotalRecords(person.getTotalElements());
+            personMetaDataDto.setPageSize(person.getSize());
+            personMetaDataDto.setTotalPages(person.getTotalPages());
+            personMetaDataDto.setCurrentPage(person.getNumber());
+            //personMetaDataDto.setRecords(person.getContent());
             personMetaDataDto.setRecords(person.getContent().stream().map(this::getDtoFromPerson).collect(Collectors.toList()));
             return personMetaDataDto;
         }
@@ -542,11 +544,12 @@ public class PersonService {
         return null;
     }
 
-    public String getFullName(String fn, String sn) {
+    public String getFullName(String fn, String mn, String sn) {
         String fullName = "";
         if (fn == null) fn = "";
         if (sn == null) sn = "";
-        fullName = fn.trim() + sn.trim();
+        if (mn == null) mn = "";
+        fullName = fn.trim() +mn.trim()+ sn.trim();
         fullName = fullName.replaceAll("\\s", "");
         fullName = fullName.replaceAll(",", "");
 
@@ -593,5 +596,6 @@ public class PersonService {
         return personMetaDataDto;
         //return checkedInPeople;
     }
+
 
 }

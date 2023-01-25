@@ -2,7 +2,7 @@ import React, {useState, useEffect, useCallback, useRef} from 'react'
 import MaterialTable from 'material-table';
 import axios from "axios";
 import { url as baseUrl, token } from "../../../../api";
-import { Link } from 'react-router-dom'
+import { Link, useHistory } from 'react-router-dom'
 import { Card,CardBody,} from 'reactstrap';
 import { Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import Button from "@material-ui/core/Button";
@@ -39,9 +39,7 @@ import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import TablePagination from '@mui/material/TablePagination';
-
-
-
+import Swal from "sweetalert2";
 
 const tableIcons = {
     Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -62,7 +60,6 @@ const tableIcons = {
     ThirdStateCheck: forwardRef((props, ref) => <Remove {...props} ref={ref} />),
     ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />)
 };
-
 
 const useStyles = makeStyles(theme => ({
     card: {
@@ -110,7 +107,6 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-
 const PatientList = (props) => {
     const tableRef = useRef(null);
     const classes = useStyles();
@@ -126,10 +122,38 @@ const PatientList = (props) => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [currentPage,setCurrentPage] = useState(1);
+    const history = useHistory();
     const toggle = (id) => {
-        const patient = patients.find(obj => obj.id == id);
-        setPatient(patient);
+//        const patient = patients.find(obj => obj.id == id);
+//        setPatient(patient);
+        localStorage.setItem("patientID", JSON.stringify(id));
         setModal(!modal);
+    }
+
+    const handleDelete = () => {
+        const patientId = localStorage.getItem("patientID");
+        axios
+            .delete(`${baseUrl}patient/${patientId}`,
+                { headers: {"Authorization" : `Bearer ${token}`} }
+            )
+            .then((response) => {
+                localStorage.removeItem("patientID")
+                Swal.fire({
+                      icon: 'success',
+                      text: 'Patient Deleted Successfully',
+                      timer: 1500
+                 });
+
+                setModal(false);
+                history.push('/')
+            })
+            .catch((error) => {
+                 Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'An error occurred while deleting!!!',
+                });
+            });
     }
 
     function actionItems(row){
@@ -139,7 +163,7 @@ const PatientList = (props) => {
                 type:'link',
                 icon:<FaEye  size="22"/>,
                 to:{
-                    pathname: "/register-patient",
+                    pathname: "/view-patient",
                     state: { patientId : row.id, permissions:permissions  }
                 }
             },
@@ -170,6 +194,7 @@ const PatientList = (props) => {
                         name:'Delete',
                         type:'link',
                         icon:<MdDeleteForever size="20" color='rgb(4, 196, 217)'  />,
+                        deleteAction: () => {toggle(row.id)},
                         to:{
                             pathname: "/#",
                             state: { patientObj: row, permissions:permissions  }
@@ -183,29 +208,37 @@ const PatientList = (props) => {
             axios.get(`${baseUrl}patient?pageSize=${query.pageSize}&pageNo=${query.page}&searchParam=${query.search}`, { headers: {"Authorization" : `Bearer ${token}`} })
                 .then(response => response)
                 .then(result => {
-                    resolve({
-                        data: result.data.records.map((row) => ({
-                            name: [row.firstName, row.otherName, row.surname].filter(Boolean).join(", "),
-                            id: getHospitalNumber(row.identifier),
-                            sex:row.sex.toLowerCase().charAt(0).toUpperCase() + row.sex.slice(1).toLowerCase(),
-                            dateOfBirth: row.dateOfBirth,
-                            age: (row.dateOfBirth === 0 ||
-                                row.dateOfBirth === undefined ||
-                                row.dateOfBirth === null ||
-                                row.dateOfBirth === "" )
-                                ? 0
-                                : calculate_age(row.dateOfBirth),
-                            actions:
-                                <div>
-                                    {permissions.includes('view_patient') || permissions.includes("all_permission") ? (
-                                        <SplitActionButton actions={actionItems(row)} />
-                                    ):""
-                                    }
-                                </div>
-                        })),
-                        page: query.page,
-                        totalCount:result.data.totalRecords
-                    });
+                     if (result.data === "") {
+                        resolve({
+                          data: [],
+                          page: 0,
+                          totalCount: 0,
+                        });
+                      } else {
+                        resolve({
+                            data: result.data.records.map((row) => ({
+                                name: [row.firstName, row.otherName, row.surname].filter(Boolean).join(", "),
+                                id: getHospitalNumber(row.identifier),
+                                sex:row.sex.toLowerCase().charAt(0).toUpperCase() + row.sex.slice(1).toLowerCase(),
+                                dateOfBirth: row.dateOfBirth,
+                                age: (row.dateOfBirth === 0 ||
+                                    row.dateOfBirth === undefined ||
+                                    row.dateOfBirth === null ||
+                                    row.dateOfBirth === "" )
+                                    ? 0
+                                    : calculate_age(row.dateOfBirth),
+                                actions:
+                                    <div>
+                                        {permissions.includes('view_patient') || permissions.includes("all_permission") ? (
+                                            <SplitActionButton actions={actionItems(row)} />
+                                        ):""
+                                        }
+                                    </div>
+                            })),
+                            page: query.page,
+                            totalCount:result.data.totalRecords
+                        });
+                      }
                 });
         })
 
@@ -339,10 +372,10 @@ const PatientList = (props) => {
             <Modal isOpen={modal} toggle={onCancelDelete}>
                 <ModalHeader toggle={onCancelDelete}>Delete Patient</ModalHeader>
                 <ModalBody>
-                    Are you sure to delete this record? { patient ? patient.surname +  ', ' + patient.firstname +  ' ' + patient.otherName : '' }
+                    Are you sure you want to delete this record? { patient ? patient.surname +  ', ' + patient.firstname +  ' ' + patient.otherName : '' }
                 </ModalBody>
                 <ModalFooter>
-                    <Button color="primary" type="button" onClick={(e) => onDelete(patient.id)}>Yes</Button>{' '}
+                    <Button color="primary" type="button" onClick={handleDelete}>Yes</Button>{' '}
                     <Button color="secondary" type="button" onClick={(e) => onCancelDelete()}>No</Button>
                 </ModalFooter>
             </Modal>

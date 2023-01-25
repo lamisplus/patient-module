@@ -124,10 +124,11 @@ const isValidEmail = email =>
         email
     );
 
-const RegisterPatient = (props) => {
+const ViewPatient = (props) => {
     const { register, watch, setValue, getValues, clearErrors, setError, handleSubmit, formState} = useForm({
         resolver: yupResolver(schema),
     });
+    const [disValue, setDisValue] = useState("")
     const { errors, isSubmitting } = formState;
     const watchPnumber= watch("pnumber", false);
     const watchAltPhonenumber= watch("altPhonenumber", false);
@@ -162,6 +163,7 @@ const RegisterPatient = (props) => {
     const locationState = location.state;
     let patientId = null;
     patientId = locationState ? locationState.patientId : null;
+    const [patientData, setPatientData] = useState({})
 
 
     const getNames = (relationship) => {
@@ -205,6 +207,8 @@ const RegisterPatient = (props) => {
             const response = await axios.get(`${baseUrl}patient/${patientId}`, { headers: {"Authorization" : `Bearer ${token}`} });
             const sexCodeset = await axios.get(`${baseUrl}application-codesets/v2/SEX`, { headers: {"Authorization" : `Bearer ${token}`} });
             const patient = response.data;
+            console.log(patient)
+            setPatientData(patient)
             const contacts = patient.contact ? patient.contact : [];
             setContacts(contacts.contact);
             const identifiers = patient.identifier;
@@ -216,8 +220,8 @@ const RegisterPatient = (props) => {
             const altphone = phoneNumberFormatCheck(contactPoint.contactPoint.find(obj => obj.type == 'altphone'));
             const country = address && address.address && address.address.length > 0 ? address.address[0] : null;
             const gender = patient.gender;
-            console.log(sexCodeset.data)
-            console.log(_.upperFirst(_.lowerCase(patient.sex)))
+
+            //console.log(_.upperFirst(_.lowerCase(patient.sex)))
             const sex = _.find(sexCodeset.data, {'display':_.upperFirst(_.lowerCase(patient.sex))}).id;
             const employmentStatus = patient.employmentStatus;
             const education = patient.education;
@@ -579,7 +583,9 @@ const RegisterPatient = (props) => {
         loadRelationships();
         loadTopLevelCountry();
         getPatient();
-    }, [loadSexes, loadMaritalStatus, loadEducation, loadOccupation, loadRelationships, loadTopLevelCountry, getPatient]);
+        districtValue()
+    }, [loadSexes, loadMaritalStatus, loadEducation,
+    loadOccupation, loadRelationships, loadTopLevelCountry, getPatient]);
 
     let genderRows = null;
     let sexRows = null;
@@ -597,7 +603,7 @@ const RegisterPatient = (props) => {
     }
     if (maritalStatusOptions && maritalStatusOptions.length > 0) {
         maritalStatusRows = maritalStatusOptions.map((maritalStatusOption, index) => (
-            <option key={maritalStatusOption.id} value={maritalStatusOption.id}>{maritalStatusOption.display}</option>
+            <option key={maritalStatusOption.id} value={maritalStatusOption.id} defaultValue={maritalStatusOption.display}>{maritalStatusOption.display}</option>
         ));
     }
     if (educationOptions && educationOptions.length > 0) {
@@ -627,8 +633,21 @@ const RegisterPatient = (props) => {
     }
     if (districtUnitOptions && districtUnitOptions.length > 0) {
         districtRows = districtUnitOptions.map((districtUnitOption, index) => (
-            <option key={districtUnitOption.id} value={districtUnitOption.id}>{districtUnitOption.name}</option>
+             <option key={districtUnitOption.id} value={districtUnitOption.id}>{districtUnitOption.name}</option>
         ));
+    }
+
+    const districtValue = () => {
+        let value = ""
+        if (Object.keys(patientData).length !== 0 && patientData.address.address[0].district !== null) {
+            districtUnitOptions.map((districtUnitOption, index) => {
+                if (districtUnitOption.id === patientData.address.address[0].district) {
+                   value = districtUnitOption.name;
+                   setDisValue(value)
+                }
+            })
+        }
+        return value;
     }
 
     const handleCancel = () => {
@@ -703,6 +722,7 @@ const RegisterPatient = (props) => {
                                                             }
                                                         }}
                                                         style={{border: "1px solid #014d88"}}
+                                                        readOnly
                                                     />
                                                     {errors.dateOfRegistration && <p>Enter the registration date</p>}
                                                 </FormGroup>
@@ -727,6 +747,7 @@ const RegisterPatient = (props) => {
                                                             onChange:(e)=>{ checkHospitalNumber(e.target.value.replace(/\s/g, ''))}
                                                         })}
                                                         style={{border: "1px solid #014d88"}}
+                                                        readOnly
                                                     />
                                                     {checkHospitalNumberError && <p>Hospital number has been registered before</p> }
                                                     {!checkHospitalNumberError && errors.hospitalNumber && <p>Enter the hospital number</p>}
@@ -760,6 +781,7 @@ const RegisterPatient = (props) => {
                                                         minLength={11}
                                                         maxLength={11}
                                                         style={{border: "1px solid #014d88"}}
+                                                        readOnly
                                                     />
                                                     {checkNINError && <p>NIN has been registered before</p> }
                                                     {!checkNINError && errors.ninNumber && <p>Enter a valid NIN Number</p>}
@@ -794,6 +816,7 @@ const RegisterPatient = (props) => {
                                                             onChange:(e)=>{alphabetOnly(e,'firstName')}
                                                         })}
                                                         style={{border: "1px solid #014d88"}}
+                                                        readOnly
                                                     />
                                                     {errors.firstName && <p>First Name is required</p>}
                                                 </FormGroup>
@@ -811,6 +834,7 @@ const RegisterPatient = (props) => {
                                                             onChange:(e)=>{alphabetOnly(e,'middleName')}
                                                         })}
                                                         style={{border: "1px solid #014d88"}}
+                                                        readOnly
                                                     />
                                                     {errors.middleName && <p>{errors.middleName.message}</p>}
                                                 </FormGroup>
@@ -828,6 +852,7 @@ const RegisterPatient = (props) => {
                                                             onChange:(e)=>{alphabetOnly(e,'lastName')}
                                                         })}
                                                         style={{border: "1px solid #014d88"}}
+                                                        readOnly
                                                     />
                                                     {errors.lastName && <p>Last Name is required</p>}
                                                 </FormGroup>
@@ -838,16 +863,15 @@ const RegisterPatient = (props) => {
                                             <div className="form-group  col-md-4">
                                                 <FormGroup>
                                                     <Label>Sex *</Label>
-                                                    <select
+                                                     <input
                                                         className="form-control"
+                                                        type="text"
                                                         name="sex"
                                                         id="sex"
-                                                        {...register("sex")}
+                                                        value={patientData.sex !== null ? patientData.sex : " "}
                                                         style={{border: "1px solid #014d88"}}
-                                                    >
-                                                        <option value={""}>Select Sex</option>
-                                                        {sexRows}
-                                                    </select>
+                                                        readOnly
+                                                    />
                                                     {errors.sex && <p>Select Sex</p>}
                                                 </FormGroup>
                                             </div>
@@ -905,6 +929,7 @@ const RegisterPatient = (props) => {
 
                                                         }}
                                                         style={{border: "1px solid #014d88"}}
+                                                        readOnly
                                                     />
                                                     {errors.dob && <p>Enter a valid date of birth (dd/mm/yyyy)</p>}
                                                 </FormGroup>
@@ -922,6 +947,7 @@ const RegisterPatient = (props) => {
                                                         disabled={ageDisabled}
                                                         onChange={(e) => handleAgeChange(e)}
                                                         style={{border: "1px solid #014d88"}}
+                                                        readOnly
                                                     />
                                                 </FormGroup>
                                             </div>
@@ -933,16 +959,15 @@ const RegisterPatient = (props) => {
                                             <div className="form-group mb-3 col-md-3">
                                                 <FormGroup>
                                                     <Label>Marital Status</Label>
-                                                    <select
+                                                     <input
                                                         className="form-control"
+                                                        type="text"
                                                         name="maritalStatus"
                                                         id="maritalStatus"
-                                                        {...register("maritalStatus")}
+                                                        value={Object.keys(patientData).length !== 0 ? patientData.maritalStatus.display : ""}
                                                         style={{border: "1px solid #014d88"}}
-                                                    >
-                                                        <option value={""}>Select Marital Status</option>
-                                                        {maritalStatusRows}
-                                                    </select>
+                                                        readOnly
+                                                    />
                                                     {errors.maritalStatus && <p>Select Marital Status</p>}
                                                 </FormGroup>
                                             </div>
@@ -950,16 +975,15 @@ const RegisterPatient = (props) => {
                                             <div className="form-group  col-md-4">
                                                 <FormGroup>
                                                     <Label>Employment Status *</Label>
-                                                    <select
+                                                    <input
                                                         className="form-control"
+                                                        type="text"
                                                         name="employmentStatus"
                                                         id="employmentStatus"
-                                                        {...register("employmentStatus")}
+                                                        value={Object.keys(patientData).length !== 0 && patientData.employmentStatus !== null ? patientData.employmentStatus.display : " "}
                                                         style={{border: "1px solid #014d88"}}
-                                                    >
-                                                        <option value={""}>Select Employment Status</option>
-                                                        {occupationRows}
-                                                    </select>
+                                                        readOnly
+                                                    />
                                                     {errors.employmentStatus && <p>Select Employment Status</p>}
                                                 </FormGroup>
                                             </div>
@@ -972,16 +996,15 @@ const RegisterPatient = (props) => {
                                             <div className="form-group  col-md-4">
                                                 <FormGroup>
                                                     <Label>Education Level</Label>
-                                                    <select
+                                                    <input
                                                         className="form-control"
+                                                        type="text"
                                                         name="highestQualification"
                                                         id="highestQualification"
-                                                        {...register("highestQualification")}
+                                                        value={Object.keys(patientData).length !== 0 ? patientData.education.display : ""}
                                                         style={{border: "1px solid #014d88"}}
-                                                    >
-                                                        <option value={""}>Select the Education Level</option>
-                                                        {educationRows}
-                                                    </select>
+                                                        readOnly
+                                                    />
                                                     {errors.highestQualification && <p>Select the Education Level</p>}
                                                 </FormGroup>
                                             </div>
@@ -1021,6 +1044,7 @@ const RegisterPatient = (props) => {
                                                             }
                                                         }
                                                     }}
+                                                    disabled={true}
                                                 />
 
                                                 {/*                                                <input
@@ -1062,6 +1086,7 @@ const RegisterPatient = (props) => {
                                                             }
                                                         }
                                                     }}
+                                                    disabled={true}
                                                 />
                                                 {/*                                                <input
                                                     className="form-control"
@@ -1088,7 +1113,7 @@ const RegisterPatient = (props) => {
                                                     id="email"
                                                     {...register("email",{ required: true, validate: handleEmailValidation })}
                                                     style={{border: "1px solid #014d88"}}
-                                                    /*ref={register()}*/
+                                                    readOnly
                                                 />
                                                 {errors.email && <p>{errors.email.message}</p>}
                                             </FormGroup>
@@ -1099,17 +1124,15 @@ const RegisterPatient = (props) => {
                                         <div className="form-group  col-md-4">
                                             <FormGroup>
                                                 <Label>Country *</Label>
-                                                <select
+                                                  <input
                                                     className="form-control"
                                                     type="text"
                                                     name="country"
                                                     id="country"
+                                                    value={Object.keys(patientData).length !== 0 &&  patientData.address.address[0]?.countryId === 1 ? "Nigeria" : ""}
                                                     style={{border: "1px solid #014d88"}}
-                                                    {...register("countryId")}
-                                                    onChange={(e) => onCountryChange(e)}>
-                                                    <option value={""}>Select Country</option>
-                                                    {topLevelUnitCountryRows}
-                                                </select>
+                                                    readOnly
+                                                />
                                                 {errors.countryId && <p>Select Country</p>}
                                             </FormGroup>
                                         </div>
@@ -1117,17 +1140,15 @@ const RegisterPatient = (props) => {
                                         <div className="form-group  col-md-4">
                                             <FormGroup>
                                                 <Label>State *</Label>
-                                                <select
+                                               <input
                                                     className="form-control"
                                                     type="text"
                                                     name="stateId"
                                                     id="stateId"
+                                                    value={Object.keys(patientData).length !== 0 && patientData.address.address[0].city !== null ? patientData.address.address[0].city : ""}
                                                     style={{border: "1px solid #014d88"}}
-                                                    {...register("stateId")}
-                                                    onChange={(e) => onStateChange(e)}>
-                                                    <option value={""}>Select State</option>
-                                                    {stateRows}
-                                                </select>
+                                                    readOnly
+                                                />
                                                 {errors.stateId && <p>Select State</p>}
                                             </FormGroup>
                                         </div>
@@ -1135,7 +1156,16 @@ const RegisterPatient = (props) => {
                                         <div className="form-group  col-md-4">
                                             <FormGroup>
                                                 <Label>Province/District/LGA *</Label>
-                                                <select
+                                                 <input
+                                                        className="form-control"
+                                                        type="text"
+                                                        name="district"
+                                                        id="district"
+                                                        value={disValue !== "" ? disValue : ""}
+                                                        style={{border: "1px solid #014d88"}}
+                                                        readOnly
+                                                    />
+                                               {/* <select
                                                     className="form-control"
                                                     type="text"
                                                     name="district"
@@ -1144,7 +1174,7 @@ const RegisterPatient = (props) => {
                                                     {...register("district")}>
                                                     <option value={""}>Select Province/District/LGA</option>
                                                     {districtRows}
-                                                </select>
+                                                </select> */}
                                                 {errors.district && <p>Select Province/District/LGA</p>}
                                             </FormGroup>
                                         </div>
@@ -1161,12 +1191,13 @@ const RegisterPatient = (props) => {
                                                     id="address"
                                                     style={{border: "1px solid #014d88"}}
                                                     {...register("address")}
+                                                    readOnly
                                                 />
                                                 {errors.address && <p>{errors.address.message}</p>}
                                             </FormGroup>
                                         </div>
 
-                                        <div className="form-group  col-md-4">
+                                        <div className="form-group  col-md-6">
                                             <FormGroup>
                                                 <Label>Landmark</Label>
                                                 <input
@@ -1176,6 +1207,7 @@ const RegisterPatient = (props) => {
                                                     id="landmark"
                                                     style={{border: "1px solid #014d88"}}
                                                     {...register("landmark")}
+                                                    readOnly
                                                 />
                                                 {errors.landmark && <p>{errors.landmark.message}</p>}
                                             </FormGroup>
@@ -1200,7 +1232,7 @@ const RegisterPatient = (props) => {
                                                             <th>Name</th>
                                                             <th>Phone</th>
                                                             <th>Address</th>
-                                                            <th>Actions</th>
+
                                                         </tr>
                                                         </thead>
                                                         <tbody>
@@ -1211,7 +1243,7 @@ const RegisterPatient = (props) => {
                                                                     <td>{ getNames(item) }</td>
                                                                     <td>{ getPhoneContactPoint(item.contactPoint) }</td>
                                                                     <td>{ getAddress(item.address) }</td>
-                                                                    <td>
+                                                                    {/*<td>
                                                                         <button type="button"
                                                                                 className="btn btn-default btn-light btn-sm editRow"
                                                                                 onClick={(e) => handleEditRelative(item, index)}>
@@ -1224,7 +1256,7 @@ const RegisterPatient = (props) => {
                                                                             onClick={(e) => handleDeleteRelative(index)}>
                                                                             <FontAwesomeIcon icon="trash" />
                                                                         </button>
-                                                                    </td>
+                                                                    </td>*/}
                                                                 </tr>
                                                             );
                                                         })}
@@ -1381,7 +1413,7 @@ const RegisterPatient = (props) => {
                                                                 </div>
                                                             </div>
 
-                                                            <div className="row">
+                                                          {/*  <div className="row">
                                                                 <div className="">
                                                                     <MatButton
                                                                         type="button"
@@ -1404,14 +1436,14 @@ const RegisterPatient = (props) => {
                                                                         Cancel
                                                                     </MatButton>
                                                                 </div>
-                                                            </div>
+                                                            </div> */}
                                                         </div>
                                                     </div>
                                                 )
                                             }
                                         </div>
                                     </div>
-
+                                    {/*
                                     <div className="row">
                                         <MatButton
                                             type="button"
@@ -1425,13 +1457,14 @@ const RegisterPatient = (props) => {
                                             Add a Relative/Next Of Kin
                                         </MatButton>
                                     </div>
+                                    */}
                                 </div>
                             </div>
 
                             {saving ? <Spinner /> : ""}
 
                             <br />
-                            {!checkHospitalNumberError &&
+                            { /*!checkHospitalNumberError &&
                                 <>
                                     {userDetail ===null ? (
                                             <MatButton
@@ -1479,7 +1512,7 @@ const RegisterPatient = (props) => {
                                 style={{backgroundColor:'#992E62',color:'#fff'}}
                             >
                                 <span style={{ textTransform: "capitalize" }}>Cancel</span>
-                            </MatButton>
+                            </MatButton> */}
                         </Form>
                     </div>
                 </CardContent>
@@ -1504,4 +1537,4 @@ const RegisterPatient = (props) => {
     );
 };
 
-export default RegisterPatient;
+export default ViewPatient;

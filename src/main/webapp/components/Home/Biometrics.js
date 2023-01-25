@@ -1,34 +1,47 @@
-import React, {forwardRef, useCallback, useEffect, useRef, useState} from 'react';
+import React, {useState, useEffect, useCallback, useRef} from 'react'
+import MaterialTable from 'material-table';
 import axios from "axios";
-import {token, url as baseUrl} from "../../../../api";
-import MaterialTable from "material-table";
-import Swal from "sweetalert2";
-
-import {FaEye} from "react-icons/fa";
-import {MdDeleteForever, MdModeEdit, MdPerson} from "react-icons/md";
-import FormGroup from "@mui/material/FormGroup";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
-import AddBox from "@material-ui/icons/AddBox";
-import Check from "@material-ui/icons/Check";
-import Clear from "@material-ui/icons/Clear";
-import DeleteOutline from "@material-ui/icons/DeleteOutline";
-import ChevronRight from "@material-ui/icons/ChevronRight";
-import Edit from "@material-ui/icons/Edit";
-import SaveAlt from "@material-ui/icons/SaveAlt";
-import FilterList from "@material-ui/icons/FilterList";
-import FirstPage from "@material-ui/icons/FirstPage";
-import LastPage from "@material-ui/icons/LastPage";
-import ChevronLeft from "@material-ui/icons/ChevronLeft";
-import Search from "@material-ui/icons/Search";
-import ArrowUpward from "@material-ui/icons/ArrowUpward";
-import Remove from "@material-ui/icons/Remove";
-import ViewColumn from "@material-ui/icons/ViewColumn";
-import {makeStyles} from "@material-ui/core/styles";
-import {ToastContainer} from "react-toastify";
-import {Modal, ModalBody, ModalFooter, ModalHeader} from "reactstrap";
+import { url as baseUrl, token } from "../../../../api";
+import { Link } from 'react-router-dom'
+import { Card,CardBody,} from 'reactstrap';
+import { Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import Button from "@material-ui/core/Button";
-import SplitActionButton from "../SplitActionButton";
+import 'react-toastify/dist/ReactToastify.css';
+import 'react-widgets/dist/css/react-widgets.css';
+import {FaEye, FaUserPlus} from "react-icons/fa";
+import { MdDashboard, MdDeleteForever, MdModeEdit,MdPerson} from "react-icons/md";
+import {Menu,MenuList,MenuButton,MenuItem,} from "@reach/menu-button";
+import "@reach/menu-button/styles.css";
+import { ToastContainer } from "react-toastify";
+import { Label } from 'semantic-ui-react';
+import { makeStyles } from '@material-ui/core/styles';
+import "../patient.css";
+import SplitActionButton from '../SplitActionButton';
+
+import { forwardRef } from 'react';
+//import { Button} from "react-bootstrap";
+import AddBox from '@material-ui/icons/AddBox';
+import ArrowUpward from '@material-ui/icons/ArrowUpward';
+import Check from '@material-ui/icons/Check';
+import ChevronLeft from '@material-ui/icons/ChevronLeft';
+import ChevronRight from '@material-ui/icons/ChevronRight';
+import Clear from '@material-ui/icons/Clear';
+import DeleteOutline from '@material-ui/icons/DeleteOutline';
+import Edit from '@material-ui/icons/Edit';
+import FilterList from '@material-ui/icons/FilterList';
+import FirstPage from '@material-ui/icons/FirstPage';
+import LastPage from '@material-ui/icons/LastPage';
+import Remove from '@material-ui/icons/Remove';
+import SaveAlt from '@material-ui/icons/SaveAlt';
+import Search from '@material-ui/icons/Search';
+import ViewColumn from '@material-ui/icons/ViewColumn';
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
+import TablePagination from '@mui/material/TablePagination';
+
+
+
 
 const tableIcons = {
     Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -97,7 +110,8 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-function DuplicateHospitalNumbers(props) {
+
+const Biometrics = (props) => {
     const tableRef = useRef(null);
     const classes = useStyles();
     const [patients, setPatients] = useState([]);
@@ -118,27 +132,6 @@ function DuplicateHospitalNumbers(props) {
         setModal(!modal);
     }
 
-    const handleDelete = (id) => {
-        axios
-            .delete(`${baseUrl}patient/delete/${id}`,
-                { headers: {"Authorization" : `Bearer ${token}`} }
-            )
-            .then((response) => {
-                Swal.fire({
-                      icon: 'success',
-                      text: 'DQA Deleted Successfully',
-                      timer: 1500
-                 });
-            })
-            .catch((error) => {
-                 Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: 'An error occurred while deleting!!!',
-                });
-            });
-    }
-
     function actionItems(row){
         return  [
             {
@@ -146,54 +139,56 @@ function DuplicateHospitalNumbers(props) {
                 type:'link',
                 icon:<FaEye  size="22"/>,
                 to:{
-                    pathname: "/register-patient",
-                    state: { patientId : row.id, permissions:permissions  }
+                    pathname: "/patient-biometrics",
+                    state: { patientObj: row, permissions:permissions  }
                 }
             },
-            {...(permissions.includes('edit_patient') || permissions.includes("all_permission")&&
+            {...(permissions.includes('view_patient') || permissions.includes("all_permission")&&
                     {
-                        name:'Edit',
+                        name:'Dashboard',
                         type:'link',
-                        icon:<MdModeEdit size="20" color='rgb(4, 196, 217)' />,
+                        icon:<MdPerson size="20" color='rgb(4, 196, 217)' />,
                         to:{
-                            pathname: "/register-patient",
-                            state: { patientId : row.id, permissions:permissions  }
-                        }
-                    }
-                )},
-             {...(permissions.includes('delete_patient') || permissions.includes("all_permission")&&
-                    {
-                        name:'Delete',
-                        type:'link',
-                        icon:<MdDeleteForever size="20" color='rgb(4, 196, 217)'  />,
-                        deleteAction: () => {handleDelete(row.id)},
-                        to:{
-                            pathname: "/#",
+                            pathname: "/patient-biometrics",
                             state: { patientObj: row, permissions:permissions  }
                         }
                     }
-                )}
+                )},
+//            {...(permissions.includes('edit_patient') || permissions.includes("all_permission")&&
+//                    {
+//                        name:'Edit',
+//                        type:'link',
+//                        icon:<MdModeEdit size="20" color='rgb(4, 196, 217)' />,
+//                        to:{
+//                            pathname: "/register-patient",
+//                            state: { patientId : row.id, permissions:permissions  }
+//                        }
+//                    }
+//                )},
+//            {...(permissions.includes('delete_patient') || permissions.includes("all_permission")&&
+//                    {
+//                        name:'Delete',
+//                        type:'link',
+//                        icon:<MdDeleteForever size="20" color='rgb(4, 196, 217)'  />,
+//                        to:{
+//                            pathname: "/#",
+//                            state: { patientObj: row, permissions:permissions  }
+//                        }
+//                    }
+//                )}
         ]
     }
     const handleRemoteData = query =>
         new Promise((resolve, reject) => {
-            axios.get(`${baseUrl}patient/get-duplicate-hospital_numbers?pageSize=${query.pageSize}&pageNo=${query.page}&searchParam=${query.search}`, { headers: {"Authorization" : `Bearer ${token}`} })
+            axios.get(`${baseUrl}patient/getall-patients-with-biometric?pageSize=${query.pageSize}&pageNo=${query.page}&searchParam=${query.search}`, { headers: {"Authorization" : `Bearer ${token}`} })
                 .then(response => response)
                 .then(result => {
-                  if (result.data === "") {
                     resolve({
-                      data: [],
-                      page: 0,
-                      totalCount: 0,
-                    });
-                  } else {
-                      resolve({
                         data: result.data.records.map((row) => ({
                             name: [row.firstName, row.otherName, row.surname].filter(Boolean).join(", "),
                             id: getHospitalNumber(row.identifier),
-                            sex: row.sex,
+                            sex:row.sex.toLowerCase().charAt(0).toUpperCase() + row.sex.slice(1).toLowerCase(),
                             dateOfBirth: row.dateOfBirth,
-                            status:row.archived == 1?'Archived':"Active",
                             age: (row.dateOfBirth === 0 ||
                                 row.dateOfBirth === undefined ||
                                 row.dateOfBirth === null ||
@@ -209,9 +204,8 @@ function DuplicateHospitalNumbers(props) {
                                 </div>
                         })),
                         page: query.page,
-                        totalCount: result.data.totalRecords
+                        totalCount:result.data.totalRecords
                     });
-                  }
                 });
         })
 
@@ -287,7 +281,7 @@ function DuplicateHospitalNumbers(props) {
     };
     const localization = {
         pagination: {
-            labelDisplayedRows: `Page: ${currentPage}`
+            labelDisplayedRows: `${currentPage} - 10 of 2022`
         }
     }
 
@@ -313,23 +307,13 @@ function DuplicateHospitalNumbers(props) {
                     { title: "Date Of Birth", field: "dateOfBirth", filtering: false },
                     { title: "Age", field: "age", filtering: false },
                     /*{ title: "Address", field: "address", filtering: false },*/
-                    { title: "Status", field: "status", filtering: false },
+                    /*{ title: "Status", field: "status", filtering: false },*/
                     {title: "Actions", field: "actions", filtering: false },
                 ]}
                 isLoading={loading}
                 data={handleRemoteData}
 
                 options={{
-                    rowStyle: rowData => {
-                        if(rowData.status === 'Archived') {
-                            return {
-                                backgroundColor: '#ceeef5',
-                                border:'2px solid #fff'
-                            };
-                        }
-
-                        return {border:'2px solid #eee'};
-                    },
                     headerStyle: {
                         backgroundColor: "#014d88",
                         color: "#fff",
@@ -366,4 +350,6 @@ function DuplicateHospitalNumbers(props) {
     );
 }
 
-export default DuplicateHospitalNumbers;
+export default Biometrics;
+
+
