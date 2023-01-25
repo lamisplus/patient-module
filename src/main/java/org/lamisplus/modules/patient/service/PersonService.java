@@ -274,9 +274,9 @@ public class PersonService {
         personResponseDto.setId(person.getId());
         personResponseDto.setIsDateOfBirthEstimated(person.getIsDateOfBirthEstimated());
         personResponseDto.setDateOfBirth(person.getDateOfBirth());
-        personResponseDto.setFirstName(this.treatNull(person.getFirstName()));
-        personResponseDto.setSurname(this.treatNull(person.getSurname()));
-        personResponseDto.setOtherName(this.treatNull(person.getOtherName()));
+        personResponseDto.setFirstName(person.getFirstName());
+        personResponseDto.setSurname(person.getSurname());
+        personResponseDto.setOtherName(person.getOtherName());
         personResponseDto.setContactPoint(person.getContactPoint());
         personResponseDto.setAddress(person.getAddress());
         personResponseDto.setContact(person.getContact());
