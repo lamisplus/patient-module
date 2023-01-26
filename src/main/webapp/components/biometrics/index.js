@@ -108,8 +108,6 @@ function Index(props) {
     const [patientVisits, setPatientVisits]= useState([]);
     const [checkinStatus, setCheckinStatus]= useState(false)
 
-
-
     const updatePatientBiometricStatus = (bioStatus) =>{
         setPatientBiometricStatus(bioStatus);
     }
