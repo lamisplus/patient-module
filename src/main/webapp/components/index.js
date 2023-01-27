@@ -111,16 +111,16 @@ function Index(props) {
                     <CheckedInPatients permissions={permissions}/>
                 </Tab.Pane>
         },
-       { menuItem: 'Biometrics', render: () =>
+       { menuItem: 'Patient Biometrics', render: () =>
                 <Tab.Pane>
                     <BiometricsCapture permissions={permissions}/>
                 </Tab.Pane>
         },
-        { menuItem: 'Missing Biometrics', render: () =>
-                <Tab.Pane>
-                    <BiometricsList permissions={permissions}/>
-                </Tab.Pane>
-        },
+//        { menuItem: 'Missing Biometrics', render: () =>
+//                <Tab.Pane>
+//                    <BiometricsList permissions={permissions}/>
+//                </Tab.Pane>
+//        },
         { menuItem: 'Migration DQA', render: () =>
                 <Tab.Pane>
                     <MigrationDQA permissions={permissions}/>

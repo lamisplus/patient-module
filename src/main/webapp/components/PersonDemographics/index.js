@@ -111,7 +111,7 @@ function Index(props) {
     };
 
     const getAddress = (address) => {
-        const city = address && address.address && address.address.length > 0 ? address.address[0].city : null;
+        const city = address && address.address && address.address.length > 0 ? `${address.address[0].line[0]}, ${address.address[0].city}` : null;
         return city;
     };
 
