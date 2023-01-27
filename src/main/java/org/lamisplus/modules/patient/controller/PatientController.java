@@ -170,7 +170,7 @@ public class PatientController {
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize) {
 
-        PersonMetaDataDto personMetaDataDto = personService.getAllPatientWithoutBiomentic(searchParam, pageNo, pageSize);
+        PersonMetaDataDto personMetaDataDto = personService.getAllPatientWithIncompleteBiomentic(searchParam, pageNo, pageSize);
         return new ResponseEntity<>(personMetaDataDto, new HttpHeaders(), HttpStatus.OK);
     }
 
@@ -181,6 +181,16 @@ public class PatientController {
             @RequestParam(defaultValue = "10") Integer pageSize) {
 
         PersonMetaDataDto personMetaDataDto = personService.getAllPatientWithBiomentic(searchParam, pageNo, pageSize);
+        return new ResponseEntity<>(personMetaDataDto, new HttpHeaders(), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/getall-patients-with-no-biometric")
+    public ResponseEntity<PersonMetaDataDto> getAllPatientWithNoBiomentic(
+            @RequestParam(defaultValue = "*") String searchParam,
+            @RequestParam(defaultValue = "0") Integer pageNo,
+            @RequestParam(defaultValue = "10") Integer pageSize) {
+
+        PersonMetaDataDto personMetaDataDto = personService.getAllPatientWithoutBiomentic(searchParam, pageNo, pageSize);
         return new ResponseEntity<>(personMetaDataDto, new HttpHeaders(), HttpStatus.OK);
     }
 

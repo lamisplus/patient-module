@@ -10,13 +10,16 @@ import 'react-toastify/dist/ReactToastify.css';
 import 'react-widgets/dist/css/react-widgets.css';
 import {FaEye, FaUserPlus} from "react-icons/fa";
 import { MdDashboard, MdDeleteForever, MdModeEdit,MdPerson} from "react-icons/md";
-import {Menu,MenuList,MenuButton,MenuItem,} from "@reach/menu-button";
+import {Menu,MenuList,MenuButton} from "@reach/menu-button";
 import "@reach/menu-button/styles.css";
 import { ToastContainer } from "react-toastify";
 import { Label } from 'semantic-ui-react';
 import { makeStyles } from '@material-ui/core/styles';
 import "../patient.css";
 import SplitActionButton from '../SplitActionButton';
+import TextField from '@mui/material/TextField';
+import MenuItem from '@mui/material/MenuItem';
+import BiometricsList from './BiometricsList';
 
 import { forwardRef } from 'react';
 //import { Button} from "react-bootstrap";
@@ -126,6 +129,7 @@ const Biometrics = (props) => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [currentPage,setCurrentPage] = useState(1);
+    const [status, setStatus] = useState(true);
     const toggle = (id) => {
         const patient = patients.find(obj => obj.id == id);
         setPatient(patient);
@@ -285,9 +289,31 @@ const Biometrics = (props) => {
         }
     }
 
+    const handleChangeStatus = () => {
+        console.log("clicked")
+        setStatus(!status)
+    }
+
     return (
         <div className={classes.root}>
             <ToastContainer autoClose={3000} hideProgressBar />
+            <TextField
+                  id="biometrics"
+                  select
+                  label="Select"
+                  defaultValue="1"
+                  helperText="Select patient biometric status"
+                  onChange={handleChangeStatus}
+                >
+                    <MenuItem key="1" value="1">
+                     Patient with Biometrics
+                    </MenuItem>
+                    <MenuItem key="2" value="2">
+                     Patient without Biometrics
+                    </MenuItem>
+                  ))}
+            </TextField>
+            { status ?
             <MaterialTable
                 tableRef={tableRef}
                 /*onSearchChange={(e) => {
@@ -336,6 +362,10 @@ const Biometrics = (props) => {
                 //localization={localization}
 
             />
+            :
+            <BiometricsList />
+            }
+
             <Modal isOpen={modal} toggle={onCancelDelete}>
                 <ModalHeader toggle={onCancelDelete}>Delete Patient</ModalHeader>
                 <ModalBody>

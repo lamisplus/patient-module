@@ -267,8 +267,8 @@ function BiometricsList(props) {
         }
     }
     return (
-        <div className={classes.root}>
-            <ToastContainer autoClose={3000} hideProgressBar />
+        <div>
+            {/*<ToastContainer autoClose={3000} hideProgressBar />*/}
             <MaterialTable
                 icons={tableIcons}
                 title={<PPISelect/>}
