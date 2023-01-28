@@ -636,6 +636,7 @@ const RegisterPatient = (props) => {
     };
 
     const checkPhoneNumber=(e, inputName)=>{
+        console.log(e, inputName)
         setValue(inputName,e);
     }
 
@@ -1000,7 +1001,16 @@ const RegisterPatient = (props) => {
                                         <div className="form-group  col-md-4">
                                             <FormGroup>
                                                 <Label>Phone Number *</Label>
-                                                <PhoneInput
+                                                   <input
+                                                        className="form-control"
+                                                        type="text"
+                                                        name="pnumber"
+                                                        id="pnumber"
+                                                        {...register("pnumber")}
+                                                        onChange={(e)=>{checkPhoneNumber(e,'pnumber')}}
+                                                        style={{border: "1px solid #014d88"}}
+                                                    />
+                                                {/*<PhoneInput
                                                     containerStyle={{width:'100%',border: "1px solid #014d88"}}
                                                     inputStyle={{width:'100%',borderRadius:'0px'}}
                                                     country={'ng'}
@@ -1021,7 +1031,7 @@ const RegisterPatient = (props) => {
                                                             }
                                                         }
                                                     }}
-                                                />
+                                                /> */}
 
                                                 {/*                                                <input
                                                     className="form-control"
@@ -1041,7 +1051,16 @@ const RegisterPatient = (props) => {
                                         <div className="form-group col-md-4">
                                             <FormGroup>
                                                 <Label>Alt. Phone Number</Label>
-                                                <PhoneInput
+                                                    <input
+                                                        className="form-control"
+                                                        type="text"
+                                                        name="altPhonenumber"
+                                                        id="altPhonenumber"
+                                                        {...register("altPhonenumber")}
+                                                        onChange={(e)=>{checkPhoneNumber(e,'altPhonenumber')}}
+                                                        style={{border: "1px solid #014d88"}}
+                                                    />
+                                                {/*<PhoneInput
                                                     containerStyle={{width:'100%',border: "1px solid #014d88"}}
                                                     inputStyle={{width:'100%',borderRadius:'0px'}}
                                                     country={'ng'}
@@ -1062,7 +1081,7 @@ const RegisterPatient = (props) => {
                                                             }
                                                         }
                                                     }}
-                                                />
+                                                />*/}
                                                 {/*                                                <input
                                                     className="form-control"
                                                     type="tel"

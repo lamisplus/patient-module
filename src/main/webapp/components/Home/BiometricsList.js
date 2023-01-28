@@ -269,6 +269,7 @@ function BiometricsList(props) {
     return (
         <div>
             {/*<ToastContainer autoClose={3000} hideProgressBar />*/}
+            <h3>Patients without biometrics</h3>
             <MaterialTable
                 icons={tableIcons}
                 title={<PPISelect/>}
