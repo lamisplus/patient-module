@@ -857,7 +857,7 @@ const RegisterPatient = (props) => {
                                                     {errors.sex && <p>Select Sex</p>}
                                                 </FormGroup>
                                             </div>
-                                            <div className="form-group mb-2 col-md-2">
+                                            <div className="form-group mb-3 col-md-1">
                                                 <FormGroup>
                                                     <Label>Date Of Birth</Label>
                                                     <div className="radio">
@@ -916,7 +916,7 @@ const RegisterPatient = (props) => {
                                                 </FormGroup>
                                             </div>
 
-                                            <div className="form-group mb-3 col-md-3">
+                                            <div className="form-group mb-3 col-md-4">
                                                 <FormGroup>
                                                     <Label>Age</Label>
                                                     <input
@@ -936,7 +936,7 @@ const RegisterPatient = (props) => {
                                         <div className={"row"}>
                                             {/*                                            {watchShowAge >=0 &&
                                             <>*/}
-                                            <div className="form-group mb-3 col-md-3">
+                                            <div className="form-group mb-3 col-md-4">
                                                 <FormGroup>
                                                     <Label>Marital Status *</Label>
                                                     <select
@@ -1315,7 +1315,7 @@ const RegisterPatient = (props) => {
 
                                                                 <div className="form-group mb-3 col-md-3">
                                                                     <FormGroup>
-                                                                        <Label>Last Name *</Label>
+                                                                        <Label>Last Name </Label>
                                                                         <input
                                                                             className="form-control"
                                                                             type="text"
