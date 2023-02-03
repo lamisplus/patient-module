@@ -170,7 +170,7 @@ function Index(props) {
                 permissions.includes('view_patient_appointment') || permissions.includes("all_permission") ?
                     <Tab.Pane>
                         <div style={{ minHeight: 400, width: '100%' }}>
-                            <Biometrics patientId={patientObj.id} updatePatientBiometricStatus={updatePatientBiometricStatus}/>
+                            <Biometrics age={patientObj.dateOfBirth} patientId={patientObj.id} updatePatientBiometricStatus={updatePatientBiometricStatus}/>
                         </div>
                     </Tab.Pane>
                     :""

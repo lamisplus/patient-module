@@ -879,7 +879,7 @@ const ViewPatient = (props) => {
                                                     {errors.sex && <p>Select Sex</p>}
                                                 </FormGroup>
                                             </div>
-                                            <div className="form-group mb-2 col-md-1">
+                                            <div className="form-group mb-2 col-md-2">
                                                 <FormGroup>
                                                     <Label>Date Of Birth</Label>
                                                     <div className="radio">
@@ -910,7 +910,7 @@ const ViewPatient = (props) => {
                                                 </FormGroup>
                                             </div>
 
-                                            <div className="form-group mb-3 col-md-3">
+                                            <div className="form-group mb-3 col-md-2">
                                                 <FormGroup>
                                                     <Label>Date</Label>
                                                     <input
