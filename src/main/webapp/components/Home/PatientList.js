@@ -259,7 +259,6 @@ const PatientList = (props) => {
     }
 
     const calculate_age = dob => {
-
         const today = new Date();
         const dateParts = dob.split("-");
         const birthDate = new Date(dob); // create a date object directlyfrom`dob1`argument

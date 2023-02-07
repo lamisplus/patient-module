@@ -134,7 +134,8 @@ function Biometrics(props) {
     patientId: props.patientId,
     templateType: "",
     device: "",
-    reason: ""
+    reason: "",
+    age: ""
   });
   const [fingerType, setFingerType] = useState([]);
   const [devices, setDevices] = useState([]);
@@ -149,6 +150,7 @@ function Biometrics(props) {
   const [capturedFingered, setCapturedFingered] = useState([]);
   const [selectedFingers, setSelectedFingers] = useState([]);
   const [imageQuality, setImageQuality] = useState(false);
+  const [isNewStatus, setIsNewStatus] = useState(true);
 
   const calculate_age = dob => {
 
@@ -302,7 +304,7 @@ function Biometrics(props) {
   };
   // handle the input changes
   const handleInputChange = (e) => {
-    setObjValues({ ...objValues, [e.target.name]: e.target.value });
+    setObjValues({ ...objValues, [e.target.name]: e.target.value, age: calculate_age(props.age) });
   };
   //form validation
   const validate = () => {
@@ -324,7 +326,7 @@ function Biometrics(props) {
       // axios.post(`${checkUrl}biometrics/secugen/enrollment?reader=SG_DEV_AUTO`,objValues,
       console.log("", objValues)
       axios
-        .post(`${devices.url}?reader=${devices.name}`, objValues, {
+        .post(`${devices.url}?reader=${devices.name}&isNew=${isNewStatus}`, objValues, {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((response) => {
@@ -336,6 +338,7 @@ function Biometrics(props) {
               setTryAgain(false);
             }, 5000);
             toast.error(response.data.message.ERROR);
+            setIsNewStatus(false)
           } 
           else if (response.data.type === "SUCCESS") {
             if (response.data.imageQuality <= 60 && calculate_age(props.age) <= 6) {
@@ -362,7 +365,7 @@ function Biometrics(props) {
             setFingerType([...fingerType]);
             //setObjValues({biometricType: "FINGERPRINT", patientId:props.patientId, templateType:"", device:""});
             setObjValues({ ...objValues, templateType: "" });
-
+            setIsNewStatus(false)
             //console.log("captured",  biometricsEnrollments)
           } else {
              setLoading(false);
@@ -410,7 +413,7 @@ function Biometrics(props) {
         "templateType"
       );
 
-      console.log("capturedObj", capturedObj);
+      //console.log("capturedObj", capturedFingered);
 
       axios
         .post(`${baseUrl}biometrics/templates`, capturedObj, {
