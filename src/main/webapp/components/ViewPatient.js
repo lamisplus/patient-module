@@ -177,13 +177,17 @@ const ViewPatient = (props) => {
         return relationship ? relationship.display : '';
     };
     const getPhoneContactPoint = (contactPoint) => {
-        return contactPoint ? phoneNumberFormatCheck(contactPoint).value : '';
+        if (contactPoint.value === null) {
+
+        }else {
+           return contactPoint ? phoneNumberFormatCheck(contactPoint).value : '';
+        }
     };
     const getAddress = (address) => {
         return address && address.line && address.line.length > 0 ? address.line[0] : '';
     };
     const phoneNumberFormatCheck = (phone) =>{
-        if( phone != undefined && phone.value.charAt(0) === '0'){
+        if( phone != undefined && typeof phone.value !== null && phone.value.charAt(0) === '0'){
             phone.value = phone.value.replace('0','234');
         }
         return phone
@@ -704,7 +708,7 @@ const ViewPatient = (props) => {
                                 <div className="card-body">
                                     <div className="basic-form">
                                         <div className="row">
-                                            <div className="form-group mb-3 col-md-3">
+                                            <div className="form-group mb-3 col-md-4">
                                                 <FormGroup>
                                                     <Label for="dateOfRegistration">Date of Registration* </Label>
                                                     <input
@@ -728,7 +732,7 @@ const ViewPatient = (props) => {
                                                 </FormGroup>
                                             </div>
 
-                                            <div className="form-group mb-3 col-md-3">
+                                            <div className="form-group mb-3 col-md-4">
                                                 <FormGroup>
                                                     <Label for="patientId">Hospital Number* </Label>
                                                     <input
@@ -753,7 +757,7 @@ const ViewPatient = (props) => {
                                                     {!checkHospitalNumberError && errors.hospitalNumber && <p>Enter the hospital number</p>}
                                                 </FormGroup>
                                             </div>
-                                            <div className="form-group mb-3 col-md-3">
+                                            {/*<div className="form-group mb-3 col-md-3">
                                                 <FormGroup>
                                                     <Label for="ninNumber">National Identification Number (NIN)</Label>
                                                     <input
@@ -787,7 +791,7 @@ const ViewPatient = (props) => {
                                                     {!checkNINError && errors.ninNumber && <p>Enter a valid NIN Number</p>}
 
                                                 </FormGroup>
-                                            </div>
+                                            </div>*/}
                                             {/*                                            <div className="form-group mb-3 col-md-3">
                                                 <FormGroup>
                                                     <Label for="emrId">EMR ID *</Label>
@@ -906,7 +910,7 @@ const ViewPatient = (props) => {
                                                 </FormGroup>
                                             </div>
 
-                                            <div className="form-group mb-3 col-md-3">
+                                            <div className="form-group mb-3 col-md-2">
                                                 <FormGroup>
                                                     <Label>Date</Label>
                                                     <input
@@ -935,7 +939,7 @@ const ViewPatient = (props) => {
                                                 </FormGroup>
                                             </div>
 
-                                            <div className="form-group mb-3 col-md-3">
+                                            <div className="form-group mb-3 col-md-4">
                                                 <FormGroup>
                                                     <Label>Age</Label>
                                                     <input
@@ -956,9 +960,9 @@ const ViewPatient = (props) => {
                                         <div className={"row"}>
                                             {/*                                            {watchShowAge >=0 &&
                                             <>*/}
-                                            <div className="form-group mb-3 col-md-3">
+                                            <div className="form-group mb-3 col-md-4">
                                                 <FormGroup>
-                                                    <Label>Marital Status</Label>
+                                                    <Label>Marital Status *</Label>
                                                      <input
                                                         className="form-control"
                                                         type="text"
@@ -1323,7 +1327,7 @@ const ViewPatient = (props) => {
 
                                                                 <div className="form-group mb-3 col-md-3">
                                                                     <FormGroup>
-                                                                        <Label>Last Name *</Label>
+                                                                        <Label>Last Name </Label>
                                                                         <input
                                                                             className="form-control"
                                                                             type="text"

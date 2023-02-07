@@ -10,13 +10,17 @@ import 'react-toastify/dist/ReactToastify.css';
 import 'react-widgets/dist/css/react-widgets.css';
 import {FaEye, FaUserPlus} from "react-icons/fa";
 import { MdDashboard, MdDeleteForever, MdModeEdit,MdPerson} from "react-icons/md";
-import {Menu,MenuList,MenuButton,MenuItem,} from "@reach/menu-button";
+import {Menu,MenuList,MenuButton} from "@reach/menu-button";
 import "@reach/menu-button/styles.css";
 import { ToastContainer } from "react-toastify";
 import { Label } from 'semantic-ui-react';
 import { makeStyles } from '@material-ui/core/styles';
 import "../patient.css";
 import SplitActionButton from '../SplitActionButton';
+import TextField from '@mui/material/TextField';
+import MenuItem from '@mui/material/MenuItem';
+import BiometricsList from './BiometricsList';
+import NotCaptured from './NotCaptured';
 
 import { forwardRef } from 'react';
 //import { Button} from "react-bootstrap";
@@ -39,9 +43,6 @@ import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import TablePagination from '@mui/material/TablePagination';
-
-
-
 
 const tableIcons = {
     Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -126,6 +127,7 @@ const Biometrics = (props) => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [currentPage,setCurrentPage] = useState(1);
+    const [status, setStatus] = useState(1);
     const toggle = (id) => {
         const patient = patients.find(obj => obj.id == id);
         setPatient(patient);
@@ -285,9 +287,44 @@ const Biometrics = (props) => {
         }
     }
 
+    const handleChangeStatus = (e) => {
+        let count = e.target.value;
+        if (count === "1") {
+            setStatus(1)
+        } else if (count === "2") {
+            setStatus(2)
+        }else if (count === "3") {
+            setStatus(3)
+        }else {
+            setStatus(1)
+        }
+       
+    }
+
     return (
         <div className={classes.root}>
             <ToastContainer autoClose={3000} hideProgressBar />
+            <TextField
+                  id="biometrics"
+                  select
+                  label="Select"
+                  defaultValue="1"
+                  helperText="Select patient biometric status"
+                  onChange={(e) => handleChangeStatus(e)}
+                >
+                    <MenuItem key="1" value="1">
+                     With Biometrics
+                    </MenuItem>
+                    <MenuItem key="2" value="2">
+                     Without Biometrics
+                    </MenuItem>
+                    <MenuItem key="3" value="3">
+                     Not captured
+                    </MenuItem>
+            </TextField>
+            { status === 1 ?
+            <>
+             <h3>Patients with biometrics</h3>
             <MaterialTable
                 tableRef={tableRef}
                 /*onSearchChange={(e) => {
@@ -336,6 +373,13 @@ const Biometrics = (props) => {
                 //localization={localization}
 
             />
+            </>
+            : status === 2 ?
+            <BiometricsList />
+            : status === 3 ?
+            <NotCaptured /> : ""
+            }
+
             <Modal isOpen={modal} toggle={onCancelDelete}>
                 <ModalHeader toggle={onCancelDelete}>Delete Patient</ModalHeader>
                 <ModalBody>

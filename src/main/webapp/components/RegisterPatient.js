@@ -181,7 +181,7 @@ const RegisterPatient = (props) => {
         return address && address.line && address.line.length > 0 ? address.line[0] : '';
     };
     const phoneNumberFormatCheck = (phone) =>{
-        if( phone != undefined && phone.value.charAt(0) === '0'){
+        if( phone != undefined && typeof phone.value !== 'undefined' && phone.value.charAt(0) === '0'){
             phone.value = phone.value.replace('0','234');
         }
         return phone
@@ -301,8 +301,13 @@ const RegisterPatient = (props) => {
             setError("cfirstName", {  type: 'custom', message: 'FirstName is required' }, { shouldFocus: true });
             return;
         }
-        if (!clastName) {
-            setError("clastName", {  type: 'custom', message: 'LastName is required' }, { shouldFocus: true });
+//        if (!clastName) {
+//            setError("clastName", {  type: 'custom', message: 'LastName is required' }, { shouldFocus: true });
+//            return;
+//        }
+
+        if (!contactAddress) {
+            setError("contactAddress", {  type: 'custom', message: 'Address is required' }, { shouldFocus: true });
             return;
         }
 
@@ -356,7 +361,7 @@ const RegisterPatient = (props) => {
     };
 
     const onSubmit = async (data) => {
-        if(_.find(errors,function (error){return error;})){
+        if(_.find(errors,function (error){return console.log("err",error);})){
             toast.error("Failed to save form kindly check the form for errors", {position: toast.POSITION.TOP_RIGHT});
         }else{
             try {
@@ -636,6 +641,7 @@ const RegisterPatient = (props) => {
     };
 
     const checkPhoneNumber=(e, inputName)=>{
+        console.log(e, inputName)
         setValue(inputName,e);
     }
 
@@ -685,7 +691,7 @@ const RegisterPatient = (props) => {
                                 <div className="card-body">
                                     <div className="basic-form">
                                         <div className="row">
-                                            <div className="form-group mb-3 col-md-3">
+                                            <div className="form-group mb-3 col-md-4">
                                                 <FormGroup>
                                                     <Label for="dateOfRegistration">Date of Registration* </Label>
                                                     <input
@@ -708,7 +714,7 @@ const RegisterPatient = (props) => {
                                                 </FormGroup>
                                             </div>
 
-                                            <div className="form-group mb-3 col-md-3">
+                                            <div className="form-group mb-3 col-md-4">
                                                 <FormGroup>
                                                     <Label for="patientId">Hospital Number* </Label>
                                                     <input
@@ -732,7 +738,7 @@ const RegisterPatient = (props) => {
                                                     {!checkHospitalNumberError && errors.hospitalNumber && <p>Enter the hospital number</p>}
                                                 </FormGroup>
                                             </div>
-                                            <div className="form-group mb-3 col-md-3">
+                                            {/*<div className="form-group mb-3 col-md-3">
                                                 <FormGroup>
                                                     <Label for="ninNumber">National Identification Number (NIN)</Label>
                                                     <input
@@ -765,7 +771,7 @@ const RegisterPatient = (props) => {
                                                     {!checkNINError && errors.ninNumber && <p>Enter a valid NIN Number</p>}
 
                                                 </FormGroup>
-                                            </div>
+                                            </div>*/}
                                             {/*                                            <div className="form-group mb-3 col-md-3">
                                                 <FormGroup>
                                                     <Label for="emrId">EMR ID *</Label>
@@ -851,7 +857,7 @@ const RegisterPatient = (props) => {
                                                     {errors.sex && <p>Select Sex</p>}
                                                 </FormGroup>
                                             </div>
-                                            <div className="form-group mb-2 col-md-2">
+                                            <div className="form-group mb-3 col-md-2">
                                                 <FormGroup>
                                                     <Label>Date Of Birth</Label>
                                                     <div className="radio">
@@ -882,7 +888,7 @@ const RegisterPatient = (props) => {
                                                 </FormGroup>
                                             </div>
 
-                                            <div className="form-group mb-3 col-md-3">
+                                            <div className="form-group mb-3 col-md-2">
                                                 <FormGroup>
                                                     <Label>Date</Label>
                                                     <input
@@ -910,7 +916,7 @@ const RegisterPatient = (props) => {
                                                 </FormGroup>
                                             </div>
 
-                                            <div className="form-group mb-3 col-md-3">
+                                            <div className="form-group mb-3 col-md-4">
                                                 <FormGroup>
                                                     <Label>Age</Label>
                                                     <input
@@ -930,9 +936,9 @@ const RegisterPatient = (props) => {
                                         <div className={"row"}>
                                             {/*                                            {watchShowAge >=0 &&
                                             <>*/}
-                                            <div className="form-group mb-3 col-md-3">
+                                            <div className="form-group mb-3 col-md-4">
                                                 <FormGroup>
-                                                    <Label>Marital Status</Label>
+                                                    <Label>Marital Status *</Label>
                                                     <select
                                                         className="form-control"
                                                         name="maritalStatus"
@@ -1000,7 +1006,16 @@ const RegisterPatient = (props) => {
                                         <div className="form-group  col-md-4">
                                             <FormGroup>
                                                 <Label>Phone Number *</Label>
-                                                <PhoneInput
+                                                    {/*<input
+                                                        className="form-control"
+                                                        type="text"
+                                                        name="pnumber"
+                                                        id="pnumber"
+                                                        {...register("pnumber")}
+                                                        onChange={(e)=>{checkPhoneNumber(e,'pnumber')}}
+                                                        style={{border: "1px solid #014d88"}}
+                                                    />*/}
+                                               <PhoneInput
                                                     containerStyle={{width:'100%',border: "1px solid #014d88"}}
                                                     inputStyle={{width:'100%',borderRadius:'0px'}}
                                                     country={'ng'}
@@ -1041,6 +1056,15 @@ const RegisterPatient = (props) => {
                                         <div className="form-group col-md-4">
                                             <FormGroup>
                                                 <Label>Alt. Phone Number</Label>
+                                                   {/* <input
+                                                        className="form-control"
+                                                        type="text"
+                                                        name="altPhonenumber"
+                                                        id="altPhonenumber"
+                                                        {...register("altPhonenumber")}
+                                                        onChange={(e)=>{checkPhoneNumber(e,'altPhonenumber')}}
+                                                        style={{border: "1px solid #014d88"}}
+                                                    />*/}
                                                 <PhoneInput
                                                     containerStyle={{width:'100%',border: "1px solid #014d88"}}
                                                     inputStyle={{width:'100%',borderRadius:'0px'}}
@@ -1291,7 +1315,7 @@ const RegisterPatient = (props) => {
 
                                                                 <div className="form-group mb-3 col-md-3">
                                                                     <FormGroup>
-                                                                        <Label>Last Name *</Label>
+                                                                        <Label>Last Name </Label>
                                                                         <input
                                                                             className="form-control"
                                                                             type="text"
@@ -1302,7 +1326,7 @@ const RegisterPatient = (props) => {
                                                                                 onChange:(e)=>{alphabetOnly(e,'clastName')}
                                                                             })}
                                                                         />
-                                                                        {errors.clastName && <p>{errors.clastName.message}</p>}
+                                                                        {/*errors.clastName && <p>{errors.clastName.message}</p>*/}
                                                                     </FormGroup>
                                                                 </div>
                                                             </div>
@@ -1367,7 +1391,7 @@ const RegisterPatient = (props) => {
 
                                                                 <div className="form-group mb-3 col-md-3">
                                                                     <FormGroup>
-                                                                        <Label for="contactAddress">Address</Label>
+                                                                        <Label for="contactAddress">Address *</Label>
                                                                         <input
                                                                             className="form-control"
                                                                             type="text"
