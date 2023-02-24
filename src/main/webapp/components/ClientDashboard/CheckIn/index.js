@@ -107,6 +107,7 @@ function Index(props) {
     const [checkOutDate,setCheckOutDate]=useState(new Date());
     const [today, setToday] = useState(new Date().toISOString().substr(0, 10).replace('T', ' '));
     const patientObj = history.location && history.location.state ? history.location.state.patientObj : {};
+    ///console.log("check in", patientObj)
     const permissions = history.location && history.location.state ? history.location.state.permissions : [];
     const { handleSubmit, control } = useForm();
     const [modal, setModal] = useState(false);

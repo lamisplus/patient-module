@@ -757,7 +757,7 @@ const ViewPatient = (props) => {
                                                     {!checkHospitalNumberError && errors.hospitalNumber && <p>Enter the hospital number</p>}
                                                 </FormGroup>
                                             </div>
-                                            {/*<div className="form-group mb-3 col-md-3">
+                                            <div className="form-group mb-3 col-md-4">
                                                 <FormGroup>
                                                     <Label for="ninNumber">National Identification Number (NIN)</Label>
                                                     <input
@@ -791,7 +791,7 @@ const ViewPatient = (props) => {
                                                     {!checkNINError && errors.ninNumber && <p>Enter a valid NIN Number</p>}
 
                                                 </FormGroup>
-                                            </div>*/}
+                                            </div>
                                             {/*                                            <div className="form-group mb-3 col-md-3">
                                                 <FormGroup>
                                                     <Label for="emrId">EMR ID *</Label>
@@ -968,7 +968,7 @@ const ViewPatient = (props) => {
                                                         type="text"
                                                         name="maritalStatus"
                                                         id="maritalStatus"
-                                                        value={Object.keys(patientData).length !== 0 ? patientData.maritalStatus.display : ""}
+                                                        value={Object.keys(patientData).length !== 0 && patientData.maritalStatus !== null ? patientData.maritalStatus.display : ""}
                                                         style={{border: "1px solid #014d88"}}
                                                         readOnly
                                                     />
@@ -1005,7 +1005,7 @@ const ViewPatient = (props) => {
                                                         type="text"
                                                         name="highestQualification"
                                                         id="highestQualification"
-                                                        value={Object.keys(patientData).length !== 0 ? patientData.education.display : ""}
+                                                        value={Object.keys(patientData).length !== 0 && patientData.education !== null  ? patientData.education.display : ""}
                                                         style={{border: "1px solid #014d88"}}
                                                         readOnly
                                                     />
@@ -1062,7 +1062,7 @@ const ViewPatient = (props) => {
                                                     placeholder="(234)7099999999"
                                                     style={{border: "1px solid #014d88"}}
                                                 />*/}
-                                                {errors.pnumber && <p>Phone number is required</p>}
+                                                {/*errors.pnumber && <p>Phone number is required</p>*/}
                                             </FormGroup>
                                         </div>
 
@@ -1380,7 +1380,7 @@ const ViewPatient = (props) => {
                                                                                 onChange:(e)=>{checkPhoneNumber(e,'contactPhoneNumber')}
                                                                             })}
                                                                         />*/}
-                                                                        {errors.contactPhoneNumber && <p>{errors.contactPhoneNumber.message}</p>}
+                                                                        //{errors.contactPhoneNumber && <p>{errors.contactPhoneNumber.message}</p>}
                                                                     </FormGroup>
                                                                 </div>
 

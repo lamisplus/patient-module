@@ -175,13 +175,19 @@ const RegisterPatient = (props) => {
         return relationship ? relationship.display : '';
     };
     const getPhoneContactPoint = (contactPoint) => {
-        return contactPoint ? phoneNumberFormatCheck(contactPoint).value : '';
+        if (contactPoint.value === null) {
+
+        }else {
+           return contactPoint ? phoneNumberFormatCheck(contactPoint).value : '';
+        }
     };
     const getAddress = (address) => {
         return address && address.line && address.line.length > 0 ? address.line[0] : '';
     };
     const phoneNumberFormatCheck = (phone) =>{
-        if( phone != undefined && typeof phone.value !== 'undefined' && phone.value.charAt(0) === '0'){
+        console.log("err",phone)
+
+        if( phone != undefined && typeof phone.value !== null && phone.value.charAt(0) === '0'){
             phone.value = phone.value.replace('0','234');
         }
         return phone
@@ -738,7 +744,7 @@ const RegisterPatient = (props) => {
                                                     {!checkHospitalNumberError && errors.hospitalNumber && <p>Enter the hospital number</p>}
                                                 </FormGroup>
                                             </div>
-                                            {/*<div className="form-group mb-3 col-md-3">
+                                            <div className="form-group mb-3 col-md-4">
                                                 <FormGroup>
                                                     <Label for="ninNumber">National Identification Number (NIN)</Label>
                                                     <input
@@ -771,7 +777,7 @@ const RegisterPatient = (props) => {
                                                     {!checkNINError && errors.ninNumber && <p>Enter a valid NIN Number</p>}
 
                                                 </FormGroup>
-                                            </div>*/}
+                                            </div>
                                             {/*                                            <div className="form-group mb-3 col-md-3">
                                                 <FormGroup>
                                                     <Label for="emrId">EMR ID *</Label>
@@ -1131,7 +1137,7 @@ const RegisterPatient = (props) => {
                                                     style={{border: "1px solid #014d88"}}
                                                     {...register("countryId")}
                                                     onChange={(e) => onCountryChange(e)}>
-
+                                                    <option value={""}>Select Country</option>
                                                     {topLevelUnitCountryRows}
                                                 </select>
                                                 {errors.countryId && <p>Select Country</p>}
