@@ -88,6 +88,9 @@ public class Person extends PatientAuditEntity implements Persistable<Long>  , S
 
     @Column(name = "full_name")
     private String fullName;
+//
+//    @Column(name = "case_manager_id")
+//    private Long caseManagerId;
 
 
 

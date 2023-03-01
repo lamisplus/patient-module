@@ -47,5 +47,6 @@ public class PersonDto implements Serializable {
     private Boolean isDateOfBirthEstimated;
     private final long facilityId;
     private final String uuid;
+//    private Long caseManagerId;
 }
 
