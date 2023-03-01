@@ -7,7 +7,7 @@ import {Button, Card, CardContent, FormControl, Grid, MenuItem, Paper, TextField
 import axios from "axios";
 import {token, url as baseUrl} from "../../../../api";
 import {makeStyles} from "@material-ui/core/styles";
-import PatientCard from "../PatientCard";
+import PatientsCard from "../PatientsCard";
 import ClientDashboard from "./index";
 import PersonDemographics from "../PersonDemographics";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
@@ -95,13 +95,14 @@ const useStyles = makeStyles((theme) => ({
         }
     }
 }));
+
 function Index(props) {
     const userDetail = props.location && props.location.state ? props.location.state.user : null;
     const [loading, setLoading] = useState('');
     let history = useHistory();
     const classes = useStyles();
     const patientObj = history.location && history.location.state ? history.location.state.patientObj : {};
-    console.log("data",patientObj)
+    console.log("bio", patientObj)
     const permissions = history.location && history.location.state ? history.location.state.permissions : [];
     const [patientBiometricStatus, setPatientBiometricStatus]= useState(patientObj.biometricStatus);
     const [biometricsModuleInstalled,setBiometricsModuleInstalled]=useState(false);
@@ -128,9 +129,8 @@ function Index(props) {
                     :""
         }
 
-
-
     ];
+
     const checkForBiometricsModule =()=>{
         axios
             .get(`${baseUrl}modules/check?moduleName=biometric`,
@@ -161,7 +161,8 @@ function Index(props) {
             </div>
             <Card>
                 <CardContent>
-                    <PersonDemographics patientObj={patientObj} permissions={permissions} patientBiometricStatus={patientObj.biometricStatus}/>
+                    {/* <PersonDemographics patientObj={patientObj} permissions={permissions} patientBiometricStatus={patientObj.biometricStatus}/> */}
+                    <PatientsCard patientObj={patientObj} permissions={permissions} patientBiometricStatus={patientObj.biometricStatus}/>
                     <Card style={{marginTop:'5px'}}>
                        <div>
                             <Link to={"/"} >

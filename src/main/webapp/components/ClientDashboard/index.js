@@ -100,13 +100,13 @@ function Index(props) {
     let history = useHistory();
     const classes = useStyles();
     const patientObj = history.location && history.location.state ? history.location.state.patientObj : {};
+    console.log("client  dashboard", patientObj)
     const permissions = history.location && history.location.state ? history.location.state.permissions : [];
     const [patientBiometricStatus, setPatientBiometricStatus]= useState(patientObj.biometricStatus);
+
     const [biometricsModuleInstalled,setBiometricsModuleInstalled]=useState(false);
     const [patientVisits, setPatientVisits]= useState([]);
     const [checkinStatus, setCheckinStatus]= useState(false)
-
-
 
     const updatePatientBiometricStatus = (bioStatus) =>{
         setPatientBiometricStatus(bioStatus);
