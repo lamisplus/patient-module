@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -184,6 +185,11 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
     List<Person> findAllByFacilityIdAndArchived(Long facilityId, Integer archived);
     Optional<Person> findByUuidAndFacilityIdAndArchived(String uuid, Long facilityId, Integer archived);
     Optional<Person> findByUuid(String uuid);
+
+    List<Person> findAllByFacilityIdAndArchivedAndLastModifiedDate(Long facilityId, Integer archived, LocalDateTime dateLastSync);
+
+    @Query(value ="SELECT * FROM patient_person WHERE last_modified_date > ?1 AND facility_id=?2 And archived=?3", nativeQuery = true)
+    public List<Person> getPatientsDueForServerUpload(LocalDateTime dateLastSync, Long facilityId, int archived);
 
 
 }
