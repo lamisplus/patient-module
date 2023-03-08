@@ -54,5 +54,6 @@ public class PatientDTO {
     private Long htsNewId;
     private Object details;
     private Long organisationUnitId;
+
 }
 

@@ -37,7 +37,7 @@ public class PatientAuditEntity {
     @CreatedDate
     private LocalDateTime createdDate = LocalDateTime.now ();
 
-    @JsonIgnore
+    //@JsonIgnore
     @ToString.Exclude
     @Column(name = "created_by", updatable = false)
     private String createdBy = SecurityUtils.getCurrentUserLogin ().orElse ("");
@@ -49,7 +49,7 @@ public class PatientAuditEntity {
 
 
     @Column(name = "last_modified_by")
-    @JsonIgnore
+    //@JsonIgnore
     @ToString.Exclude
     private String lastModifiedBy = SecurityUtils.getCurrentUserLogin ().orElse ("");
 

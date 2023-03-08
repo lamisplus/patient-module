@@ -48,7 +48,8 @@
                 hospital_number            VARCHAR(255),
                 is_date_of_birth_estimated BOOLEAN,
                 full_name                   VARCHAR(255),
-                    CONSTRAINT pk_patient_person PRIMARY KEY (id)
+                case_manager_id bigint,
+                CONSTRAINT pk_patient_person PRIMARY KEY (id)
             );
             ALTER TABLE patient_person
                 ADD CONSTRAINT uc_patient_person_uuid UNIQUE (uuid);
