@@ -163,7 +163,6 @@ const RegisterPatient = (props) => {
     let patientId = null;
     patientId = locationState ? locationState.patientId : null;
 
-
     const getNames = (relationship) => {
         const surname = relationship.surname;
         const firstName = relationship.firstName;
@@ -185,12 +184,17 @@ const RegisterPatient = (props) => {
         return address && address.line && address.line.length > 0 ? address.line[0] : '';
     };
     const phoneNumberFormatCheck = (phone) =>{
-        console.log("err",phone)
+        //console.log("err",phone.value)
+        return phone;
 
-        if( phone != undefined && typeof phone.value !== null && phone.value.charAt(0) === '0'){
-            phone.value = phone.value.replace('0','234');
-        }
-        return phone
+//        if (phone.value === undefined) {
+//            return phone
+//        }else {
+//             if( phone.value !== null && phone.value.charAt(0) === '0'){
+//                        phone.value = phone.value.replace('0','234');
+//                    }
+//             return phone
+//        }
     }
     const calculate_age = dob => {
         const today = new Date();
@@ -365,7 +369,6 @@ const RegisterPatient = (props) => {
 
         return isValid;
     };
-
     const onSubmit = async (data) => {
         if(_.find(errors,function (error){return console.log("err",error);})){
             toast.error("Failed to save form kindly check the form for errors", {position: toast.POSITION.TOP_RIGHT});
@@ -529,12 +532,16 @@ const RegisterPatient = (props) => {
     };
     const onCountryChange = async (e) => {
         if (e.target.value) {
-            const stateOptions = await loadOrganisationUnitsByParentId(e.target.value);
+            const stateOptions = await loadOrganisationUnitsByParentId(1);
             setStateUnitOptions(stateOptions);
         } else {
             setStateUnitOptions([]);
         }
     };
+    const statesList = async () => {
+        const stateOptions = await loadOrganisationUnitsByParentId(1);
+        setStateUnitOptions(stateOptions);
+    }
     const onStateChange = async (e) => {
         if (e.target.value) {
             const districtOptions = await loadOrganisationUnitsByParentId(e.target.value);
@@ -583,6 +590,7 @@ const RegisterPatient = (props) => {
     }
 
     useEffect(() => {
+        statesList();
         loadSexes();
         loadMaritalStatus();
         loadEducation();
@@ -1137,10 +1145,10 @@ const RegisterPatient = (props) => {
                                                     style={{border: "1px solid #014d88"}}
                                                     {...register("countryId")}
                                                     onChange={(e) => onCountryChange(e)}>
-                                                    <option value={""}>Select Country</option>
+                                                    {/*<option value={""}>Select Country</option>*/}
                                                     {topLevelUnitCountryRows}
                                                 </select>
-                                                {errors.countryId && <p>Select Country</p>}
+                                                {/*errors.countryId && <p>Select Country</p>*/}
                                             </FormGroup>
                                         </div>
 

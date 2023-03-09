@@ -187,9 +187,7 @@ const ViewPatient = (props) => {
         return address && address.line && address.line.length > 0 ? address.line[0] : '';
     };
     const phoneNumberFormatCheck = (phone) =>{
-        if( phone != undefined && typeof phone.value !== null && phone.value.charAt(0) === '0'){
-            phone.value = phone.value.replace('0','234');
-        }
+        //console.log(phone)
         return phone
     }
     const calculate_age = dob => {
@@ -1160,7 +1158,7 @@ const ViewPatient = (props) => {
                                         <div className="form-group  col-md-4">
                                             <FormGroup>
                                                 <Label>Province/District/LGA *</Label>
-                                                 <input
+                                                    {/*  <input
                                                         className="form-control"
                                                         type="text"
                                                         name="district"
@@ -1168,17 +1166,18 @@ const ViewPatient = (props) => {
                                                         value={disValue !== "" ? disValue : ""}
                                                         style={{border: "1px solid #014d88"}}
                                                         readOnly
-                                                    />
-                                               {/* <select
+                                                    />*/}
+                                           <select
                                                     className="form-control"
                                                     type="text"
                                                     name="district"
                                                     id="district"
+                                                    readOnly
                                                     style={{border: "1px solid #014d88"}}
                                                     {...register("district")}>
                                                     <option value={""}>Select Province/District/LGA</option>
                                                     {districtRows}
-                                                </select> */}
+                                                </select>
                                                 {errors.district && <p>Select Province/District/LGA</p>}
                                             </FormGroup>
                                         </div>
