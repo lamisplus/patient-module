@@ -187,7 +187,10 @@ const ViewPatient = (props) => {
         return address && address.line && address.line.length > 0 ? address.line[0] : '';
     };
     const phoneNumberFormatCheck = (phone) =>{
-        //console.log(phone)
+        console.log(phone)
+        if( phone != undefined && typeof phone?.value !== null && typeof phone?.value !== "undefined" && phone?.value?.charAt(0) === '0'){
+            phone.value = phone.value.replace('0','234');
+        }
         return phone
     }
     const calculate_age = dob => {
@@ -1125,8 +1128,8 @@ const ViewPatient = (props) => {
                                     <div className="row">
                                         <div className="form-group  col-md-4">
                                             <FormGroup>
-                                                <Label>Country *</Label>
-                                                  <input
+                                               <Label>Country *</Label>
+                                                  {/* <input
                                                     className="form-control"
                                                     type="text"
                                                     name="country"
@@ -1134,15 +1137,26 @@ const ViewPatient = (props) => {
                                                     value={Object.keys(patientData).length !== 0 &&  patientData.address.address[0]?.countryId === 1 ? "Nigeria" : ""}
                                                     style={{border: "1px solid #014d88"}}
                                                     readOnly
-                                                />
-                                                {errors.countryId && <p>Select Country</p>}
+                                                />*/}
+                                                 <select
+                                                    className="form-control"
+                                                    type="text"
+                                                    name="country"
+                                                    id="country"
+                                                    readOnly
+                                                    style={{border: "1px solid #014d88"}}
+                                                    {...register("countryId")}
+                                                    onChange={(e) => onCountryChange(e)}>
+                                                    {/*<option value={""}>Select Country</option>*/}
+                                                    {topLevelUnitCountryRows}
+                                                </select>
                                             </FormGroup>
                                         </div>
 
                                         <div className="form-group  col-md-4">
                                             <FormGroup>
                                                 <Label>State *</Label>
-                                               <input
+                                               {/*<input
                                                     className="form-control"
                                                     type="text"
                                                     name="stateId"
@@ -1150,8 +1164,19 @@ const ViewPatient = (props) => {
                                                     value={Object.keys(patientData).length !== 0 && patientData.address.address[0].city !== null ? patientData.address.address[0].city : ""}
                                                     style={{border: "1px solid #014d88"}}
                                                     readOnly
-                                                />
-                                                {errors.stateId && <p>Select State</p>}
+                                                />*/}
+                                                  <select
+                                                     className="form-control"
+                                                     type="text"
+                                                     name="stateId"
+                                                     id="stateId"
+                                                     readOnly
+                                                     style={{border: "1px solid #014d88"}}
+                                                     {...register("stateId")}
+                                                     onChange={(e) => onStateChange(e)}>
+                                                     <option value={""}>Select State</option>
+                                                     {stateRows}
+                                                 </select>
                                             </FormGroup>
                                         </div>
 

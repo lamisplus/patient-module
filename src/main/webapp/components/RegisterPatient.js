@@ -184,17 +184,11 @@ const RegisterPatient = (props) => {
         return address && address.line && address.line.length > 0 ? address.line[0] : '';
     };
     const phoneNumberFormatCheck = (phone) =>{
-        //console.log("err",phone.value)
-        return phone;
-
-//        if (phone.value === undefined) {
-//            return phone
-//        }else {
-//             if( phone.value !== null && phone.value.charAt(0) === '0'){
-//                        phone.value = phone.value.replace('0','234');
-//                    }
-//             return phone
-//        }
+        console.log("err",phone)
+        if( phone != undefined && typeof phone?.value !== null && typeof phone?.value !== "undefined" && phone?.value?.charAt(0) === '0'){
+            phone.value = phone.value.replace('0','234');
+        }
+        return phone
     }
     const calculate_age = dob => {
         const today = new Date();
