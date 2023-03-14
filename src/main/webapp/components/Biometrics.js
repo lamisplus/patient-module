@@ -122,6 +122,7 @@ const useStyles = makeStyles((theme) => ({
 let checkUrl = "";
 
 function Biometrics(props) {
+  console.log(props.age)
   const classes = useStyles();
   let history = useHistory();
   const permissions =
@@ -639,17 +640,30 @@ function Biometrics(props) {
                     <br />
                     <br />
                     <Col md={12}>
-                    <MatButton
-                        type="button"
-                        variant="contained"
-                        color="primary"
-                        disabled={capturedFingered.length < 6 ? true : false}
-                        onClick={saveBiometrics}
-                        // className={classes.button}
-                        startIcon={<SaveIcon />}
-                    >
-                        Save Capture
-                    </MatButton>
+                    { storedBiometrics.length < 10 && storedBiometrics.length !== 0 ?
+                        <MatButton
+                            type="button"
+                            variant="contained"
+                            color="primary"
+                            //disabled={capturedFingered.length < 6 ? true : false}
+                            onClick={saveBiometrics}
+                            // className={classes.button}
+                            startIcon={<SaveIcon />}
+                        >
+                            Save Capture
+                        </MatButton> :
+                         <MatButton
+                            type="button"
+                            variant="contained"
+                            color="primary"
+                            disabled={capturedFingered.length < 6 ? true : false}
+                            onClick={saveBiometrics}
+                            // className={classes.button}
+                            startIcon={<SaveIcon />}
+                        >
+                            Save Capture
+                        </MatButton>
+                    }
                     </Col>
                     <br />
                 </>
