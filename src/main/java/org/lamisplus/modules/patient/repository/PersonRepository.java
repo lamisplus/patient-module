@@ -184,13 +184,15 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
 
     List<Person> findAllByFacilityIdAndArchived(Long facilityId, Integer archived);
     Optional<Person> findByUuidAndFacilityIdAndArchived(String uuid, Long facilityId, Integer archived);
-    Optional<Person> findByUuid(String uuid);
+    Optional<Person> findByUuidAndFacilityId(String uuid, Long facilityId);
 
     @Query(value ="SELECT * FROM patient_person where facility_id=?1", nativeQuery = true)
     List<Person> findAllByFacilityIdAndArchivedAndLastModifiedDate(Long facilityId, Integer archived, LocalDateTime dateLastSync);
 
+    List<Person> findAllByFacilityId(Long facilityId);
+
     @Query(value ="SELECT * FROM patient_person WHERE last_modified_date > ?1 AND facility_id=?2", nativeQuery = true)
-    public List<Person> getPatientsDueForServerUpload(LocalDateTime dateLastSync, Long facilityId, int archived);
+    public List<Person> getAllDueForServerUpload(LocalDateTime dateLastSync, Long facilityId);
 
 
 }
