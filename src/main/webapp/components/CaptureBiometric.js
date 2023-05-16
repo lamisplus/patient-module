@@ -155,7 +155,7 @@ const CaptureBiometric = (props) => {
         temp.device = objValues.device ? "" : "This field is required"
         setErrors({
             ...temp
-            })    
+            })  
         return Object.values(temp).every(x => x == "")
     }
     //to capture  selected index finger 
