@@ -127,6 +127,7 @@ const isValidEmail = (email) =>
   );
 
 const RegisterPatient = (props) => {
+  localStorage.setItem('menu', JSON.stringify(1));
   const {
     register,
     watch,

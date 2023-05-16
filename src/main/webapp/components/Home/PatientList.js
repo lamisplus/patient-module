@@ -117,6 +117,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const PatientList = (props) => {
+  localStorage.setItem('menu', JSON.stringify(0));
   const tableRef = useRef(null);
   const classes = useStyles();
   const [patients, setPatients] = useState([]);
