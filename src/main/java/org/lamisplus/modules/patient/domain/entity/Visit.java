@@ -26,10 +26,10 @@ public class Visit extends PatientAuditEntity implements Persistable<Long>, Seri
     @ManyToOne(optional = false)
     @JoinColumn(name = "person_uuid", nullable = false, referencedColumnName = "uuid")
     private Person person;
-    @PastOrPresent
+    //@PastOrPresent
     @Column(name = "visit_start_date", nullable = false)
     private LocalDateTime visitStartDate;
-    @PastOrPresent
+   // @PastOrPresent
     @Column(name = "visit_end_date")
     private LocalDateTime visitEndDate;
     @Column(name = "uuid", nullable = false, unique = true, updatable = false)
