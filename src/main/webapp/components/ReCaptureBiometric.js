@@ -47,6 +47,9 @@ import { Alert, AlertTitle } from "@material-ui/lab";
 import fingerprintimage from "../images/fingerprintimage.png";
 import DeleteIcon from "@material-ui/icons/Delete";
 import UpgradeIcon from "@mui/icons-material/Upgrade";
+import LinearProgress from '@mui/material/LinearProgress';
+
+
 import _ from "lodash";
 
 const useStyles = makeStyles((theme) => ({
@@ -301,7 +304,7 @@ function Biometrics(props) {
             selectedFingers.archived = arrCaptureObj.length + 1 ;
             selectedFingers.templateType = objValues.templateType ;
             setCapturedFingeredObj([...capturedFingeredObj, selectedFingers]) 
-            toast.success("Captured successful!")          
+            toast.success(objValues.templateType + "captured successful!")          
           }, 5000);
       
     }
@@ -340,9 +343,12 @@ function Biometrics(props) {
   };
 
   const deleteTempBiometrics = (x) => {
-    let deletedRecord = capturedFingered.filter((data) => ( data.templateType !== x.templateType ))
-    setCapturedFingered(deletedRecord)
-    console.log("deleted temp");
+    window.setTimeout(() => {
+        let deletedRecord = capturedFingeredObj.filter((data) => ( data.templateType !== x.templateType ))
+        setCapturedFingeredObj(deletedRecord)
+        toast.info(x.templateType + "captured removed successfully!")    
+      }, 1000);
+    
   }
  console.log(arrCaptureObj)
  console.log(capturedFingeredObj)
@@ -381,7 +387,7 @@ function Biometrics(props) {
                                 name="device"
                                 id="device"
                                 //onChange={checkDevice}
-                                value={"SECUGEN"}
+                                value={"Secugen"}
                                 required
                                 disabled
                             >
@@ -452,6 +458,8 @@ function Biometrics(props) {
                       </Col> }
 
                     <Col md={2}>
+                    {!loading ?
+                    (<>
                     <MatButton
                         type="button"
                         variant="contained"
@@ -462,11 +470,38 @@ function Biometrics(props) {
                         startIcon={<FingerprintIcon />}
                         disabled={loading}
                     >
-                        {loading ? "Capturing" : "Capture Finger" }
+                       Capture Finger
                     </MatButton>
+                    </>)
+                    :
+                    (<>
+                    <MatButton
+                        type="button"
+                        variant="contained"
+                        color="primary"
+                        
+                        className={"mt-4"}
+                        style={{ backgroundColor: "#992E62" }}
+                        startIcon={<CircularProgress />}
+                    >
+                       Capturing...
+                    </MatButton>
+                    </>)
+                    }
                     </Col>
                     <br />
-
+                    <Col md={12}>
+                        
+                        {loading ? (
+                            <>
+                            <b>Capturing finger...</b>
+                            <LinearProgress />
+                            </>
+                            ) 
+                        :""}
+                    </Col>
+                    
+                    
                 </Row>
             </div>
             ) : (
@@ -568,9 +603,10 @@ function Biometrics(props) {
                   </Col>
                   <br />
               </>
-              ) : (
-              ""
-              )}
+            ) : (
+            ""
+            )
+          }
         </Row>
         </div>
         <div style={{ display: "flex", width: "100%" }}>

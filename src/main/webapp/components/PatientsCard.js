@@ -121,6 +121,7 @@ function PatientsCard(props) {
         let patientObjID= id
         setModal(!modal)
     }
+    
     return (
         <div className={classes.root}>
             <Accordion defaultExpanded>

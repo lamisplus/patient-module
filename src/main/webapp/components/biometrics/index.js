@@ -103,7 +103,6 @@ function Index(props) {
     let history = useHistory();
     const classes = useStyles();
     const patientObj = history.location && history.location.state ? history.location.state.patientObj : {};
-    console.log("bio", patientObj)
     const permissions = history.location && history.location.state ? history.location.state.permissions : [];
     const [patientBiometricStatus, setPatientBiometricStatus]= useState(patientObj.biometricStatus);
     const [biometricsModuleInstalled,setBiometricsModuleInstalled]=useState(false);
@@ -113,9 +112,8 @@ function Index(props) {
     const updatePatientBiometricStatus = (bioStatus) =>{
         setPatientBiometricStatus(bioStatus);
     }
+
     const panes = [
-
-
         { menuItem: permissions.includes('view_patient_appointment') && biometricsModuleInstalled || permissions.includes("all_permission")  && biometricsModuleInstalled? 'Biometrics' : "", render: () =>
                 permissions.includes('view_patient_appointment') || permissions.includes("all_permission") ?
                     <Tab.Pane>
@@ -125,13 +123,16 @@ function Index(props) {
                     </Tab.Pane>
                     :""
         },
-        { menuItem: 'Re-captured Biomteric', render: () =>
-        <Tab.Pane>
-            <div style={{ minHeight: 400, width: '100%' }}>
-                <ReCaptureBiometric patientObj={patientObj} age={patientObj.dateOfBirth} patientId={patientObj.id} updatePatientBiometricStatus={updatePatientBiometricStatus}/>
-            </div>
-        </Tab.Pane>
-},
+        { menuItem:  'Re-captured Biomteric', render: () =>
+
+            <Tab.Pane>
+                <div style={{ minHeight: 400, width: '100%' }}>
+                    <ReCaptureBiometric patientObj={patientObj} age={patientObj.dateOfBirth} patientId={patientObj.id} updatePatientBiometricStatus={updatePatientBiometricStatus}/>
+                </div>
+            </Tab.Pane>
+            
+        }, 
+         
 
     ];
 

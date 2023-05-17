@@ -147,7 +147,7 @@ function BiometricsList(props) {
                 icon:<FaEye  size="22"/>,
                 to:{
                     pathname: "/register-patient",
-                    state: { patientId : row.id, permissions:permissions  }
+                    state: { patientId : row.id, permissions:permissions, patientObj: row  }
                 }
             },
             {...(permissions.includes('view_patient') || permissions.includes("all_permission")&&
