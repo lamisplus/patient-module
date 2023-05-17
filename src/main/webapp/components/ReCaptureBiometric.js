@@ -291,14 +291,19 @@ function Biometrics(props) {
     setLoading(true);
     setFingerType([])
     if (validate()) {
-      setLoading(false);
-      const removeFingers=fingerType.filter((x)=> x.display!==objValues.templateType)
-      fingerType.splice(removeFingers, 1);
-      setFingerType([...fingerType]);
-      arrCaptureObj.push(objValues.templateType)
-      selectedFingers.archived = arrCaptureObj.length + 1 ;
-      selectedFingers.templateType = objValues.templateType ;
-      setCapturedFingeredObj([...capturedFingeredObj, selectedFingers])
+        setFingerType([])
+        window.setTimeout(() => {
+            setLoading(false);
+            const removeFingers=fingerType.filter((x)=> x.display!==objValues.templateType)
+            fingerType.splice(removeFingers, 1);
+            setFingerType([...fingerType]);
+            arrCaptureObj.push(objValues.templateType)
+            selectedFingers.archived = arrCaptureObj.length + 1 ;
+            selectedFingers.templateType = objValues.templateType ;
+            setCapturedFingeredObj([...capturedFingeredObj, selectedFingers]) 
+            toast.success("Captured successful!")          
+          }, 5000);
+      
     }
   };
 
@@ -372,7 +377,7 @@ function Biometrics(props) {
                                 {" "} Device {" "}
                             </Label>
                             <Input
-                                type="select"
+                                type="text"
                                 name="device"
                                 id="device"
                                 //onChange={checkDevice}
@@ -380,12 +385,8 @@ function Biometrics(props) {
                                 required
                                 disabled
                             >
-                                {biometricDevices.map(({ id, name, active, url, type }) => (
-                                <option key={id} value={url}>
-                                    {type}
-                                </option>
-                                ))}
                             </Input>
+                            
                             {errors.device !== "" ? (
                                 <span className={classes.error}>{errors.device}</span>
                             ) : (
@@ -461,7 +462,7 @@ function Biometrics(props) {
                         startIcon={<FingerprintIcon />}
                         disabled={loading}
                     >
-                        Capture Finger
+                        {loading ? "Capturing" : "Capture Finger" }
                     </MatButton>
                     </Col>
                     <br />
