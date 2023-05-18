@@ -122,7 +122,7 @@ const useStyles = makeStyles((theme) => ({
 let checkUrl = "";
 
 function Biometrics(props) {
-  console.log(props.age)
+  console.log(props.age);
   const classes = useStyles();
   let history = useHistory();
   const permissions =
@@ -136,7 +136,7 @@ function Biometrics(props) {
     templateType: "",
     device: "",
     reason: "",
-    age: ""
+    age: "",
   });
   const [fingerType, setFingerType] = useState([]);
   const [devices, setDevices] = useState([]);
@@ -153,21 +153,20 @@ function Biometrics(props) {
   const [imageQuality, setImageQuality] = useState(false);
   const [isNewStatus, setIsNewStatus] = useState(true);
 
-  const calculate_age = dob => {
-
+  const calculate_age = (dob) => {
     const today = new Date();
     const dateParts = dob.split("-");
     const birthDate = new Date(dob); // create a date object directlyfrom`dob1`argument
     let age_now = today.getFullYear() - birthDate.getFullYear();
     const m = today.getMonth() - birthDate.getMonth();
     if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-        age_now--;
+      age_now--;
     }
     if (age_now === 0) {
-        return m + " month(s)";
+      return m + " month(s)";
     }
     return age_now;
-};
+  };
 
   const buttonSx = {
     ...(success && {
@@ -189,7 +188,7 @@ function Biometrics(props) {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then(async (response) => {
-        console.log("patient bio", response.data)
+        console.log("patient bio", response.data);
         if (response.data.length > 0) {
           setStoredBiometrics(response.data);
           setPageLoading(true);
@@ -279,6 +278,7 @@ function Biometrics(props) {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
+        console.log("er", response);
         setFingerType(response.data);
       })
       .catch((error) => {});
@@ -305,7 +305,11 @@ function Biometrics(props) {
   };
   // handle the input changes
   const handleInputChange = (e) => {
-    setObjValues({ ...objValues, [e.target.name]: e.target.value, age: calculate_age(props.age) });
+    setObjValues({
+      ...objValues,
+      [e.target.name]: e.target.value,
+      age: calculate_age(props.age),
+    });
   };
   //form validation
   const validate = () => {
@@ -325,11 +329,15 @@ function Biometrics(props) {
       // console.log(biometricDevices)
       // console.log(devices)
       // axios.post(`${checkUrl}biometrics/secugen/enrollment?reader=SG_DEV_AUTO`,objValues,
-      console.log("", objValues)
+      console.log("", objValues);
       axios
-        .post(`${devices.url}?reader=${devices.name}&isNew=${isNewStatus}`, objValues, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
+        .post(
+          `${devices.url}?reader=${devices.name}&isNew=${isNewStatus}`,
+          objValues,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        )
         .then((response) => {
           setLoading(false);
           if (response.data.type === "ERROR") {
@@ -339,13 +347,17 @@ function Biometrics(props) {
               setTryAgain(false);
             }, 5000);
             toast.error(response.data.message.ERROR);
-            setIsNewStatus(false)
-          } 
-          else if (response.data.type === "SUCCESS") {
-            if (response.data.imageQuality <= 60 && calculate_age(props.age) <= 6) {
-              toast.info("Image quality captured is poor, Kindly give a reason for capture above.", 
-              {position: toast.POSITION.BOTTOM_CENTER, autoClose: 20000});
-              setImageQuality(true)
+            setIsNewStatus(false);
+          } else if (response.data.type === "SUCCESS") {
+            if (
+              response.data.imageQuality <= 60 &&
+              calculate_age(props.age) <= 6
+            ) {
+              toast.info(
+                "Image quality captured is poor, Kindly give a reason for capture above.",
+                { position: toast.POSITION.BOTTOM_CENTER, autoClose: 20000 }
+              );
+              setImageQuality(true);
             }
             const templateType = response.data.templateType;
             setTryAgain(false);
@@ -359,21 +371,22 @@ function Biometrics(props) {
               biometricsEnrollments.capturedBiometricsList,
               "templateType"
             );
-           
+
             setCapturedFingered([...capturedFingered, biometricsEnrollments]);
             //fingerType.splice(templateType, 1);
             _.find(fingerType, { display: templateType }).captured = true;
             setFingerType([...fingerType]);
             //setObjValues({biometricType: "FINGERPRINT", patientId:props.patientId, templateType:"", device:""});
             setObjValues({ ...objValues, templateType: "" });
-            setIsNewStatus(false)
+            setIsNewStatus(false);
             //console.log("captured",  biometricsEnrollments)
           } else {
-             setLoading(false);
-             setTryAgain(true);
-             toast.error("Something went wrong capturing biometrics...", {position: toast.POSITION.BOTTOM_CENTER});
+            setLoading(false);
+            setTryAgain(true);
+            toast.error("Something went wrong capturing biometrics...", {
+              position: toast.POSITION.BOTTOM_CENTER,
+            });
           }
-         
         })
         .catch((error) => {
           setLoading(false);
@@ -387,7 +400,9 @@ function Biometrics(props) {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
-        toast.success(`${finger} deleted successfully`, {position: toast.POSITION.BOTTOM_CENTER});
+        toast.success(`${finger} deleted successfully`, {
+          position: toast.POSITION.BOTTOM_CENTER,
+        });
         _.find(fingerType, { display: finger }).captured = false;
         setFingerType([...fingerType]);
         let newStoredBiometrics = _.reject(storedBiometrics, {
@@ -400,7 +415,9 @@ function Biometrics(props) {
         }
       })
       .catch((error) => {
-        toast.error("Something went wrong", {position: toast.POSITION.BOTTOM_CENTER});
+        toast.error("Something went wrong", {
+          position: toast.POSITION.BOTTOM_CENTER,
+        });
         console.log(error);
       });
   };
@@ -409,7 +426,7 @@ function Biometrics(props) {
     e.preventDefault();
     if (capturedFingered.length >= 1) {
       const capturedObj = capturedFingered[capturedFingered.length - 1];
-        capturedObj.capturedBiometricsList = _.uniqBy(
+      capturedObj.capturedBiometricsList = _.uniqBy(
         capturedObj.capturedBiometricsList,
         "templateType"
       );
@@ -421,433 +438,449 @@ function Biometrics(props) {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((response) => {
-          console.log("saved", response)
-          toast.success("Biometric save successful", {position: toast.POSITION.BOTTOM_CENTER});
+          console.log("saved", response);
+          toast.success("Biometric save successful", {
+            position: toast.POSITION.BOTTOM_CENTER,
+          });
           setCapturedFingered([]);
           getPersonBiometrics();
           props.updatePatientBiometricStatus(true);
         })
         .catch((error) => {
-          toast.error("Something went wrong saving biometrics", {position: toast.POSITION.BOTTOM_CENTER});
+          toast.error("Something went wrong saving biometrics", {
+            position: toast.POSITION.BOTTOM_CENTER,
+          });
           console.log(error);
         });
     } else {
-      toast.error("You can't save less than 2 finger", {position: toast.POSITION.BOTTOM_CENTER});
+      toast.error("You can't save less than 2 finger", {
+        position: toast.POSITION.BOTTOM_CENTER,
+      });
     }
   };
 
   const deleteTempBiometrics = (x) => {
-    let deletedRecord = capturedFingered.filter((data) => ( data.templateType !== x.templateType ))
-    setCapturedFingered(deletedRecord)
+    let deletedRecord = capturedFingered.filter(
+      (data) => data.templateType !== x.templateType
+    );
+    setCapturedFingered(deletedRecord);
     console.log("deleted temp");
-  }
+  };
 
   return (
     <div className={classes.root}>
-        <div>
-        {/* temporal update */}   
+      <div>
+        {/* temporal update */}
         {permissions.includes("capture_patient_biometrics") ||
-            permissions.includes("all_permission") ? (
-            <div
-                style={{
-                flex: "10",
-                padding: "5px",
-                marginLeft: "5px",
-                border: "1px solid rgba(99, 99, 99, 0.2)",
-                boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
-                }}
-            >
-                <Row>
-                    <ToastContainer />
-                    <Col md={3}>
-                        <FormGroup>
-                            <Label
-                                for="device"
-                                style={{
-                                color: "#014d88",
-                                fontWeight: "bold",
-                                fontSize: "14px",
-                                }}
-                            >
-                                {" "} Device {" "}
-                            </Label>
-                            <Input
-                                type="select"
-                                name="device"
-                                id="device"
-                                //onChange={checkDevice}
-                                value={objValues.device}
-                                required
-                                disabled
-                            >
-                                {biometricDevices.map(({ id, name, active, url, type }) => (
-                                <option key={id} value={url}>
-                                    {type}
-                                </option>
-                                ))}
-                            </Input>
-                            {errors.device !== "" ? (
-                                <span className={classes.error}>{errors.device}</span>
-                            ) : (
-                                ""
-                            )}
-                        </FormGroup>
-                    </Col>
+        permissions.includes("all_permission") ? (
+          <div
+            style={{
+              flex: "10",
+              padding: "5px",
+              marginLeft: "5px",
+              border: "1px solid rgba(99, 99, 99, 0.2)",
+              boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
+            }}
+          >
+            <Row>
+              <ToastContainer />
+              <Col md={3}>
+                <FormGroup>
+                  <Label
+                    for="device"
+                    style={{
+                      color: "#014d88",
+                      fontWeight: "bold",
+                      fontSize: "14px",
+                    }}
+                  >
+                    {" "}
+                    Device{" "}
+                  </Label>
+                  <Input
+                    type="select"
+                    name="device"
+                    id="device"
+                    //onChange={checkDevice}
+                    value={objValues.device}
+                    required
+                    disabled
+                  >
+                    {biometricDevices.map(({ id, name, active, url, type }) => (
+                      <option key={id} value={url}>
+                        {type}
+                      </option>
+                    ))}
+                  </Input>
+                  {errors.device !== "" ? (
+                    <span className={classes.error}>{errors.device}</span>
+                  ) : (
+                    ""
+                  )}
+                </FormGroup>
+              </Col>
 
-                    <Col md={3}>
-                    <FormGroup>
-                        <Label
-                        for="device"
-                        style={{
-                            color: "#014d88",
-                            fontWeight: "bold",
-                            fontSize: "14px",
-                        }}
-                        >
-                        Select Finger
-                        </Label>
-                        <Input
-                        type="select"
-                        name="templateType"
-                        id="templateType"
-                        onChange={handleInputChange}
-                        value={objValues.templateType}
-                        required
-                        >
-                        <option value="">Select Finger </option>
+              <Col md={3}>
+                <FormGroup>
+                  <Label
+                    for="device"
+                    style={{
+                      color: "#014d88",
+                      fontWeight: "bold",
+                      fontSize: "14px",
+                    }}
+                  >
+                    Select Finger
+                  </Label>
+                  <Input
+                    type="select"
+                    name="templateType"
+                    id="templateType"
+                    onChange={handleInputChange}
+                    value={objValues.templateType}
+                    required
+                  >
+                    <option value="">Select Finger </option>
 
-                        {_.filter(fingerType, ["captured", false]).map(
-                            (value) => (
-                            <option key={value.id} value={value.display}>
-                                {value.display}
-                            </option>
-                            )
-                        )}
-                        </Input>
-                        {errors.templateType !== "" ? (
-                        <span className={classes.error}>
-                            {errors.templateType}
-                        </span>
-                        ) : (
-                        ""
-                        )}
-                    </FormGroup>
-                    </Col>
+                    {_.filter(fingerType, ["captured", false]).map((value) => (
+                      <option key={value.id} value={value.display}>
+                        {value.display}
+                      </option>
+                    ))}
+                  </Input>
+                  {errors.templateType !== "" ? (
+                    <span className={classes.error}>{errors.templateType}</span>
+                  ) : (
+                    ""
+                  )}
+                </FormGroup>
+              </Col>
 
-                   { !imageQuality ? "" : <Col md={4}>
-                    <FormGroup>
+              {!imageQuality ? (
+                ""
+              ) : (
+                <Col md={4}>
+                  <FormGroup>
                     <Label
-                        for="device"
-                        style={{
+                      for="device"
+                      style={{
                         color: "#014d88",
                         fontWeight: "bold",
                         fontSize: "14px",
-                        }}
+                      }}
                     >
-                        {" "} Reason for capture {" "}
+                      {" "}
+                      Reason for capture{" "}
                     </Label>
-                    <Input type="textarea" name="reason" id="reason" onChange={handleInputChange} />
-                    </FormGroup>
-                      </Col> }
+                    <Input
+                      type="textarea"
+                      name="reason"
+                      id="reason"
+                      onChange={handleInputChange}
+                    />
+                  </FormGroup>
+                </Col>
+              )}
 
-                    <Col md={2}>
-                    <MatButton
-                        type="button"
-                        variant="contained"
-                        color="primary"
-                        onClick={captureFinger}
-                        className={"mt-4"}
-                        style={{ backgroundColor: "#992E62" }}
-                        startIcon={<FingerprintIcon />}
-                        disabled={loading}
-                    >
-                        Capture Finger
-                    </MatButton>
-                    </Col>
-                    <br />
-
-                </Row>
-            </div>
-            ) : (
-            ""
-            )}
-        <Row>
-            {capturedFingered.length >= 1 ? (
-                <>
-                    <Col
-                        md={12}
-                        style={{ marginTop: "10px", paddingBottom: "20px" }}
-                    >
-                      <List celled horizontal>
-                          {capturedFingered.map((x) => (
-                          <List.Item
-                              style={{
-                              width: "200px",
-                              height: "200px",
-                              border: "1px dotted #014d88",
-                              margin: "5px",
-                              }}
-                          >
-                              <List.Header
-                              style={{
-                                  paddingLeft: "0px",
-                                  height: "0.5rem",
-                                  display: "flex",
-                                  justifyContent: "right",
-                                  alignItems: "right",
-                              }}
-                              onClick = {() => {deleteTempBiometrics(x)}}
-                              >
-                              <Icon name="cancel" color="red" />{" "}
-                              </List.Header>
-                              <List.Content
-                              style={{
-                                  width: "200px",
-                                  height: "160px",
-                                  display: "flex",
-                                  justifyContent: "center",
-                                  alignItems: "center",
-                              }}
-                              >
-                              {" "}
-                              <FingerprintIcon
-                                  style={{ color: "#992E62", fontSize: 150 }}
-                              /> 
-                              </List.Content>
-                              <List.Content
-                              style={{
-                                  width: "200px",
-                                  height: "30px",
-                                  display: "flex",
-                                  justifyContent: "center",
-                                  alignItems: "center",
-                                  fontSize: "18px",
-                                  color: "#014d88",
-                                  fontWeight: "bold",
-                                  fontFamily: '"poppins", sans-serif',
-                              }}
-                              >
-                              {x.templateType}
-                              </List.Content>
-                          </List.Item>
-                          ))}
-                      </List>
-                    </Col>
-                    <br />
-                    <br />
-                    <br />
-                    <br />
-                    <br />
-                    <br />
-                    <Col md={12}>
-                    { storedBiometrics.length < 10 && storedBiometrics.length !== 0 ?
-                        <MatButton
-                            type="button"
-                            variant="contained"
-                            color="primary"
-                            //disabled={capturedFingered.length < 6 ? true : false}
-                            onClick={saveBiometrics}
-                            // className={classes.button}
-                            startIcon={<SaveIcon />}
-                        >
-                            Save Capture
-                        </MatButton> :
-                         <MatButton
-                            type="button"
-                            variant="contained"
-                            color="primary"
-                            disabled={capturedFingered.length < 6 ? true : false}
-                            onClick={saveBiometrics}
-                            // className={classes.button}
-                            startIcon={<SaveIcon />}
-                        >
-                            Save Capture
-                        </MatButton>
-                    }
-                    </Col>
-                    <br />
-                </>
-                ) : (
-                ""
-                )}
-        </Row>
-        </div>
-        <div style={{ display: "flex", width: "100%" }}>
-            <div
-                className=""
-                style={{
-                    padding: "5px",
-                    flex: "10",
-                    boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
-                    minHeight: "400px",
-                }}
+              <Col md={2}>
+                <MatButton
+                  type="button"
+                  variant="contained"
+                  color="primary"
+                  onClick={captureFinger}
+                  className={"mt-4"}
+                  style={{ backgroundColor: "#992E62" }}
+                  startIcon={<FingerprintIcon />}
+                  disabled={loading}
                 >
-            {pageLoading && storedBiometrics.length > 0 ? (
-                <div style={{ display: "flex", width: "100%", flexWrap: "wrap" }}>
-                {storedBiometrics.map((biometric, index) => (
-                    <div
-                    key={index}
-                    style={{ minHeight: "120px", padding: "5px", width: "20%" }}
+                  Capture Finger
+                </MatButton>
+              </Col>
+              <br />
+            </Row>
+          </div>
+        ) : (
+          ""
+        )}
+        <Row>
+          {capturedFingered.length >= 1 ? (
+            <>
+              <Col md={12} style={{ marginTop: "10px", paddingBottom: "20px" }}>
+                <List celled horizontal>
+                  {capturedFingered.map((x) => (
+                    <List.Item
+                      style={{
+                        width: "200px",
+                        height: "200px",
+                        border: "1px dotted #014d88",
+                        margin: "5px",
+                      }}
                     >
-                    <div className="card " style={{ borderRadius: "6px" }}>
+                      <List.Header
+                        style={{
+                          paddingLeft: "0px",
+                          height: "0.5rem",
+                          display: "flex",
+                          justifyContent: "right",
+                          alignItems: "right",
+                        }}
+                        onClick={() => {
+                          deleteTempBiometrics(x);
+                        }}
+                      >
+                        <Icon name="cancel" color="red" />{" "}
+                      </List.Header>
+                      <List.Content
+                        style={{
+                          width: "200px",
+                          height: "160px",
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      >
+                        {" "}
+                        <FingerprintIcon
+                          style={{ color: "#992E62", fontSize: 150 }}
+                        />
+                      </List.Content>
+                      <List.Content
+                        style={{
+                          width: "200px",
+                          height: "30px",
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          fontSize: "18px",
+                          color: "#014d88",
+                          fontWeight: "bold",
+                          fontFamily: '"poppins", sans-serif',
+                        }}
+                      >
+                        {x.templateType}
+                      </List.Content>
+                    </List.Item>
+                  ))}
+                </List>
+              </Col>
+              <br />
+              <br />
+              <br />
+              <br />
+              <br />
+              <br />
+              <Col md={12}>
+                {storedBiometrics.length < 10 &&
+                storedBiometrics.length !== 0 ? (
+                  <MatButton
+                    type="button"
+                    variant="contained"
+                    color="primary"
+                    //disabled={capturedFingered.length < 6 ? true : false}
+                    onClick={saveBiometrics}
+                    // className={classes.button}
+                    startIcon={<SaveIcon />}
+                  >
+                    Save Capture
+                  </MatButton>
+                ) : (
+                  <MatButton
+                    type="button"
+                    variant="contained"
+                    color="primary"
+                    disabled={capturedFingered.length < 6 ? true : false}
+                    onClick={saveBiometrics}
+                    // className={classes.button}
+                    startIcon={<SaveIcon />}
+                  >
+                    Save Capture
+                  </MatButton>
+                )}
+              </Col>
+              <br />
+            </>
+          ) : (
+            ""
+          )}
+        </Row>
+      </div>
+      <div style={{ display: "flex", width: "100%" }}>
+        <div
+          className=""
+          style={{
+            padding: "5px",
+            flex: "10",
+            boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
+            minHeight: "400px",
+          }}
+        >
+          {pageLoading && storedBiometrics.length > 0 ? (
+            <div style={{ display: "flex", width: "100%", flexWrap: "wrap" }}>
+              {storedBiometrics.map((biometric, index) => (
+                <div
+                  key={index}
+                  style={{ minHeight: "120px", padding: "5px", width: "20%" }}
+                >
+                  <div className="card " style={{ borderRadius: "6px" }}>
+                    <div
+                      className="card-header align-items-start"
+                      style={{ backgroundColor: "#fff" }}
+                    >
+                      <div>
+                        <h6 className="fs-18 font-w500 mb-3 user-name">
+                          <Link
+                            to={"#"}
+                            style={{
+                              color: "#014d88",
+                              fontSize: "14px",
+                              fontFamily: `"poppins",sans-serif`,
+                            }}
+                          >
+                            {biometric.templateType}
+                          </Link>
+                        </h6>
                         <div
-                        className="card-header align-items-start"
-                        style={{ backgroundColor: "#fff" }}
+                          className="fs-9 text-nowrap"
+                          style={{
+                            fontSize: "10px",
+                            color: "#992E62",
+                            fontWeight: "bold",
+                            fontFamily: `"poppins",sans-serif`,
+                          }}
                         >
-                        <div>
-                            <h6 className="fs-18 font-w500 mb-3 user-name">
-                            <Link
-                                to={"#"}
-                                style={{
-                                color: "#014d88",
-                                fontSize: "14px",
-                                fontFamily: `"poppins",sans-serif`,
-                                }}
-                            >
-                                {biometric.templateType}
-                            </Link>
-                            </h6>
-                            <div
-                            className="fs-9 text-nowrap"
-                            style={{
-                                fontSize: "10px",
-                                color: "#992E62",
-                                fontWeight: "bold",
-                                fontFamily: `"poppins",sans-serif`,
-                            }}
-                            >
-                            <i
-                                className="fa fa-calendar-o me-3"
-                                aria-hidden="true"
-                            ></i>
-                            {moment(biometric.lastModifiedDate).format(
-                                "YYYY-MM-DD HH:mm"
-                            )}
-                            </div>
+                          <i
+                            className="fa fa-calendar-o me-3"
+                            aria-hidden="true"
+                          ></i>
+                          {moment(biometric.lastModifiedDate).format(
+                            "YYYY-MM-DD HH:mm"
+                          )}
                         </div>
+                      </div>
 
-                        {/*Action button -- Dropdown menu*/}
-                        <Dropdown className="dropdown ms-auto">
-                            <Dropdown.Toggle
-                            as="button"
-                            variant=""
-                            drop="up"
-                            className="btn sharp btn-primary "
-                            id="tp-btn"
-                            style={{
-                                backgroundColor: "#014d88",
-                                borderColor: "#014d88",
-                                borderRadius: "5px",
-                                marginRight: "-18px",
-                                marginTop: "-10px",
-                            }}
+                      {/*Action button -- Dropdown menu*/}
+                      <Dropdown className="dropdown ms-auto">
+                        <Dropdown.Toggle
+                          as="button"
+                          variant=""
+                          drop="up"
+                          className="btn sharp btn-primary "
+                          id="tp-btn"
+                          style={{
+                            backgroundColor: "#014d88",
+                            borderColor: "#014d88",
+                            borderRadius: "5px",
+                            marginRight: "-18px",
+                            marginTop: "-10px",
+                          }}
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            xmlnsXlink="http://www.w3.org/1999/xlink"
+                            width="18px"
+                            height="18px"
+                            viewBox="0 0 24 24"
+                            version="1.1"
+                          >
+                            <g
+                              stroke="none"
+                              strokeWidth="1"
+                              fill="none"
+                              fillRule="evenodd"
                             >
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                xmlnsXlink="http://www.w3.org/1999/xlink"
-                                width="18px"
-                                height="18px"
-                                viewBox="0 0 24 24"
-                                version="1.1"
-                            >
-                                <g
-                                stroke="none"
-                                strokeWidth="1"
-                                fill="none"
-                                fillRule="evenodd"
-                                >
-                                <rect x="0" y="0" width="24" height="24" />
-                                <circle fill="#ffffff" cx="12" cy="5" r="2" />
-                                <circle fill="#ffffff" cx="12" cy="12" r="2" />
-                                <circle fill="#ffffff" cx="12" cy="19" r="2" />
-                                </g>
-                            </svg>
-                            </Dropdown.Toggle>
-                            <Dropdown.Menu
-                            alignRight={true}
-                            className="dropdown-menu-right"
-                            >
-                            <Dropdown.Item
-                                style={{ color: "red" }}
-                                onClick={() =>
-                                deleteBiometric(
-                                    biometric.id,
-                                    biometric.templateType
-                                )
-                                }
-                            >
-                                <DeleteIcon /> Delete
-                            </Dropdown.Item>
-                            </Dropdown.Menu>
-                        </Dropdown>
-                        </div>
-                        <div className="card-body p-0 pb-2">
-                        <ul className="list-group list-group-flush">
-                            <li
-                            className="list-group-item"
-                            style={{
-                                height: "100px",
-                                display: "flex",
-                                justifyContent: "center",
-                            }}
-                            >
-                            <img
-                                src={fingerprintimage}
-                                alt=""
-                                style={{ height: "80px" }}
-                            />
-                            </li>
+                              <rect x="0" y="0" width="24" height="24" />
+                              <circle fill="#ffffff" cx="12" cy="5" r="2" />
+                              <circle fill="#ffffff" cx="12" cy="12" r="2" />
+                              <circle fill="#ffffff" cx="12" cy="19" r="2" />
+                            </g>
+                          </svg>
+                        </Dropdown.Toggle>
+                        <Dropdown.Menu
+                          alignRight={true}
+                          className="dropdown-menu-right"
+                        >
+                          <Dropdown.Item
+                            style={{ color: "red" }}
+                            onClick={() =>
+                              deleteBiometric(
+                                biometric.id,
+                                biometric.templateType
+                              )
+                            }
+                          >
+                            <DeleteIcon /> Delete
+                          </Dropdown.Item>
+                        </Dropdown.Menu>
+                      </Dropdown>
+                    </div>
+                    <div className="card-body p-0 pb-2">
+                      <ul className="list-group list-group-flush">
+                        <li
+                          className="list-group-item"
+                          style={{
+                            height: "100px",
+                            display: "flex",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <img
+                            src={fingerprintimage}
+                            alt=""
+                            style={{ height: "80px" }}
+                          />
+                        </li>
 
-                            <li className="list-group-item">
+                        <li className="list-group-item">
+                          <Badge
+                            variant="info badge-xs light"
+                            className="card-link float-end"
+                          >
+                            Version {/*{contact.version}*/}
+                          </Badge>
+                          <span className="mb-0 title">
+                            Status {biometric.iso}
+                          </span>{" "}
+                          :
+                          <span className="text-black desc-text ms-2">
                             <Badge
-                                variant="info badge-xs light"
-                                className="card-link float-end"
+                              variant={
+                                biometric.iso === true
+                                  ? "primary badge-xs"
+                                  : "danger badge-xs"
+                              }
                             >
-                                Version {/*{contact.version}*/}
+                              <i
+                                className="fa fa-check-square me-2 scale4"
+                                aria-hidden="true"
+                              ></i>{" "}
                             </Badge>
-                            <span className="mb-0 title">
-                                Status {biometric.iso}
-                            </span>{" "}
-                            :
-                            <span className="text-black desc-text ms-2">
-                                <Badge
-                                variant={
-                                    biometric.iso === true
-                                    ? "primary badge-xs"
-                                    : "danger badge-xs"
-                                }
-                                >
-                                <i
-                                    className="fa fa-check-square me-2 scale4"
-                                    aria-hidden="true"
-                                ></i>{" "}
-                                </Badge>
-                            </span>
-                            </li>
-                        </ul>
-                        </div>
+                          </span>
+                        </li>
+                      </ul>
                     </div>
-                    </div>
-                ))}
+                  </div>
                 </div>
-            ) : (
-                <>
-                <div className="flex-grow-8">
-                    <div className="flex-grow-8">
-                    <Alert severity="info">
-                        <AlertTitle style={{ height: "400px" }}>
-                        <strong>No biometrics captured</strong>
-                        </AlertTitle>
-                    </Alert>
-                    </div>
-                </div>
-                </>
-            )}
+              ))}
             </div>
-            {/*{permissions.includes('capture_patient_biometrics')|| permissions.includes("all_permission")?*/}
-            {permissions.includes("capture_patient_biometrics") ||
-            permissions.includes("all_permission") ? (""
-            // <div
+          ) : (
+            <>
+              <div className="flex-grow-8">
+                <div className="flex-grow-8">
+                  <Alert severity="info">
+                    <AlertTitle style={{ height: "400px" }}>
+                      <strong>No biometrics captured</strong>
+                    </AlertTitle>
+                  </Alert>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+        {/*{permissions.includes('capture_patient_biometrics')|| permissions.includes("all_permission")?*/}
+        {permissions.includes("capture_patient_biometrics") ||
+        permissions.includes("all_permission")
+          ? ""
+          : // <div
             //     style={{
             //     flex: "3",
             //     padding: "5px",
@@ -952,10 +985,8 @@ function Biometrics(props) {
             //     </div>
             //     </div>
             // </div>
-            ) : (
-            ""
-            )}
-        </div>
+            ""}
+      </div>
 
       {/*
             <Form >
