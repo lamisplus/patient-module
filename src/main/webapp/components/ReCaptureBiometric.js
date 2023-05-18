@@ -189,36 +189,35 @@ function Biometrics(props) {
       })
       .then(async (response) => {
         console.log("patient bio", response.data);
-        if (response.data.length > 0) {
-          setStoredBiometrics(response.data);
-          setPageLoading(true);
-          let personCapturedFingers = _.uniq(
-            _.map(response.data, "templateType")
-          );
-          setSelectedFingers(personCapturedFingers);
-          let biometricItems = _.map(fingersCodeset.data, (item) => {
-            return _.extend({}, item, {
-              captured: personCapturedFingers.includes(item.display),
-            });
-          });
-          setFingerType(biometricItems);
-        } else {
-          let biometricItems = _.map(fingersCodeset.data, (item) => {
-            return _.extend({}, item, { captured: false });
-            //return item.captured = personCapturedFingers.includes(item.display)
-          });
-          setFingerType(biometricItems);
-        }
+        // if (response.data.length > 0) {
+        //   setStoredBiometrics(response.data);
+        //   setPageLoading(true);
+        //   let personCapturedFingers = _.uniq(
+        //     _.map(response.data, "templateType")
+        //   );
+        //   setSelectedFingers(personCapturedFingers);
+        //   let biometricItems = _.map(fingersCodeset.data, (item) => {
+        //     return _.extend({}, item, {
+        //       captured: personCapturedFingers.includes(item.display),
+        //     });
+        //   });
+        //   setFingerType(biometricItems);
+        // } else {
+        //   let biometricItems = _.map(fingersCodeset.data, (item) => {
+        //     return _.extend({}, item, { captured: false });
+        //     //return item.captured = personCapturedFingers.includes(item.display)
+        //   });
+        //   setFingerType(biometricItems);
+        // }
       })
       .catch(async (error) => {
         // console.log("getPersonBiometrics error")
         // console.log(error)
-
-        let biometricItems = _.map(fingersCodeset.data, (item) => {
-          return _.extend({}, item, { captured: false });
-        });
-        setFingerType(biometricItems);
-        setPageLoading(true);
+        // let biometricItems = _.map(fingersCodeset.data, (item) => {
+        //   return _.extend({}, item, { captured: false });
+        // });
+        // setFingerType(biometricItems);
+        // setPageLoading(true);
       });
   };
 
@@ -278,7 +277,6 @@ function Biometrics(props) {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
-        console.log("er", response);
         setFingerType(response.data);
       })
       .catch((error) => {});
@@ -495,7 +493,7 @@ function Biometrics(props) {
                     }}
                   >
                     {" "}
-                    Device{" "}
+                    Device updated{" "}
                   </Label>
                   <Input
                     type="select"
@@ -530,7 +528,7 @@ function Biometrics(props) {
                       fontSize: "14px",
                     }}
                   >
-                    Select Finger
+                    Select Finger -new
                   </Label>
                   <Input
                     type="select"

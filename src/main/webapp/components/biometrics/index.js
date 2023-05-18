@@ -14,6 +14,7 @@ import Breadcrumbs from "@mui/material/Breadcrumbs";
 import {Tab} from "semantic-ui-react";
 import MaterialTable from "material-table";
 import Biometrics from "../Biometrics";
+import ReCaptureBiometric from "../ReCaptureBiometric";
 import moment from "moment";
 import Swal from "sweetalert2";
 
@@ -113,11 +114,7 @@ function Index(props) {
         setPatientBiometricStatus(bioStatus);
     }
     const panes = [
-//        { menuItem: 'Patient Biometric Details', render: () =>
-//                <Tab.Pane>
-//                    <p>Patient biometric captured finger prints </p>
-//                </Tab.Pane>
-//        },
+
 
         { menuItem: permissions.includes('view_patient_appointment') && biometricsModuleInstalled || permissions.includes("all_permission")  && biometricsModuleInstalled? 'Biometrics' : "", render: () =>
                 permissions.includes('view_patient_appointment') || permissions.includes("all_permission") ?
@@ -127,7 +124,14 @@ function Index(props) {
                         </div>
                     </Tab.Pane>
                     :""
-        }
+        },
+        { menuItem: 'Re-captured Biomteric', render: () =>
+        <Tab.Pane>
+            <div style={{ minHeight: 400, width: '100%' }}>
+                <ReCaptureBiometric patientObj={patientObj} age={patientObj.dateOfBirth} patientId={patientObj.id} updatePatientBiometricStatus={updatePatientBiometricStatus}/>
+            </div>
+        </Tab.Pane>
+},
 
     ];
 
