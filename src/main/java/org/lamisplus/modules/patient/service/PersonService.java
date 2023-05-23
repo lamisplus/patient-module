@@ -266,11 +266,11 @@ public class PersonService {
 
 
     public PersonResponseDto getDtoFromPerson(Person person) {
-        Optional<Visit> visit = visitRepository.findVisitByPersonAndVisitStartDateNotNullAndVisitEndDateIsNull(person);
+        //Optional<Visit> visit = visitRepository.findVisitByPersonAndVisitStartDateNotNullAndVisitEndDateIsNull(person);
         PersonResponseDto personResponseDto = new PersonResponseDto();
-        if (visit.isPresent()) {
-            personResponseDto.setVisitId(visit.get().getId());
-        }
+//        if (visit.isPresent()) {
+//            personResponseDto.setVisitId(visit.get().getId());
+//        }
         personResponseDto.setId(person.getId());
         personResponseDto.setIsDateOfBirthEstimated(person.getIsDateOfBirthEstimated());
         personResponseDto.setDateOfBirth(person.getDateOfBirth());
