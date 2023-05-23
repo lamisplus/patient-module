@@ -224,13 +224,13 @@ const RegisterPatient = (props) => {
     const dateParts = dob.split("-");
     const birthDate = new Date(dob); // create a date object directlyfrom`dob1`argument
     let age_now = today.getFullYear() - birthDate.getFullYear();
-    const m = today.getMonth() - birthDate.getMonth();
-    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-      age_now--;
-    }
-    if (age_now === 0) {
-      return m;
-    }
+    //const m = today.getMonth() - birthDate.getMonth();
+    // if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+    //   age_now--;
+    // }
+    // if (age_now === 0) {
+    //   return m;
+    // }
     return age_now;
   };
   const getPatient = useCallback(async () => {
@@ -444,6 +444,8 @@ const RegisterPatient = (props) => {
     return isValid;
   };
   const onSubmit = async (data) => {
+    //console.log(new Date(data.dob));
+
     if (
       _.find(errors, function (error) {
         return console.log("err", error);
@@ -675,10 +677,10 @@ const RegisterPatient = (props) => {
       const today = new Date();
       const birthDate = new Date(e.target.value);
       let age_now = today.getFullYear() - birthDate.getFullYear();
-      const m = today.getMonth() - birthDate.getMonth();
-      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-        age_now--;
-      }
+      // const m = today.getMonth() - birthDate.getMonth();
+      // if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      //   age_now--;
+      // }
       setValue("age", age_now);
     } else {
       setValue("age", null);
