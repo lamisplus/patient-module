@@ -426,6 +426,7 @@ function Biometrics(props) {
     e.preventDefault();
     if (capturedFingered.length >= 1) {
       const capturedObj = capturedFingered[capturedFingered.length - 1];
+      console.log({ ...capturedObj, recapture: true });
       capturedObj.capturedBiometricsList = _.uniqBy(
         capturedObj.capturedBiometricsList,
         "templateType"
