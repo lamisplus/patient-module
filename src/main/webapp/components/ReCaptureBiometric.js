@@ -182,6 +182,7 @@ function Biometrics(props) {
         console.log("patient bio", response.data);
         if (response.data.length > 0) {
           setStoredBiometrics(response.data);
+          //setSaveCapturedFingered(response.data);
           setPageLoading(true);
           let personCapturedFingers = _.uniq(
             _.map(response.data, "templateType")
@@ -317,10 +318,7 @@ function Biometrics(props) {
     e.preventDefault();
     if (validate()) {
       setLoading(true);
-      // console.log(biometricDevices)
-      // console.log(devices)
-      // axios.post(`${checkUrl}biometrics/secugen/enrollment?reader=SG_DEV_AUTO`,objValues,
-      //console.log("", objValues);
+
       axios
         .post(
           `${devices.url}?reader=${
@@ -341,6 +339,35 @@ function Biometrics(props) {
             }, 5000);
             toast.error(response.data.message.ERROR);
             setIsNewStatus(false);
+          } else if (response.data.type === "WARNING") {
+            if (
+              response.data.imageQuality <= 60 &&
+              calculate_age(props.age) <= 6
+            ) {
+              toast.info(
+                "Image quality captured is poor, Kindly give a reason for capture above.",
+                { position: toast.POSITION.BOTTOM_CENTER, autoClose: 20000 }
+              );
+              setImageQuality(true);
+            }
+            const templateType = response.data.templateType;
+            setTryAgain(false);
+            setSuccess(true);
+
+            let biometricsEnrollments = response.data;
+            biometricsEnrollments.capturedBiometricsList = _.uniqBy(
+              biometricsEnrollments.capturedBiometricsList,
+              "templateType"
+            );
+
+            setCapturedFingered([...capturedFingered, biometricsEnrollments]);
+
+            _.find(fingerType, { display: templateType }).captured = true;
+            setFingerType([...fingerType]);
+
+            setObjValues({ ...objValues, templateType: "" });
+            setIsNewStatus(false);
+            toast.warning(response.data.message.WARNING);
           } else if (response.data.type === "SUCCESS") {
             if (
               response.data.imageQuality <= 60 &&
@@ -363,13 +390,12 @@ function Biometrics(props) {
             );
 
             setCapturedFingered([...capturedFingered, biometricsEnrollments]);
-            //fingerType.splice(templateType, 1);
+
             _.find(fingerType, { display: templateType }).captured = true;
             setFingerType([...fingerType]);
-            //setObjValues({biometricType: "FINGERPRINT", patientId:props.patientId, templateType:"", device:""});
+
             setObjValues({ ...objValues, templateType: "" });
             setIsNewStatus(false);
-            //console.log("captured",  biometricsEnrollments)
           } else {
             setLoading(false);
             setTryAgain(true);
@@ -441,15 +467,16 @@ function Biometrics(props) {
           toast.success("Biometric recaptured successfully", {
             position: toast.POSITION.BOTTOM_CENTER,
           });
-          capturedFingered([]);
+          setCapturedFingered([]);
           getPersonBiometrics();
           props.updatePatientBiometricStatus(true);
+          //console.log("capturedObj", capturedFingered);
         })
         .catch((error) => {
           toast.error("Something went wrong saving biometrics", {
             position: toast.POSITION.BOTTOM_CENTER,
           });
-          console.log(error);
+          console.log(error.message);
         });
     } else {
       toast.error("You can't save less than 2 finger", {
@@ -538,11 +565,12 @@ function Biometrics(props) {
                   >
                     <option value="">Select Finger </option>
 
-                    {_.filter(fingerType, ["captured", true]).map((value) => (
-                      <option key={value.id} value={value.display}>
-                        {value.display}
-                      </option>
-                    ))}
+                    {fingerType &&
+                      fingerType.map((value) => (
+                        <option key={value.id} value={value.display}>
+                          {value.display}
+                        </option>
+                      ))}
                   </Input>
                   {errors.templateType !== "" ? (
                     <span className={classes.error}>{errors.templateType}</span>
