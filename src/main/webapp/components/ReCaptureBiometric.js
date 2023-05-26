@@ -1,21 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
-import {
-  Modal,
-  ModalHeader,
-  ModalBody,
-  Form,
-  Row,
-  Label,
-  Card,
-  CardBody,
-  Col,
-  FormGroup,
-  CardHeader,
-  Input,
-} from "reactstrap";
+import { Row, Label, Col, FormGroup, Input, Button, Badge } from "reactstrap";
 
 import { makeStyles } from "@material-ui/core/styles";
-import Select from "react-select";
+
 import "react-toastify/dist/ReactToastify.css";
 import "react-widgets/dist/css/react-widgets.css";
 import SaveIcon from "@material-ui/icons/Save";
@@ -23,26 +10,19 @@ import MatButton from "@material-ui/core/Button";
 import FingerprintIcon from "@material-ui/icons/Fingerprint";
 import { Button2, Icon, List } from "semantic-ui-react";
 import { ToastContainer, toast } from "react-toastify";
-import ThumbUpIcon from "@material-ui/icons/ThumbUp";
+
 import axios from "axios";
 import { token, url as baseUrl } from "../../../api";
 
-import { green, red } from "@mui/material/colors";
-import { Dimmer, Loader, Image, Segment } from "semantic-ui-react";
-
-import Box from "@mui/material/Box";
 import CircularProgress from "@mui/material/CircularProgress";
-import Button from "@mui/material/Button";
-import Fab from "@mui/material/Fab";
-import CheckIcon from "@mui/icons-material/Check";
-import Typography from "@mui/material/Typography";
+
 import { Link, useHistory } from "react-router-dom";
 import moment from "moment";
-import { Dropdown, Badge } from "react-bootstrap";
+import { Dropdown } from "react-bootstrap";
 import { Alert, AlertTitle } from "@material-ui/lab";
 import fingerprintimage from "../images/fingerprintimage.png";
 import DeleteIcon from "@material-ui/icons/Delete";
-import UpgradeIcon from "@mui/icons-material/Upgrade";
+
 import LinearProgress from "@mui/material/LinearProgress";
 
 import _ from "lodash";
@@ -495,6 +475,28 @@ function Biometrics(props) {
     }, 1000);
   };
 
+  const getFingerprintsQuality = (imageQuality) => {
+    if (imageQuality > 60 && imageQuality <= 75) {
+      return (
+        <Badge color="warning" style={{ fontSize: "12px" }}>
+          {imageQuality + "%"}
+        </Badge>
+      );
+    } else if (imageQuality > 75) {
+      return (
+        <Badge color="success" style={{ fontSize: "12px" }}>
+          {imageQuality + "%"}
+        </Badge>
+      );
+    } else {
+      return (
+        <Badge color="error" style={{ fontSize: "12px" }}>
+          {imageQuality + "%"}
+        </Badge>
+      );
+    }
+  };
+
   return (
     <div className={classes.root}>
       <div>
@@ -654,10 +656,21 @@ function Biometrics(props) {
           ""
         )}
         <Row>
+          <Col>
+            <br />
+            <p>
+              {" "}
+              Patient Recapture Count : <b>0</b>
+            </p>
+            <hr />
+          </Col>
+        </Row>
+        <Row>
           {capturedFingered.length >= 1 ? (
             <>
               <Col md={12} style={{ marginTop: "10px", paddingBottom: "20px" }}>
                 <List celled horizontal>
+                  {console.log(capturedFingered)}
                   {capturedFingered.map((x) => (
                     <List.Item
                       style={{
@@ -671,20 +684,27 @@ function Biometrics(props) {
                         style={{
                           paddingLeft: "0px",
                           height: "0.5rem",
-                          display: "flex",
-                          justifyContent: "right",
+
                           alignItems: "right",
                         }}
-                        onClick={() => {
-                          deleteTempBiometrics(x);
-                        }}
                       >
-                        <Icon name="cancel" color="red" />{" "}
+                        {getFingerprintsQuality(x.imageQuality)}
+                        <span
+                          onClick={() => {
+                            deleteTempBiometrics(x);
+                          }}
+                        >
+                          <Icon
+                            name="cancel"
+                            color="red"
+                            style={{ float: "right" }}
+                          />{" "}
+                        </span>
                       </List.Header>
                       <List.Content
                         style={{
                           width: "200px",
-                          height: "160px",
+                          height: "150px",
                           display: "flex",
                           justifyContent: "center",
                           alignItems: "center",
@@ -694,6 +714,11 @@ function Biometrics(props) {
                         <FingerprintIcon
                           style={{ color: "#992E62", fontSize: 150 }}
                         />
+                        {/* <img
+                          src={`data:image/png;base64,${x.image}`}
+                          style={{ width: "80px", height: "80px" }}
+                          alt=""
+                        /> */}
                       </List.Content>
                       <List.Content
                         style={{
@@ -702,7 +727,7 @@ function Biometrics(props) {
                           display: "flex",
                           justifyContent: "center",
                           alignItems: "center",
-                          fontSize: "18px",
+                          fontSize: "16px",
                           color: "#014d88",
                           fontWeight: "bold",
                           fontFamily: '"poppins", sans-serif',
@@ -721,7 +746,7 @@ function Biometrics(props) {
               <br />
               <br />
               <Col md={12}>
-                {storedBiometrics.length < 10 &&
+                {/* {storedBiometrics.length < 10 &&
                 storedBiometrics.length !== 0 ? (
                   <MatButton
                     type="button"
@@ -734,19 +759,19 @@ function Biometrics(props) {
                   >
                     Save Capture
                   </MatButton>
-                ) : (
-                  <MatButton
-                    type="button"
-                    variant="contained"
-                    color="primary"
-                    disabled={capturedFingered.length < 6 ? true : false}
-                    onClick={saveBiometrics}
-                    // className={classes.button}
-                    startIcon={<SaveIcon />}
-                  >
-                    Save Capture
-                  </MatButton>
-                )}
+                ) : ( */}
+                <MatButton
+                  type="button"
+                  variant="contained"
+                  color="primary"
+                  disabled={capturedFingered.length < 6 ? true : false}
+                  onClick={saveBiometrics}
+                  // className={classes.button}
+                  startIcon={<SaveIcon />}
+                >
+                  Save Capture
+                </MatButton>
+                {/* )} */}
               </Col>
               <br />
             </>
@@ -755,7 +780,7 @@ function Biometrics(props) {
           )}
         </Row>
       </div>
-      <div style={{ display: "flex", width: "100%" }}>
+      {/* <div style={{ display: "flex", width: "100%" }}>
         <div
           className=""
           style={{
@@ -809,7 +834,6 @@ function Biometrics(props) {
                         </div>
                       </div>
 
-                      {/*Action button -- Dropdown menu*/}
                       <Dropdown className="dropdown ms-auto">
                         <Dropdown.Toggle
                           as="button"
@@ -886,7 +910,7 @@ function Biometrics(props) {
                             variant="info badge-xs light"
                             className="card-link float-end"
                           >
-                            Version {/*{contact.version}*/}
+                            Version 
                           </Badge>
                           <span className="mb-0 title">
                             Status {biometric.iso}
@@ -927,7 +951,7 @@ function Biometrics(props) {
             </>
           )}
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }
