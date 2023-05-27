@@ -1,5 +1,7 @@
 import React, { useState, useRef } from "react";
 import MaterialTable from "material-table";
+import axios from "axios";
+import { url as baseUrl, token } from "../../../api";
 
 import { forwardRef } from "react";
 //import { Button} from "react-bootstrap";
@@ -48,6 +50,7 @@ const tableIcons = {
 };
 
 const PreviousRecapture = (props) => {
+  const patientID = JSON.parse(localStorage.getItem("patient_id"));
   const tableRef = useRef(null);
   const [loading, setLoading] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -57,27 +60,43 @@ const PreviousRecapture = (props) => {
 
   return (
     <>
-      <h3>PreviousRecapture</h3>
+      {/* <h3>Previous Recapture</h3> */}
       <MaterialTable
         tableRef={tableRef}
         /*onSearchChange={(e) => {
           handleSearchChange(e);
       }}*/
         icons={tableIcons}
-        //title={<PPISelect />}
+        title={`Previous Recaptured Biometrics`}
         columns={[
           {
             title: "Visit Date",
-            field: "name",
+            field: "visitDate",
             filtering: false,
             // hidden: enablePPI,
           },
-          { title: "Fingers Captured", field: "id", filtering: false },
+          { title: "Re-captured Count", field: "count", filtering: false },
 
           { title: "Actions", field: "actions", filtering: false },
         ]}
         isLoading={loading}
-        data={[]}
+        data={(query) =>
+          new Promise((resolve, reject) =>
+            axios
+              .get(`${baseUrl}biometrics/grouped/person/${patientID}`, {
+                headers: { Authorization: `Bearer ${token}` },
+              })
+              .then((response) => response)
+              .then((result) => {
+                resolve({
+                  data: result.data.map((row) => ({
+                    visitDate: row.captureDate,
+                    count: row.count === null ? 0 : row.count,
+                  })),
+                });
+              })
+          )
+        }
         options={{
           headerStyle: {
             backgroundColor: "#014d88",

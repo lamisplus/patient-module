@@ -101,6 +101,7 @@ let checkUrl = "";
 
 function Biometrics(props) {
   //console.log(props.age);
+  localStorage.setItem("patient_id", JSON.stringify(props.patientId));
   const classes = useStyles();
   let history = useHistory();
   const permissions =
