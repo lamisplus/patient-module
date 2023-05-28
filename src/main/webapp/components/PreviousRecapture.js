@@ -1,7 +1,11 @@
 import React, { useState, useRef } from "react";
 import MaterialTable from "material-table";
+import Button from "@material-ui/core/Button";
 import axios from "axios";
 import { url as baseUrl, token } from "../../../api";
+import { FaEye } from "react-icons/fa";
+import SplitActionButton from "./SplitActionButton";
+import PatientRecapture from "./PatientRecapture";
 
 import { forwardRef } from "react";
 //import { Button} from "react-bootstrap";
@@ -51,12 +55,34 @@ const tableIcons = {
 
 const PreviousRecapture = (props) => {
   const patientID = JSON.parse(localStorage.getItem("patient_id"));
+  const [modal, setModal] = useState(false);
+
+  const toggle = () => setModal(!modal);
+
   const tableRef = useRef(null);
   const [loading, setLoading] = useState("");
+  const [biometrics, setBiometrics] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const handleChangePage = (page) => {
     setCurrentPage(page + 1);
   };
+
+  const viewRecapture = () => {
+    return;
+  };
+
+  function actionItems(row) {
+    // console.log(row);
+    axios
+      .get(
+        `${baseUrl}biometrics?personUuid=${row.personUuid}&recapture=${row.recapture}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      )
+      .then((response) => setBiometrics(response.data));
+    //.error((err) => console.log(err));
+  }
 
   return (
     <>
@@ -70,13 +96,13 @@ const PreviousRecapture = (props) => {
         title={`Previous Recaptured Biometrics`}
         columns={[
           {
-            title: "Visit Date",
+            title: "Re-captured Date",
             field: "visitDate",
             filtering: false,
             // hidden: enablePPI,
           },
           { title: "Re-captured Count", field: "count", filtering: false },
-
+          { title: "data", field: "data", hidden: true },
           { title: "Actions", field: "actions", filtering: false },
         ]}
         isLoading={loading}
@@ -92,6 +118,15 @@ const PreviousRecapture = (props) => {
                   data: result.data.map((row) => ({
                     visitDate: row.captureDate,
                     count: row.count === null ? 0 : row.count,
+                    data: actionItems(row),
+                    actions: (
+                      <Button
+                        style={{ backgroundColor: "#014d88", color: "#fff" }}
+                        onClick={toggle}
+                      >
+                        View
+                      </Button>
+                    ),
                   })),
                 });
               })
@@ -117,6 +152,11 @@ const PreviousRecapture = (props) => {
         }}
         onChangePage={handleChangePage}
         //localization={localization}
+      />
+      <PatientRecapture
+        storedBiometrics={biometrics}
+        modal={modal}
+        toggle={toggle}
       />
     </>
   );
