@@ -160,7 +160,7 @@ function Index(props) {
         ),
     },
     {
-      menuItem: "Re-captured Biomteric",
+      menuItem: "Recaptured Biomterics",
       render: () => (
         <Tab.Pane>
           <div style={{ minHeight: 400, width: "100%" }}>
@@ -175,7 +175,7 @@ function Index(props) {
       ),
     },
     {
-      menuItem: "Previous Re-captured Biomteric",
+      menuItem: "Previously Recaptured Biomterics",
       render: () => (
         <Tab.Pane>
           <div style={{ minHeight: 400, width: "100%" }}>

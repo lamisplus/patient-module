@@ -10,6 +10,7 @@ import MatButton from "@material-ui/core/Button";
 import FingerprintIcon from "@material-ui/icons/Fingerprint";
 import { Button2, Icon, List } from "semantic-ui-react";
 import { ToastContainer, toast } from "react-toastify";
+import RestartAltIcon from "@mui/icons-material/RestartAlt";
 
 import axios from "axios";
 import { token, url as baseUrl } from "../../../api";
@@ -498,6 +499,8 @@ function Biometrics(props) {
     }
   };
 
+  const resetBiometrics = (fingerprint) => {};
+
   return (
     <div className={classes.root}>
       <div>
@@ -671,7 +674,7 @@ function Biometrics(props) {
             <>
               <Col md={12} style={{ marginTop: "10px", paddingBottom: "20px" }}>
                 <List celled horizontal>
-                  {console.log(capturedFingered)}
+                  {/* {console.log(capturedFingered)} */}
                   {capturedFingered.map((x) => (
                     <List.Item
                       style={{
@@ -736,6 +739,24 @@ function Biometrics(props) {
                       >
                         {x.templateType}
                       </List.Content>
+                      <List.Content>
+                        <br />
+                        {x.imageQuality < 75 ? (
+                          <MatButton
+                            type="button"
+                            variant="contained"
+                            color="secondary"
+                            onClick={() => {
+                              deleteTempBiometrics(x);
+                            }}
+                            startIcon={<RestartAltIcon />}
+                          >
+                            Reset recapture
+                          </MatButton>
+                        ) : (
+                          " "
+                        )}
+                      </List.Content>
                     </List.Item>
                   ))}
                 </List>
@@ -747,6 +768,7 @@ function Biometrics(props) {
               <br />
               <br />
               <Col md={12}>
+                <br />
                 {/* {storedBiometrics.length < 10 &&
                 storedBiometrics.length !== 0 ? (
                   <MatButton

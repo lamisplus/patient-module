@@ -7,17 +7,17 @@ import { Link, useHistory } from "react-router-dom";
 import fingerprintimage from "../images/fingerprintimage.png";
 
 const PatientRecapture = (props) => {
-  console.log(props.storedBiometrics);
+  //console.log(props.storedBiometrics);
   return (
     <>
       <Modal
         isOpen={props.modal}
         toggle={props.toggle}
-        style={{ display: "flex", maxWidth: "80%", maxHeight: "80%" }}
+        style={{ display: "flex", maxWidth: "85%", maxHeight: "80%" }}
         fullscreen={true}
       >
         <ModalHeader toggle={props.toggle}>
-          Previously Re-captured Biometrics Fingerprints
+          Previously Recaptured Fingerprints
         </ModalHeader>
         <ModalBody>
           <div>
@@ -213,10 +213,10 @@ const PatientRecapture = (props) => {
         <ModalFooter>
           {/* <Button color="primary" onClick={props.toggle}>
             Do Something
-          </Button>{" "} */}
+          </Button>{" "}
           <Button color="secondary" onClick={props.toggle}>
             Cancel
-          </Button>
+          </Button> */}
         </ModalFooter>
       </Modal>
     </>

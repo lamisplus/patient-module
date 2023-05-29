@@ -96,12 +96,16 @@ const PreviousRecapture = (props) => {
         title={`Previous Recaptured Biometrics`}
         columns={[
           {
-            title: "Re-captured Date",
+            title: "Recaptured Date",
             field: "visitDate",
             filtering: false,
             // hidden: enablePPI,
           },
-          { title: "Re-captured Count", field: "count", filtering: false },
+          {
+            title: "Number of Fingers Recaptured",
+            field: "count",
+            filtering: false,
+          },
           { title: "data", field: "data", hidden: true },
           { title: "Actions", field: "actions", filtering: false },
         ]}
