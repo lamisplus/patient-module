@@ -101,7 +101,6 @@ const useStyles = makeStyles((theme) => ({
 let checkUrl = "";
 
 function Biometrics(props) {
-  //console.log(props.age);
   localStorage.setItem("patient_id", JSON.stringify(props.patientId));
   const classes = useStyles();
   let history = useHistory();
@@ -129,8 +128,8 @@ function Biometrics(props) {
   const [storedBiometrics, setStoredBiometrics] = useState([]);
   // const [responseImage, setResponseImage] = useState("")
   const [capturedFingered, setCapturedFingered] = useState([]);
-  //const [capturedFingeredObj, setCapturedFingeredObj] = useState([]);
-  const [saveCapturedFingered, setSaveCapturedFingered] = useState([]);
+  const [capturedFingeredObj, setCapturedFingeredObj] = useState([]);
+  const [recapturedFingered, setRecapturedFingered] = useState([]);
   const [selectedFingers, setSelectedFingers] = useState([]);
   const [imageQuality, setImageQuality] = useState(false);
   const [isNewStatus, setIsNewStatus] = useState(true);
@@ -161,20 +160,24 @@ function Biometrics(props) {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then(async (response) => {
-        console.log("patient bio", response.data);
         if (response.data.length > 0) {
           setStoredBiometrics(response.data);
-          //setSaveCapturedFingered(response.data);
+
           setPageLoading(true);
+
           let personCapturedFingers = _.uniq(
             _.map(response.data, "templateType")
           );
-          setSelectedFingers(personCapturedFingers);
+
+          //console.log(personCapturedFingers);
+          //setSelectedFingers(personCapturedFingers);
+
           let biometricItems = _.map(fingersCodeset.data, (item) => {
             return _.extend({}, item, {
-              captured: personCapturedFingers.includes(item.display),
+              captured: false,
             });
           });
+
           setFingerType(biometricItems);
         } else {
           let biometricItems = _.map(fingersCodeset.data, (item) => {
@@ -204,11 +207,22 @@ function Biometrics(props) {
         { headers: { Authorization: `Bearer ${token}` } }
       )
       .then((response) => {
-        console.log("cleared store");
+        //console.log("cleared store");
       })
       .catch((error) => {
-        console.log("cleared store error");
+        //console.log("cleared store error");
         console.log(error);
+      });
+  };
+
+  const getRecaptureCount = () => {
+    axios
+      .get(`${baseUrl}biometrics/grouped/person/${props.patientId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((response) => {
+        //console.log(response.data);
+        setRecapturedFingered(response.data);
       });
   };
 
@@ -216,6 +230,7 @@ function Biometrics(props) {
     clear_storelist();
     getPersonBiometrics();
     TemplateType();
+    getRecaptureCount();
     //biometricFingers();
   }, []);
 
@@ -313,6 +328,7 @@ function Biometrics(props) {
         )
         .then((response) => {
           setLoading(false);
+
           if (response.data.type === "ERROR") {
             setLoading(false);
             setTryAgain(true);
@@ -332,7 +348,9 @@ function Biometrics(props) {
               );
               setImageQuality(true);
             }
+
             const templateType = response.data.templateType;
+
             setTryAgain(false);
             setSuccess(true);
 
@@ -345,6 +363,7 @@ function Biometrics(props) {
             setCapturedFingered([...capturedFingered, biometricsEnrollments]);
 
             _.find(fingerType, { display: templateType }).captured = true;
+
             setFingerType([...fingerType]);
 
             setObjValues({ ...objValues, templateType: "" });
@@ -392,33 +411,6 @@ function Biometrics(props) {
     }
   };
 
-  const deleteBiometric = (id, finger) => {
-    axios
-      .delete(`${baseUrl}biometrics/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((response) => {
-        toast.success(`${finger} deleted successfully`, {
-          position: toast.POSITION.BOTTOM_CENTER,
-        });
-        _.find(fingerType, { display: finger }).captured = false;
-        setFingerType([...fingerType]);
-        let newStoredBiometrics = _.reject(storedBiometrics, {
-          templateType: finger,
-        });
-        setStoredBiometrics(newStoredBiometrics);
-        clear_storelist();
-        if (newStoredBiometrics.length === 0) {
-          props.updatePatientBiometricStatus(false);
-        }
-      })
-      .catch((error) => {
-        toast.error("Something went wrong", {
-          position: toast.POSITION.BOTTOM_CENTER,
-        });
-        console.log(error);
-      });
-  };
   //Save Biometric capture
   // const saveBiometrics = (e) => {
   //   e.preventDefault();
@@ -468,13 +460,37 @@ function Biometrics(props) {
   };
 
   const deleteTempBiometrics = (x) => {
-    window.setTimeout(() => {
-      let deletedRecord = capturedFingered.filter(
-        (data) => data.templateType !== x.templateType
-      );
-      setCapturedFingered(deletedRecord);
-      toast.info(x.templateType + "captured removed successfully!");
-    }, 1000);
+    axios
+      .delete(
+        `${baseUrl}biometrics?personId=${x.patientId}&templateType=${x.templateType}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      )
+      .then((resp) => {
+        console.log(resp);
+        let deletedRecord = capturedFingered.filter(
+          (data) => data.templateType !== x.templateType
+        );
+        setCapturedFingered(deletedRecord);
+        toast.info(x.templateType + "captured removed successfully!");
+        // toast.success(`finger deleted successfully`, {
+        //   position: toast.POSITION.BOTTOM_CENTER,
+        // });
+      })
+      .catch((error) => {
+        toast.error("Something went wrong", {
+          position: toast.POSITION.BOTTOM_CENTER,
+        });
+        console.log(error);
+      });
+    // window.setTimeout(() => {
+    //   let deletedRecord = capturedFingered.filter(
+    //     (data) => data.templateType !== x.templateType
+    //   );
+    //   setCapturedFingered(deletedRecord);
+    //   toast.info(x.templateType + "captured removed successfully!");
+    // }, 1000);
   };
 
   const getFingerprintsQuality = (imageQuality) => {
@@ -498,8 +514,6 @@ function Biometrics(props) {
       );
     }
   };
-
-  const resetBiometrics = (fingerprint) => {};
 
   return (
     <div className={classes.root}>
@@ -572,7 +586,7 @@ function Biometrics(props) {
                     <option value="">Select Finger </option>
 
                     {fingerType &&
-                      fingerType.map((value) => (
+                      _.filter(fingerType, ["captured", false]).map((value) => (
                         <option key={value.id} value={value.display}>
                           {value.display}
                         </option>
@@ -664,7 +678,7 @@ function Biometrics(props) {
             <br />
             <p>
               {" "}
-              Patient Recapture Count : <b>0</b>
+              Patient Recapture Count : <b>{recapturedFingered.length}</b>
             </p>
             <hr />
           </Col>
