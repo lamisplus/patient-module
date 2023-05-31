@@ -17,7 +17,9 @@ const PatientRecapture = (props) => {
         fullscreen={true}
       >
         <ModalHeader toggle={props.toggle}>
-          Previously Recaptured Fingerprints
+          {props.storedBiometrics[0]?.recapture === 0
+            ? "Baseline Fingerprints"
+            : "Previous Recaptured Fingerprints"}
         </ModalHeader>
         <ModalBody>
           <div>
@@ -167,7 +169,10 @@ const PatientRecapture = (props) => {
                                 variant="info badge-xs light"
                                 className="card-link float-end"
                               >
-                                100% {/*{contact.version}*/}
+                                {biometric.imageQuality !== null
+                                  ? biometric.imageQuality + "%"
+                                  : "N/A"}{" "}
+                                {/*{contact.version}*/}
                               </Badge>
                               <span className="mb-0 title">
                                 Fingerprint Quality {biometric.iso}

@@ -135,47 +135,33 @@ function Index(props) {
   };
 
   const panes = [
+    // {
+    //   menuItem:
+    //     (permissions.includes("view_patient_appointment") &&
+    //       biometricsModuleInstalled) ||
+    //     (permissions.includes("all_permission") && biometricsModuleInstalled)
+    //       ? "Biometrics"
+    //       : "",
+    //   render: () =>
+    //     permissions.includes("view_patient_appointment") ||
+    //     permissions.includes("all_permission") ? (
+    //       <Tab.Pane>
+    //         <div style={{ minHeight: 400, width: "100%" }}>
+    //           <Biometrics
+    //             patientObj={patientObj}
+    //             age={patientObj.dateOfBirth}
+    //             patientId={patientObj.id}
+    //             updatePatientBiometricStatus={updatePatientBiometricStatus}
+    //           />
+    //         </div>
+    //       </Tab.Pane>
+    //     ) : (
+    //       ""
+    //     ),
+    // },
+
     {
-      menuItem:
-        (permissions.includes("view_patient_appointment") &&
-          biometricsModuleInstalled) ||
-        (permissions.includes("all_permission") && biometricsModuleInstalled)
-          ? "Biometrics"
-          : "",
-      render: () =>
-        permissions.includes("view_patient_appointment") ||
-        permissions.includes("all_permission") ? (
-          <Tab.Pane>
-            <div style={{ minHeight: 400, width: "100%" }}>
-              <Biometrics
-                patientObj={patientObj}
-                age={patientObj.dateOfBirth}
-                patientId={patientObj.id}
-                updatePatientBiometricStatus={updatePatientBiometricStatus}
-              />
-            </div>
-          </Tab.Pane>
-        ) : (
-          ""
-        ),
-    },
-    {
-      menuItem: "Recaptured Biomterics",
-      render: () => (
-        <Tab.Pane>
-          <div style={{ minHeight: 400, width: "100%" }}>
-            <ReCaptureBiometric
-              patientObj={patientObj}
-              age={patientObj.dateOfBirth}
-              patientId={patientObj.id}
-              updatePatientBiometricStatus={updatePatientBiometricStatus}
-            />
-          </div>
-        </Tab.Pane>
-      ),
-    },
-    {
-      menuItem: "Previously Recaptured Biomterics",
+      menuItem: "Recapture Biometrics",
       render: () => (
         <Tab.Pane>
           <div style={{ minHeight: 400, width: "100%" }}>
@@ -189,6 +175,21 @@ function Index(props) {
         </Tab.Pane>
       ),
     },
+    // {
+    //   menuItem: "Recapture",
+    //   render: () => (
+    //     <Tab.Pane>
+    //       <div style={{ minHeight: 400, width: "100%" }}>
+    //         <ReCaptureBiometric
+    //           patientObj={patientObj}
+    //           age={patientObj.dateOfBirth}
+    //           patientId={patientObj.id}
+    //           updatePatientBiometricStatus={updatePatientBiometricStatus}
+    //         />
+    //       </div>
+    //     </Tab.Pane>
+    //   ),
+    // },
   ];
 
   const checkForBiometricsModule = () => {

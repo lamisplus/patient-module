@@ -6,6 +6,9 @@ import { url as baseUrl, token } from "../../../api";
 import { FaEye } from "react-icons/fa";
 import SplitActionButton from "./SplitActionButton";
 import PatientRecapture from "./PatientRecapture";
+import Recapture from "./Recapture";
+import MatButton from "@material-ui/core/Button";
+import FingerprintIcon from "@mui/icons-material/Fingerprint";
 
 import { forwardRef } from "react";
 //import { Button} from "react-bootstrap";
@@ -54,15 +57,18 @@ const tableIcons = {
 };
 
 const PreviousRecapture = (props) => {
-  const patientID = JSON.parse(localStorage.getItem("patient_id"));
+  //console.log("ID", props.patientId);
+  //const patientID = JSON.parse(localStorage.getItem("patient_id"));
   const [modal, setModal] = useState(false);
-
+  const [modalNew, setModalNew] = useState(false);
   const toggle = () => setModal(!modal);
+  const toggleNew = () => setModalNew(!modalNew);
 
   const tableRef = useRef(null);
   const [loading, setLoading] = useState("");
   const [biometrics, setBiometrics] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+
   const handleChangePage = (page) => {
     setCurrentPage(page + 1);
   };
@@ -87,6 +93,25 @@ const PreviousRecapture = (props) => {
   return (
     <>
       {/* <h3>Previous Recapture</h3> */}
+      <MatButton
+        className=" float-right mr-1"
+        variant="contained"
+        floated="left"
+        startIcon={<FingerprintIcon />}
+        style={{
+          backgroundColor: "#014d88",
+          color: "#fff",
+          height: "35px",
+          float: "right",
+          //marginBottom: "40px",
+        }}
+        onClick={toggleNew}
+      >
+        <span style={{ textTransform: "capitalize" }}>Recapture</span>
+      </MatButton>
+      <br />
+      <br />
+      <br />
       <MaterialTable
         tableRef={tableRef}
         /*onSearchChange={(e) => {
@@ -96,8 +121,8 @@ const PreviousRecapture = (props) => {
         title={`Previous Recaptured Biometrics`}
         columns={[
           {
-            title: "Recaptured Date",
-            field: "visitDate",
+            title: "Captured Date",
+            field: "captureDate",
             filtering: false,
             // hidden: enablePPI,
           },
@@ -113,14 +138,14 @@ const PreviousRecapture = (props) => {
         data={(query) =>
           new Promise((resolve, reject) =>
             axios
-              .get(`${baseUrl}biometrics/grouped/person/${patientID}`, {
+              .get(`${baseUrl}biometrics/grouped/person/${props.patientId}`, {
                 headers: { Authorization: `Bearer ${token}` },
               })
               .then((response) => response)
               .then((result) => {
                 resolve({
                   data: result.data.map((row) => ({
-                    visitDate: row.captureDate,
+                    captureDate: row.captureDate,
                     count: row.count === null ? 0 : row.count,
                     data: actionItems(row),
                     actions: (
@@ -161,6 +186,12 @@ const PreviousRecapture = (props) => {
         storedBiometrics={biometrics}
         modal={modal}
         toggle={toggle}
+      />
+      <Recapture
+        toggle={toggleNew}
+        modal={modalNew}
+        patientId={props.patientId}
+        age={props.age}
       />
     </>
   );

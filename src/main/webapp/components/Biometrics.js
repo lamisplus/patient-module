@@ -468,6 +468,28 @@ function Biometrics(props) {
     console.log("deleted temp");
   };
 
+  const getFingerprintsQuality = (imageQuality) => {
+    if (imageQuality > 60 && imageQuality <= 75) {
+      return (
+        <Badge color="warning" style={{ fontSize: "12px" }}>
+          {imageQuality + "%"}
+        </Badge>
+      );
+    } else if (imageQuality > 75) {
+      return (
+        <Badge color="success" style={{ fontSize: "12px" }}>
+          {imageQuality + "%"}
+        </Badge>
+      );
+    } else {
+      return (
+        <Badge color="error" style={{ fontSize: "12px" }}>
+          {imageQuality + "%"}
+        </Badge>
+      );
+    }
+  };
+
   return (
     <div className={classes.root}>
       <div>
@@ -621,15 +643,22 @@ function Biometrics(props) {
                         style={{
                           paddingLeft: "0px",
                           height: "0.5rem",
-                          display: "flex",
-                          justifyContent: "right",
+
                           alignItems: "right",
                         }}
-                        onClick={() => {
-                          deleteTempBiometrics(x);
-                        }}
                       >
-                        <Icon name="cancel" color="red" />{" "}
+                        {getFingerprintsQuality(x.imageQuality)}
+                        <span
+                          onClick={() => {
+                            deleteTempBiometrics(x);
+                          }}
+                        >
+                          <Icon
+                            name="cancel"
+                            color="red"
+                            style={{ float: "right" }}
+                          />{" "}
+                        </span>
                       </List.Header>
                       <List.Content
                         style={{
@@ -836,7 +865,10 @@ function Biometrics(props) {
                             variant="info badge-xs light"
                             className="card-link float-end"
                           >
-                            Version {/*{contact.version}*/}
+                            {biometric.imageQuality !== null
+                              ? biometric.imageQuality + "%"
+                              : "N/A"}{" "}
+                            {/*{contact.version}*/}
                           </Badge>
                           <span className="mb-0 title">
                             Status {biometric.iso}
