@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import MaterialTable from "material-table";
 import Button from "@material-ui/core/Button";
 import axios from "axios";
@@ -57,8 +57,10 @@ const tableIcons = {
 };
 
 const PreviousRecapture = (props) => {
-  //console.log("ID", props.patientId);
-  //const patientID = JSON.parse(localStorage.getItem("patient_id"));
+  let createdDate = props.patientObj.createdDate.split("T")[0];
+  let currentDate = new Date().toISOString().split("T")[0];
+
+  const [recapturedFingered, setRecapturedFingered] = useState([]);
   const [modal, setModal] = useState(false);
   const [modalNew, setModalNew] = useState(false);
   const toggle = () => setModal(!modal);
@@ -68,6 +70,21 @@ const PreviousRecapture = (props) => {
   const [loading, setLoading] = useState("");
   const [biometrics, setBiometrics] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+
+  const getRecaptureCount = () => {
+    axios
+      .get(`${baseUrl}biometrics/grouped/person/${props.patientId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((response) => {
+        //console.log(response.data);
+        setRecapturedFingered(response.data);
+      });
+  };
+
+  useEffect(() => {
+    getRecaptureCount();
+  }, []);
 
   const handleChangePage = (page) => {
     setCurrentPage(page + 1);
@@ -92,23 +109,30 @@ const PreviousRecapture = (props) => {
 
   return (
     <>
-      {/* <h3>Previous Recapture</h3> */}
-      <MatButton
-        className=" float-right mr-1"
-        variant="contained"
-        floated="left"
-        startIcon={<FingerprintIcon />}
-        style={{
-          backgroundColor: "#014d88",
-          color: "#fff",
-          height: "35px",
-          float: "right",
-          //marginBottom: "40px",
-        }}
-        onClick={toggleNew}
-      >
-        <span style={{ textTransform: "capitalize" }}>Recapture</span>
-      </MatButton>
+      <h4>
+        {" "}
+        Patient captured count : <b>{recapturedFingered.length}</b>
+      </h4>
+      {createdDate !== currentDate ? (
+        <MatButton
+          className=" float-right mr-1"
+          variant="contained"
+          floated="left"
+          startIcon={<FingerprintIcon />}
+          style={{
+            backgroundColor: "#014d88",
+            color: "#fff",
+            height: "35px",
+            float: "right",
+            //marginBottom: "40px",
+          }}
+          onClick={toggleNew}
+        >
+          <span style={{ textTransform: "capitalize" }}>Recapture</span>
+        </MatButton>
+      ) : (
+        ""
+      )}
       <br />
       <br />
       <br />
@@ -144,19 +168,25 @@ const PreviousRecapture = (props) => {
               .then((response) => response)
               .then((result) => {
                 resolve({
-                  data: result.data.map((row) => ({
-                    captureDate: row.captureDate,
-                    count: row.count === null ? 0 : row.count,
-                    data: actionItems(row),
-                    actions: (
-                      <Button
-                        style={{ backgroundColor: "#014d88", color: "#fff" }}
-                        onClick={toggle}
-                      >
-                        View
-                      </Button>
-                    ),
-                  })),
+                  data: result.data
+                    .filter((record) => {
+                      return record.archived === 0;
+                    })
+                    .map((row) => ({
+                      captureDate: row.captureDate,
+                      count: row.count === null ? 0 : row.count,
+                      data: actionItems(row),
+                      actions: (
+                        <Button
+                          style={{ backgroundColor: "#014d88", color: "#fff" }}
+                          onClick={toggle}
+                        >
+                          View
+                        </Button>
+                      ),
+                    })),
+                  page: query.page,
+                  totalCount: result.data.length,
                 });
               })
           )

@@ -26,6 +26,7 @@ import { ToastContainer, toast } from "react-toastify";
 import ThumbUpIcon from "@material-ui/icons/ThumbUp";
 import axios from "axios";
 import { token, url as baseUrl } from "../../../api";
+import RestartAltIcon from "@mui/icons-material/RestartAlt";
 
 import { green, red } from "@mui/material/colors";
 import { Dimmer, Loader, Image, Segment } from "semantic-ui-react";
@@ -629,7 +630,7 @@ function Biometrics(props) {
           {capturedFingered.length >= 1 ? (
             <>
               <Col md={12} style={{ marginTop: "10px", paddingBottom: "20px" }}>
-                <List celled horizontal>
+                {/* <List celled horizontal>
                   {capturedFingered.map((x) => (
                     <List.Item
                       style={{
@@ -688,6 +689,87 @@ function Biometrics(props) {
                         }}
                       >
                         {x.templateType}
+                      </List.Content>
+                    </List.Item>
+                  ))}
+                </List> */}
+                <List celled horizontal>
+                  {capturedFingered.map((x) => (
+                    <List.Item
+                      style={{
+                        width: "200px",
+                        height: "200px",
+                        border: "1px dotted #014d88",
+                        margin: "5px",
+                      }}
+                    >
+                      <List.Header
+                        style={{
+                          paddingLeft: "0px",
+                          height: "0.5rem",
+
+                          alignItems: "right",
+                        }}
+                      >
+                        {getFingerprintsQuality(x.imageQuality)}
+                        <span
+                          onClick={() => {
+                            deleteTempBiometrics(x);
+                          }}
+                        >
+                          <Icon
+                            name="cancel"
+                            color="red"
+                            style={{ float: "right" }}
+                          />{" "}
+                        </span>
+                      </List.Header>
+                      <List.Content
+                        style={{
+                          width: "200px",
+                          height: "150px",
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      >
+                        {" "}
+                        <FingerprintIcon
+                          style={{ color: "#992E62", fontSize: 150 }}
+                        />
+                      </List.Content>
+                      <List.Content
+                        style={{
+                          width: "200px",
+                          height: "30px",
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          fontSize: "16px",
+                          color: "#014d88",
+                          fontWeight: "bold",
+                          fontFamily: '"poppins", sans-serif',
+                        }}
+                      >
+                        {x.templateType}
+                      </List.Content>
+                      <List.Content>
+                        <br />
+                        {x.imageQuality < 75 ? (
+                          <MatButton
+                            type="button"
+                            variant="contained"
+                            color="secondary"
+                            onClick={() => {
+                              deleteTempBiometrics(x);
+                            }}
+                            startIcon={<RestartAltIcon />}
+                          >
+                            Reset recapture
+                          </MatButton>
+                        ) : (
+                          " "
+                        )}
                       </List.Content>
                     </List.Item>
                   ))}

@@ -14,7 +14,7 @@ const PatientRecapture = (props) => {
         isOpen={props.modal}
         toggle={props.toggle}
         style={{ display: "flex", maxWidth: "85%", maxHeight: "80%" }}
-        fullscreen={true}
+        fullscreen="true"
       >
         <ModalHeader toggle={props.toggle}>
           {props.storedBiometrics[0]?.recapture === 0
