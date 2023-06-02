@@ -12,6 +12,7 @@ import {
   FormGroup,
   CardHeader,
   Input,
+  Badge,
 } from "reactstrap";
 
 import { makeStyles } from "@material-ui/core/styles";
@@ -43,7 +44,7 @@ import Typography from "@mui/material/Typography";
 // import ModalImage from "react-modal-image";
 import { Link, useHistory } from "react-router-dom";
 import moment from "moment";
-import { Dropdown, Badge } from "react-bootstrap";
+import { Dropdown } from "react-bootstrap";
 import { Alert, AlertTitle } from "@material-ui/lab";
 import fingerprintimage from "../images/fingerprintimage.png";
 import DeleteIcon from "@material-ui/icons/Delete";
@@ -123,7 +124,7 @@ const useStyles = makeStyles((theme) => ({
 let checkUrl = "";
 
 function Biometrics(props) {
-  console.log(props.age);
+  //console.log(props.age);
   const classes = useStyles();
   let history = useHistory();
   const permissions =
@@ -258,7 +259,7 @@ function Biometrics(props) {
               headers: { Authorization: `Bearer ${token}` },
             })
             .then((response) => {
-              console.log(response.data.find((x) => x.active === true));
+              //console.log(response.data.find((x) => x.active === true));
               setDevices(response.data.find((x) => x.active === true));
               setbiometricDevices(response.data);
             })
@@ -462,11 +463,32 @@ function Biometrics(props) {
   };
 
   const deleteTempBiometrics = (x) => {
-    let deletedRecord = capturedFingered.filter(
-      (data) => data.templateType !== x.templateType
-    );
-    setCapturedFingered(deletedRecord);
-    console.log("deleted temp");
+    axios
+      .delete(
+        `${baseUrl}biometrics?personId=${x.patientId}&templateType=${x.templateType}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      )
+      .then((resp) => {
+        console.log(resp);
+        let deletedRecord = capturedFingered.filter(
+          (data) => data.templateType !== x.templateType
+        );
+        setCapturedFingered(deletedRecord);
+        toast.info(x.templateType + "captured removed successfully!");
+      })
+      .catch((error) => {
+        toast.error("Something went wrong", {
+          position: toast.POSITION.BOTTOM_CENTER,
+        });
+        console.log(error);
+      });
+    // let deletedRecord = capturedFingered.filter(
+    //   (data) => data.templateType !== x.templateType
+    // );
+    // setCapturedFingered(deletedRecord);
+    // console.log("deleted temp");
   };
 
   const getFingerprintsQuality = (imageQuality) => {
@@ -630,7 +652,8 @@ function Biometrics(props) {
           {capturedFingered.length >= 1 ? (
             <>
               <Col md={12} style={{ marginTop: "10px", paddingBottom: "20px" }}>
-                {/* <List celled horizontal>
+                {
+                  /* <List celled horizontal>
                   {capturedFingered.map((x) => (
                     <List.Item
                       style={{
@@ -692,7 +715,8 @@ function Biometrics(props) {
                       </List.Content>
                     </List.Item>
                   ))}
-                </List> */}
+                </List> */ console.log(capturedFingered)
+                }
                 <List celled horizontal>
                   {capturedFingered.map((x) => (
                     <List.Item
@@ -707,7 +731,6 @@ function Biometrics(props) {
                         style={{
                           paddingLeft: "0px",
                           height: "0.5rem",
-
                           alignItems: "right",
                         }}
                       >

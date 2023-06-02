@@ -90,9 +90,9 @@ const PreviousRecapture = (props) => {
     setCurrentPage(page + 1);
   };
 
-  const viewRecapture = () => {
-    return;
-  };
+  // const viewRecapture = () => {
+  //   return;
+  // };
 
   function actionItems(row) {
     // console.log(row);
