@@ -110,7 +110,7 @@ const schema = yup.object().shape({
   dateOfBirth: yup.string().required(),
   age: yup.number(),
   ninNumber: yup.string().nullable(),
-  pnumber: yup.string().required(),
+  pnumber: yup.string().nullable(),
   altPhonenumber: yup.string().nullable(),
   email: yup.string().nullable(),
   address: yup.string().nullable(),
@@ -243,6 +243,7 @@ const RegisterPatient = (props) => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       const patient = response.data;
+      console.log(patient);
       const contacts = patient.contact ? patient.contact : [];
       setContacts(contacts.contact);
       const identifiers = patient.identifier;
@@ -252,13 +253,13 @@ const RegisterPatient = (props) => {
         (obj) => obj.type == "HospitalNumber"
       );
       const phone = phoneNumberFormatCheck(
-        contactPoint.contactPoint.find((obj) => obj.type == "phone")
+        contactPoint?.contactPoint?.find((obj) => obj.type == "phone")
       );
-      const email = contactPoint.contactPoint.find(
+      const email = contactPoint?.contactPoint?.find(
         (obj) => obj.type == "email"
       );
       const altphone = phoneNumberFormatCheck(
-        contactPoint.contactPoint.find((obj) => obj.type == "altphone")
+        contactPoint?.contactPoint?.find((obj) => obj.type == "altphone")
       );
       const country =
         address && address.address && address.address.length > 0
@@ -494,10 +495,16 @@ const RegisterPatient = (props) => {
           dateOfRegistration: data.dateOfRegistration,
           isDateOfBirthEstimated: data.dateOfBirth == "Actual" ? false : true,
         };
-        const phone = {
-          type: "phone",
-          value: data.pnumber,
-        };
+        //console.log(data.pnumber);
+
+        if (data.pnumber) {
+          const phone = {
+            type: "phone",
+            value: data.pnumber,
+          };
+          patientForm.contactPoint.push(phone);
+        }
+
         if (data.email) {
           const email = {
             type: "email",
@@ -512,7 +519,7 @@ const RegisterPatient = (props) => {
           };
           patientForm.contactPoint.push(altPhonenumber);
         }
-        patientForm.contactPoint.push(phone);
+
         if (patientId) {
           patientForm.id = null;
           patientForm.facilityId = patientFacilityId;
@@ -808,7 +815,6 @@ const RegisterPatient = (props) => {
   };
 
   const checkPhoneNumber = (e, inputName) => {
-    console.log(e, inputName);
     setValue(inputName, e);
   };
 
@@ -1272,9 +1278,7 @@ const RegisterPatient = (props) => {
                   <div className={"row"}>
                     <div className="form-group  col-md-4">
                       <FormGroup>
-                        <Label>
-                          Phone Number <span style={{ color: "red" }}> *</span>
-                        </Label>
+                        <Label>Phone Number</Label>
                         {/*<input
                                                         className="form-control"
                                                         type="text"
@@ -1323,7 +1327,7 @@ const RegisterPatient = (props) => {
                                                     placeholder="(234)7099999999"
                                                     style={{border: "1px solid #014d88"}}
                                                 />*/}
-                        {errors.pnumber && <p>Phone number is required</p>}
+                        {/* {errors.pnumber && <p>Phone number is required</p>} */}
                       </FormGroup>
                     </div>
 
