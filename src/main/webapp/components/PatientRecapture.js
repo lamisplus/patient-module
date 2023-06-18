@@ -7,7 +7,8 @@ import { Link, useHistory } from "react-router-dom";
 import fingerprintimage from "../images/fingerprintimage.png";
 
 const PatientRecapture = (props) => {
-  //console.log(props.storedBiometrics);
+  //console.log("details", props.storedBiometrics);
+
   return (
     <>
       <Modal

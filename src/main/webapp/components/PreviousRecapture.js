@@ -68,6 +68,7 @@ const PreviousRecapture = (props) => {
 
   const tableRef = useRef(null);
   const [loading, setLoading] = useState("");
+  const [recaptures, setRecaptures] = useState([]);
   const [biometrics, setBiometrics] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -90,12 +91,8 @@ const PreviousRecapture = (props) => {
     setCurrentPage(page + 1);
   };
 
-  // const viewRecapture = () => {
-  //   return;
-  // };
-
   function actionItems(row) {
-    // console.log(row);
+    //console.log(row);
     axios
       .get(
         `${baseUrl}biometrics?personUuid=${row.personUuid}&recapture=${row.recapture}`,
@@ -103,7 +100,14 @@ const PreviousRecapture = (props) => {
           headers: { Authorization: `Bearer ${token}` },
         }
       )
-      .then((response) => setBiometrics(response.data));
+      .then((response) => {
+        toggle();
+        let biometricData = response.data.filter(
+          (data) => data.date === row.captureDate
+        );
+        //console.log("gotten", biometricData);
+        setBiometrics(biometricData);
+      });
     //.error((err) => console.log(err));
   }
 
@@ -155,41 +159,60 @@ const PreviousRecapture = (props) => {
             field: "count",
             filtering: false,
           },
-          { title: "data", field: "data", hidden: true },
+          //{ title: "data", field: "data", hidden: true },
           { title: "Actions", field: "actions", filtering: false },
         ]}
         isLoading={loading}
-        data={(query) =>
-          new Promise((resolve, reject) =>
-            axios
-              .get(`${baseUrl}biometrics/grouped/person/${props.patientId}`, {
-                headers: { Authorization: `Bearer ${token}` },
-              })
-              .then((response) => response)
-              .then((result) => {
-                resolve({
-                  data: result.data
-                    .filter((record) => {
-                      return record.archived === 0;
-                    })
-                    .map((row) => ({
-                      captureDate: row.captureDate,
-                      count: row.count === null ? 0 : row.count,
-                      data: actionItems(row),
-                      actions: (
-                        <Button
-                          style={{ backgroundColor: "#014d88", color: "#fff" }}
-                          onClick={toggle}
-                        >
-                          View
-                        </Button>
-                      ),
-                    })),
-                  page: query.page,
-                  totalCount: result.data.length,
-                });
-              })
-          )
+        data={
+          recapturedFingered &&
+          recapturedFingered
+            .filter((record) => {
+              return record.archived === 0;
+            })
+            .map((row) => ({
+              captureDate: row.captureDate,
+              count: row.count === null ? 0 : row.count,
+              //data: actionItems(row),
+              actions: (
+                <Button
+                  style={{ backgroundColor: "#014d88", color: "#fff" }}
+                  onClick={() => actionItems(row)}
+                >
+                  View
+                </Button>
+              ),
+            }))
+          // (query) =>
+          // new Promise((resolve, reject) =>
+          //   axios
+          //     .get(`${baseUrl}biometrics/grouped/person/${props.patientId}`, {
+          //       headers: { Authorization: `Bearer ${token}` },
+          //     })
+          //     .then((response) => response)
+          //     .then((result) => {
+          //       resolve({
+          //         data: result.data
+          //           .filter((record) => {
+          //             return record.archived === 0;
+          //           })
+          //           .map((row) => ({
+          //             captureDate: row.captureDate,
+          //             count: row.count === null ? 0 : row.count,
+          //             //data: actionItems(row),
+          //             actions: (
+          //               <Button
+          //                 style={{ backgroundColor: "#014d88", color: "#fff" }}
+          //                 onClick={() => actionItems(row)}
+          //               >
+          //                 View
+          //               </Button>
+          //             ),
+          //           })),
+          //         page: query.page,
+          //         totalCount: result.data.length,
+          //       });
+          //     })
+          // )
         }
         options={{
           headerStyle: {
@@ -222,6 +245,7 @@ const PreviousRecapture = (props) => {
         modal={modalNew}
         patientId={props.patientId}
         age={props.age}
+        getRecaptureCount={getRecaptureCount}
       />
     </>
   );
