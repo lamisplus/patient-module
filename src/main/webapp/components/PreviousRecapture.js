@@ -73,6 +73,7 @@ const PreviousRecapture = (props) => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const getRecaptureCount = () => {
+    console.log("get recaptures")
     axios
       .get(`${baseUrl}biometrics/grouped/person/${props.patientId}`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -115,7 +116,7 @@ const PreviousRecapture = (props) => {
     <>
       <h4>
         {" "}
-        Patient captured count : <b>{recapturedFingered.length}</b>
+        Patient recapture count : <b>{recapturedFingered.length - 1}</b>
       </h4>
       {createdDate !== currentDate ? (
         <MatButton
@@ -146,7 +147,7 @@ const PreviousRecapture = (props) => {
           handleSearchChange(e);
       }}*/
         icons={tableIcons}
-        title={`Previous Recaptured Biometrics`}
+        title={`Biometrics List`}
         columns={[
           {
             title: "Captured Date",
@@ -155,11 +156,11 @@ const PreviousRecapture = (props) => {
             // hidden: enablePPI,
           },
           {
-            title: "Number of Fingers Recaptured",
+            title: "Number of Fingers Captured",
             field: "count",
             filtering: false,
           },
-          //{ title: "data", field: "data", hidden: true },
+          { title: "Category", field: "data" },
           { title: "Actions", field: "actions", filtering: false },
         ]}
         isLoading={loading}
@@ -172,7 +173,7 @@ const PreviousRecapture = (props) => {
             .map((row) => ({
               captureDate: row.captureDate,
               count: row.count === null ? 0 : row.count,
-              //data: actionItems(row),
+              data: row.recapture === 1 ? "Recapture" : "Baseline",
               actions: (
                 <Button
                   style={{ backgroundColor: "#014d88", color: "#fff" }}

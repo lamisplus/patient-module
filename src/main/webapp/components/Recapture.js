@@ -365,14 +365,15 @@ const Recapture = (props) => {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((response) => {
-          console.log("saved", response);
+          //console.log("saved", response);
           toast.success("Biometric recaptured successfully", {
             position: toast.POSITION.BOTTOM_CENTER,
           });
           setCapturedFingered([]);
           getPersonBiometrics();
-          props.updatePatientBiometricStatus(true);
+          // props.updatePatientBiometricStatus(true);
           props.getRecaptureCount();
+          props.toggle();
         })
         .catch((error) => {
           toast.error("Something went wrong saving biometrics", {
@@ -396,12 +397,14 @@ const Recapture = (props) => {
         }
       )
       .then((resp) => {
-        console.log(resp);
+        _.find(fingerType, { display: x.templateType }).captured = false;
+            setFingerType([...fingerType]);
         let deletedRecord = capturedFingered.filter(
           (data) => data.templateType !== x.templateType
         );
+    
         setCapturedFingered(deletedRecord);
-        toast.info(x.templateType + "captured removed successfully!");
+        toast.info(x.templateType + " captured removed successfully!");
       })
       .catch((error) => {
         toast.error("Something went wrong", {
@@ -471,8 +474,8 @@ const Recapture = (props) => {
                   <Row>
                     <p>
                       {" "}
-                      Patient captured count :{" "}
-                      <b>{recapturedFingered.length}</b>
+                      Patient recapture count :{" "}
+                      <b>{recapturedFingered.length - 1}</b>
                     </p>
                     <ToastContainer />
                     <Col md={3}>
