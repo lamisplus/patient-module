@@ -371,8 +371,9 @@ const Recapture = (props) => {
           });
           setCapturedFingered([]);
           getPersonBiometrics();
-          props.updatePatientBiometricStatus(true);
+          // props.updatePatientBiometricStatus(true);
           props.getRecaptureCount();
+          props.toggle();
         })
         .catch((error) => {
           toast.error("Something went wrong saving biometrics", {

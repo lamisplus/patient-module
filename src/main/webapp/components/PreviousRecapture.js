@@ -73,6 +73,7 @@ const PreviousRecapture = (props) => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const getRecaptureCount = () => {
+    console.log("get recaptures")
     axios
       .get(`${baseUrl}biometrics/grouped/person/${props.patientId}`, {
         headers: { Authorization: `Bearer ${token}` },
