@@ -715,7 +715,8 @@ function Biometrics(props) {
                       </List.Content>
                     </List.Item>
                   ))}
-                </List> */ console.log(capturedFingered)
+                </List> */
+                  //console.log(capturedFingered)
                 }
                 <List celled horizontal>
                   {capturedFingered.map((x) => (
@@ -734,7 +735,7 @@ function Biometrics(props) {
                           alignItems: "right",
                         }}
                       >
-                        {getFingerprintsQuality(x.imageQuality)}
+                        {getFingerprintsQuality(x.mainImageQuality)}
                         <span
                           onClick={() => {
                             deleteTempBiometrics(x);
@@ -778,7 +779,7 @@ function Biometrics(props) {
                       </List.Content>
                       <List.Content>
                         <br />
-                        {x.imageQuality < 75 ? (
+                        {x.mainImageQuality < 75 ? (
                           <MatButton
                             type="button"
                             variant="contained"

@@ -398,11 +398,11 @@ const Recapture = (props) => {
       )
       .then((resp) => {
         _.find(fingerType, { display: x.templateType }).captured = false;
-            setFingerType([...fingerType]);
+        setFingerType([...fingerType]);
         let deletedRecord = capturedFingered.filter(
           (data) => data.templateType !== x.templateType
         );
-    
+
         setCapturedFingered(deletedRecord);
         toast.info(x.templateType + " captured removed successfully!");
       })
@@ -625,6 +625,7 @@ const Recapture = (props) => {
               )}
 
               <Row>
+                {console.log(capturedFingered)}
                 {capturedFingered.length >= 1 ? (
                   <>
                     <Col
@@ -649,7 +650,7 @@ const Recapture = (props) => {
                                 alignItems: "right",
                               }}
                             >
-                              {getFingerprintsQuality(x.imageQuality)}
+                              {getFingerprintsQuality(x.mainImageQuality)}
                               <span
                                 onClick={() => {
                                   deleteTempBiometrics(x);
@@ -693,7 +694,7 @@ const Recapture = (props) => {
                             </List.Content>
                             <List.Content>
                               <br />
-                              {x.imageQuality < 75 ? (
+                              {x.mainImageQuality < 75 ? (
                                 <MatButton
                                   type="button"
                                   variant="contained"
