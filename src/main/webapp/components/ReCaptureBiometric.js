@@ -546,14 +546,20 @@ function Biometrics(props) {
                     Device{" "}
                   </Label>
                   <Input
-                    type="text"
+                    type="select"
                     name="device"
                     id="device"
                     //onChange={checkDevice}
-                    value={"Secugen"}
+                    value={objValues.device}
                     required
                     disabled
-                  ></Input>
+                  >
+                    {biometricDevices.map(({ id, name, active, url, type }) => (
+                      <option key={id} value={url}>
+                        {type}
+                      </option>
+                    ))}
+                  </Input>
 
                   {errors.device !== "" ? (
                     <span className={classes.error}>{errors.device}</span>
