@@ -343,10 +343,10 @@ const Biometrics = (props) => {
           With Biometrics
         </MenuItem>
         <MenuItem key="2" value="2">
-          Without Biometrics
+          Incomplete Biometrics
         </MenuItem>
         <MenuItem key="3" value="3">
-          Not captured
+          No Biometrics Captured
         </MenuItem>
       </TextField>
       {status === 1 ? (

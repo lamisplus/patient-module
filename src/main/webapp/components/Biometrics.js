@@ -12,6 +12,7 @@ import {
   FormGroup,
   CardHeader,
   Input,
+  Badge,
 } from "reactstrap";
 
 import { makeStyles } from "@material-ui/core/styles";
@@ -26,6 +27,7 @@ import { ToastContainer, toast } from "react-toastify";
 import ThumbUpIcon from "@material-ui/icons/ThumbUp";
 import axios from "axios";
 import { token, url as baseUrl } from "../../../api";
+import RestartAltIcon from "@mui/icons-material/RestartAlt";
 
 import { green, red } from "@mui/material/colors";
 import { Dimmer, Loader, Image, Segment } from "semantic-ui-react";
@@ -42,7 +44,7 @@ import Typography from "@mui/material/Typography";
 // import ModalImage from "react-modal-image";
 import { Link, useHistory } from "react-router-dom";
 import moment from "moment";
-import { Dropdown, Badge } from "react-bootstrap";
+import { Dropdown } from "react-bootstrap";
 import { Alert, AlertTitle } from "@material-ui/lab";
 import fingerprintimage from "../images/fingerprintimage.png";
 import DeleteIcon from "@material-ui/icons/Delete";
@@ -122,7 +124,7 @@ const useStyles = makeStyles((theme) => ({
 let checkUrl = "";
 
 function Biometrics(props) {
-  console.log(props.age);
+  //console.log(props.age);
   const classes = useStyles();
   let history = useHistory();
   const permissions =
@@ -257,7 +259,7 @@ function Biometrics(props) {
               headers: { Authorization: `Bearer ${token}` },
             })
             .then((response) => {
-              console.log(response.data.find((x) => x.active === true));
+              //console.log(response.data.find((x) => x.active === true));
               setDevices(response.data.find((x) => x.active === true));
               setbiometricDevices(response.data);
             })
@@ -426,6 +428,7 @@ function Biometrics(props) {
     e.preventDefault();
     if (capturedFingered.length >= 1) {
       const capturedObj = capturedFingered[capturedFingered.length - 1];
+      console.log({ ...capturedObj, recapture: true });
       capturedObj.capturedBiometricsList = _.uniqBy(
         capturedObj.capturedBiometricsList,
         "templateType"
@@ -460,11 +463,54 @@ function Biometrics(props) {
   };
 
   const deleteTempBiometrics = (x) => {
-    let deletedRecord = capturedFingered.filter(
-      (data) => data.templateType !== x.templateType
-    );
-    setCapturedFingered(deletedRecord);
-    console.log("deleted temp");
+    axios
+      .delete(
+        `${baseUrl}biometrics?personId=${x.patientId}&templateType=${x.templateType}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      )
+      .then((resp) => {
+        console.log(resp);
+        let deletedRecord = capturedFingered.filter(
+          (data) => data.templateType !== x.templateType
+        );
+        setCapturedFingered(deletedRecord);
+        toast.info(x.templateType + "captured removed successfully!");
+      })
+      .catch((error) => {
+        toast.error("Something went wrong", {
+          position: toast.POSITION.BOTTOM_CENTER,
+        });
+        console.log(error);
+      });
+    // let deletedRecord = capturedFingered.filter(
+    //   (data) => data.templateType !== x.templateType
+    // );
+    // setCapturedFingered(deletedRecord);
+    // console.log("deleted temp");
+  };
+
+  const getFingerprintsQuality = (imageQuality) => {
+    if (imageQuality > 60 && imageQuality <= 75) {
+      return (
+        <Badge color="warning" style={{ fontSize: "12px" }}>
+          {imageQuality + "%"}
+        </Badge>
+      );
+    } else if (imageQuality > 75) {
+      return (
+        <Badge color="success" style={{ fontSize: "12px" }}>
+          {imageQuality + "%"}
+        </Badge>
+      );
+    } else {
+      return (
+        <Badge color="error" style={{ fontSize: "12px" }}>
+          {imageQuality + "%"}
+        </Badge>
+      );
+    }
   };
 
   return (
@@ -606,7 +652,8 @@ function Biometrics(props) {
           {capturedFingered.length >= 1 ? (
             <>
               <Col md={12} style={{ marginTop: "10px", paddingBottom: "20px" }}>
-                <List celled horizontal>
+                {
+                  /* <List celled horizontal>
                   {capturedFingered.map((x) => (
                     <List.Item
                       style={{
@@ -620,15 +667,22 @@ function Biometrics(props) {
                         style={{
                           paddingLeft: "0px",
                           height: "0.5rem",
-                          display: "flex",
-                          justifyContent: "right",
+
                           alignItems: "right",
                         }}
-                        onClick={() => {
-                          deleteTempBiometrics(x);
-                        }}
                       >
-                        <Icon name="cancel" color="red" />{" "}
+                        {getFingerprintsQuality(x.imageQuality)}
+                        <span
+                          onClick={() => {
+                            deleteTempBiometrics(x);
+                          }}
+                        >
+                          <Icon
+                            name="cancel"
+                            color="red"
+                            style={{ float: "right" }}
+                          />{" "}
+                        </span>
                       </List.Header>
                       <List.Content
                         style={{
@@ -658,6 +712,88 @@ function Biometrics(props) {
                         }}
                       >
                         {x.templateType}
+                      </List.Content>
+                    </List.Item>
+                  ))}
+                </List> */
+                  //console.log(capturedFingered)
+                }
+                <List celled horizontal>
+                  {capturedFingered.map((x) => (
+                    <List.Item
+                      style={{
+                        width: "200px",
+                        height: "200px",
+                        border: "1px dotted #014d88",
+                        margin: "5px",
+                      }}
+                    >
+                      <List.Header
+                        style={{
+                          paddingLeft: "0px",
+                          height: "0.5rem",
+                          alignItems: "right",
+                        }}
+                      >
+                        {getFingerprintsQuality(x.mainImageQuality)}
+                        <span
+                          onClick={() => {
+                            deleteTempBiometrics(x);
+                          }}
+                        >
+                          <Icon
+                            name="cancel"
+                            color="red"
+                            style={{ float: "right" }}
+                          />{" "}
+                        </span>
+                      </List.Header>
+                      <List.Content
+                        style={{
+                          width: "200px",
+                          height: "150px",
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      >
+                        {" "}
+                        <FingerprintIcon
+                          style={{ color: "#992E62", fontSize: 150 }}
+                        />
+                      </List.Content>
+                      <List.Content
+                        style={{
+                          width: "200px",
+                          height: "30px",
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          fontSize: "16px",
+                          color: "#014d88",
+                          fontWeight: "bold",
+                          fontFamily: '"poppins", sans-serif',
+                        }}
+                      >
+                        {x.templateType}
+                      </List.Content>
+                      <List.Content>
+                        <br />
+                        {x.mainImageQuality < 75 ? (
+                          <MatButton
+                            type="button"
+                            variant="contained"
+                            color="secondary"
+                            onClick={() => {
+                              deleteTempBiometrics(x);
+                            }}
+                            startIcon={<RestartAltIcon />}
+                          >
+                            Reset recapture
+                          </MatButton>
+                        ) : (
+                          " "
+                        )}
                       </List.Content>
                     </List.Item>
                   ))}
@@ -835,7 +971,10 @@ function Biometrics(props) {
                             variant="info badge-xs light"
                             className="card-link float-end"
                           >
-                            Version {/*{contact.version}*/}
+                            {biometric.imageQuality !== null
+                              ? biometric.imageQuality + "%"
+                              : "N/A"}{" "}
+                            {/*{contact.version}*/}
                           </Badge>
                           <span className="mb-0 title">
                             Status {biometric.iso}

@@ -259,13 +259,13 @@ const ViewPatient = (props) => {
         (obj) => obj.type == "HospitalNumber"
       );
       const phone = phoneNumberFormatCheck(
-        contactPoint.contactPoint.find((obj) => obj.type == "phone")
+        contactPoint?.contactPoint?.find((obj) => obj.type == "phone")
       );
-      const email = contactPoint.contactPoint.find(
+      const email = contactPoint?.contactPoint?.find(
         (obj) => obj.type == "email"
       );
       const altphone = phoneNumberFormatCheck(
-        contactPoint.contactPoint.find((obj) => obj.type == "altphone")
+        contactPoint?.contactPoint?.find((obj) => obj.type == "altphone")
       );
       const country =
         address && address.address && address.address.length > 0
