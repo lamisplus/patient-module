@@ -22,7 +22,7 @@ public class Encounter extends PatientAuditEntity implements Persistable<Long>, 
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @PastOrPresent
+
     @Column(name = "encounter_date", nullable = false)
     private LocalDateTime encounterDate;
 
