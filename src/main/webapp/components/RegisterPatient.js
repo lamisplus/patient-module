@@ -135,6 +135,7 @@ const RegisterPatient = (props) => {
     clearErrors,
     setError,
     handleSubmit,
+    reset,
     formState,
   } = useForm({
     resolver: yupResolver(schema),
@@ -158,7 +159,7 @@ const RegisterPatient = (props) => {
   const [ageDisabled, setAgeDisabled] = useState(true);
   const [showRelative, setShowRelative] = useState(false);
   const [editRelative, setEditRelative] = useState(null);
-  const [genders, setGenders] = useState([]);
+  const [submit, setSubmit] = useState(false);
   const [sexOptions, setSexOptions] = useState([]);
   const [maritalStatusOptions, setMaritalStatusOptions] = useState([]);
   const [educationOptions, setEducationOptions] = useState([]);
@@ -445,7 +446,7 @@ const RegisterPatient = (props) => {
     return isValid;
   };
   const onSubmit = async (data) => {
-    //console.log(new Date(data.dob));
+    console.log("data", data);
 
     if (
       _.find(errors, function (error) {
@@ -520,6 +521,8 @@ const RegisterPatient = (props) => {
           patientForm.contactPoint.push(altPhonenumber);
         }
 
+        console.log("patient", patientForm);
+        reset();
         if (patientId) {
           patientForm.id = null;
           patientForm.facilityId = patientFacilityId;
@@ -533,10 +536,14 @@ const RegisterPatient = (props) => {
             headers: { Authorization: `Bearer ${token}` },
           });
 
+          if (response.status === 200) {
+            reset();
+          }
+
+          toast.success("Patient Register successful");
+          history.push("/");
           console.log(response);
         }
-        toast.success("Patient Register successful");
-        history.push("/");
       } catch (e) {
         console.log(e);
         toast.error("An error occured while registering a patient !", {
