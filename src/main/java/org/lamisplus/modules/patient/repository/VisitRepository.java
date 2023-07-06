@@ -26,11 +26,20 @@ public interface VisitRepository extends JpaRepository<Visit, Long> {
 
    // List<Visit> findAllByArchivedOrderByVisitStartDateDesc(Integer archived);
 
-    @Query(value ="SELECT * FROM patient_person WHERE archived=0", nativeQuery = true)
+    @Query(value ="SELECT * FROM patient_person", nativeQuery = true)
     List<Visit> findAllByFacilityIdAndArchived(Long facilityId, Integer archived);
 
     //@Query(value ="SELECT * FROM patient_person WHERE last_modified_date > ?1 AND facility_id=?2 And archived=?3", nativeQuery = true)
 
-    @Query(value ="SELECT * FROM patient_person WHERE last_modified_date > ?1 And archived=0", nativeQuery = true)
-    List<Visit> getVisitsDueForServerUpload(LocalDateTime dateLastSync, Long facilityId, int archived);
+    @Query(value ="SELECT * FROM patient_visit WHERE last_modified_date > ?1 AND facility_id=?2", nativeQuery = true)
+    List<Visit> getAllForServerUpload(LocalDateTime dateLastSync, Long facilityId);
+
+    List<Visit> findAllByFacilityId(Long facilityId);
+
+    List<Visit> findAllByFacilityIdAndArchived(Long facilityId, int archived);
+
+    Optional<Visit> findByUuidAndFacilityId(String uuid, Long facilityId);
+
+    @Query(value ="SELECT * FROM patient_visit WHERE last_modified_date > ?1 AND facility_id=?2", nativeQuery = true)
+    List<Visit> getAllDueForServerUpload(LocalDateTime dateLastSync, Long facilityId);
 }

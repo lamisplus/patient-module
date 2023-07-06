@@ -50,7 +50,7 @@ const styles = theme => ({
 function PatientCard(props) {
     const { classes } = props;
     const patientObj = props.patientObj ? props.patientObj : {};
-    console.log("card", patientObj)
+    
     const permissions= props.permissions ? props.permissions : [];
     const [modal, setModal] = useState(false) //Modal to collect sample
     const [patientBiometricStatus, setPatientBiometricStatus]= useState(props.patientBiometricStatus);
