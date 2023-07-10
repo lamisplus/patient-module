@@ -254,7 +254,7 @@ const ViewPatient = (props) => {
       setContacts(contacts.contact);
       const identifiers = patient.identifier;
       const address = patient.address;
-      const contactPoint = patient.contactPoint;
+      const contactPoint = patient?.contactPoint;
       const hospitalNumber = identifiers.identifier.find(
         (obj) => obj.type == "HospitalNumber"
       );
