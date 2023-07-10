@@ -73,7 +73,7 @@ const PreviousRecapture = (props) => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const getRecaptureCount = () => {
-    console.log("get recaptures");
+    //console.log("get recaptures");
     axios
       .get(`${baseUrl}biometrics/grouped/person/${props.patientId}`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -161,6 +161,7 @@ const PreviousRecapture = (props) => {
             filtering: false,
           },
           { title: "Category", field: "data" },
+          { title: "Number", field: "number" },
           { title: "Actions", field: "actions", filtering: false },
         ]}
         isLoading={loading}
@@ -170,10 +171,11 @@ const PreviousRecapture = (props) => {
             .filter((record) => {
               return record.archived === 0;
             })
-            .map((row) => ({
+            .map((row, index) => ({
               captureDate: row.captureDate,
               count: row.count === null ? 0 : row.count,
               data: row.recapture === 1 ? "Recapture" : "Baseline",
+              number: index + 1,
               actions: (
                 <Button
                   style={{ backgroundColor: "#014d88", color: "#fff" }}
