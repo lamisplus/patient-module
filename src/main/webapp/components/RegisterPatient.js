@@ -531,6 +531,8 @@ const RegisterPatient = (props) => {
             patientForm,
             { headers: { Authorization: `Bearer ${token}` } }
           );
+          toast.success("Patient Updated successful");
+          history.push("/");
         } else {
           const response = await axios.post(`${baseUrl}patient`, patientForm, {
             headers: { Authorization: `Bearer ${token}` },
@@ -542,7 +544,7 @@ const RegisterPatient = (props) => {
 
           toast.success("Patient Register successful");
           history.push("/");
-          console.log(response);
+          //console.log(response);
         }
       } catch (e) {
         console.log(e);

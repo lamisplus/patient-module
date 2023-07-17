@@ -171,11 +171,11 @@ const PreviousRecapture = (props) => {
             .filter((record) => {
               return record.archived === 0;
             })
-            .map((row, index) => ({
+            .map((row) => ({
               captureDate: row.captureDate,
               count: row.count === null ? 0 : row.count,
-              data: row.recapture === 1 ? "Recapture" : "Baseline",
-              number: index + 1,
+              data: row.recapture >= 1 ? "Recapture" : "Baseline",
+              number: row.recapture + 1,
               actions: (
                 <Button
                   style={{ backgroundColor: "#014d88", color: "#fff" }}
