@@ -256,7 +256,7 @@ const RegisterPatient = (props) => {
         lastName: patient.surname,
         genderId: "",
         identifier: "",
-        otherName: "",
+        otherName: patient.otherName,
         maritalStatusId: patient.maritalStatus?.id,
         educationId: patient.education?.id,
         employmentStatusId: patient.employmentStatus?.id,
