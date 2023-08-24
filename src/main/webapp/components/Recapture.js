@@ -267,6 +267,7 @@ const Recapture = (props) => {
         )
         .then((response) => {
           setLoading(false);
+          console.log(response.data);
 
           if (response.data.type === "ERROR") {
             setLoading(false);

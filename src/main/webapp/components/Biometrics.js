@@ -331,7 +331,7 @@ function Biometrics(props) {
       // console.log(biometricDevices)
       // console.log(devices)
       // axios.post(`${checkUrl}biometrics/secugen/enrollment?reader=SG_DEV_AUTO`,objValues,
-      console.log("", objValues);
+
       axios
         .post(
           `${devices.url}?reader=${devices.name}&isNew=${isNewStatus}`,
@@ -352,7 +352,7 @@ function Biometrics(props) {
             setIsNewStatus(false);
           } else if (response.data.type === "SUCCESS") {
             if (
-              response.data.imageQuality <= 60 &&
+              response.data.mainImageQuality <= 60 &&
               calculate_age(props.age) <= 6
             ) {
               toast.info(
@@ -374,6 +374,25 @@ function Biometrics(props) {
               "templateType"
             );
 
+            //futrunic handle finger print duplication
+            console.log("biometrics", response, objValues.device);
+            if (objValues.device === "Futronic") {
+              axios
+                .post(
+                  `${devices.url}biometrics/deduplicate/${props.patientId}`,
+                  biometricsEnrollments.capturedBiometricsList,
+                  {
+                    headers: { Authorization: `Bearer ${token}` },
+                  }
+                )
+                .then((response) => {
+                  console.log(response.data);
+                })
+                .catch((err) => {
+                  console.log(err);
+                });
+            }
+
             setCapturedFingered([...capturedFingered, biometricsEnrollments]);
             //fingerType.splice(templateType, 1);
             _.find(fingerType, { display: templateType }).captured = true;
@@ -381,7 +400,6 @@ function Biometrics(props) {
             //setObjValues({biometricType: "FINGERPRINT", patientId:props.patientId, templateType:"", device:""});
             setObjValues({ ...objValues, templateType: "" });
             setIsNewStatus(false);
-            //console.log("captured",  biometricsEnrollments)
           } else {
             setLoading(false);
             setTryAgain(true);

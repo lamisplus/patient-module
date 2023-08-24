@@ -613,6 +613,9 @@ const RegisterPatient = (props) => {
     temp.countryId = basicInfo.countryId ? "" : "Country is required.";
     temp.stateId = basicInfo.stateId ? "" : "State is required.";
     temp.district = basicInfo.district ? "" : "Province/LGA is required.";
+    temp.employmentStatusId = basicInfo.employmentStatusId
+      ? ""
+      : "Employee Status  is required.";
 
     setErrors({ ...temp });
     return Object.values(temp).every((x) => x === "");
