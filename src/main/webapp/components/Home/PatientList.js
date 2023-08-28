@@ -234,8 +234,11 @@ const PatientList = (props) => {
               totalCount: 0,
             });
           } else {
+            let data = result.data.records.filter(
+              (b) => b.biometricStatus !== true
+            );
             resolve({
-              data: result.data.records.map((row) => ({
+              data: data.map((row) => ({
                 name: [row.firstName, row.otherName, row.surname]
                   .filter(Boolean)
                   .join(", "),
