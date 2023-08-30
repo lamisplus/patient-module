@@ -530,6 +530,7 @@ const RecallPatient = (props) => {
                           className={"mt-4"}
                           style={{ backgroundColor: "#992E62" }}
                           startIcon={<CircularProgress />}
+                          disabled={loading}
                         >
                           Validating...
                         </MatButton>
