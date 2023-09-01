@@ -328,10 +328,6 @@ function Biometrics(props) {
     e.preventDefault();
     if (validate()) {
       setLoading(true);
-      // console.log(biometricDevices)
-      // console.log(devices)
-      // axios.post(`${checkUrl}biometrics/secugen/enrollment?reader=SG_DEV_AUTO`,objValues,
-      console.log("", objValues);
       axios
         .post(
           `${devices.url}?reader=${devices.name}&isNew=${isNewStatus}`,
@@ -352,7 +348,7 @@ function Biometrics(props) {
             setIsNewStatus(false);
           } else if (response.data.type === "SUCCESS") {
             if (
-              response.data.imageQuality <= 60 &&
+              response.data.mainImageQuality <= 60 &&
               calculate_age(props.age) <= 6
             ) {
               toast.info(
@@ -381,7 +377,6 @@ function Biometrics(props) {
             //setObjValues({biometricType: "FINGERPRINT", patientId:props.patientId, templateType:"", device:""});
             setObjValues({ ...objValues, templateType: "" });
             setIsNewStatus(false);
-            //console.log("captured",  biometricsEnrollments)
           } else {
             setLoading(false);
             setTryAgain(true);
@@ -426,35 +421,86 @@ function Biometrics(props) {
   //Save Biometric capture
   const saveBiometrics = (e) => {
     e.preventDefault();
+
+    const datax = capturedFingered.map(
+      ({ capturedBiometricsList }) => capturedBiometricsList
+    );
+
+    console.log(capturedFingered);
+
     if (capturedFingered.length >= 1) {
       const capturedObj = capturedFingered[capturedFingered.length - 1];
-      console.log({ ...capturedObj, recapture: true });
+      //console.log({ ...capturedObj, recapture: true });
       capturedObj.capturedBiometricsList = _.uniqBy(
         capturedObj.capturedBiometricsList,
         "templateType"
       );
 
-      //console.log("capturedObj", capturedFingered);
-
-      axios
-        .post(`${baseUrl}biometrics/templates`, capturedObj, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-        .then((response) => {
-          console.log("saved", response);
-          toast.success("Biometric save successful", {
-            position: toast.POSITION.BOTTOM_CENTER,
-          });
-          setCapturedFingered([]);
-          getPersonBiometrics();
-          props.updatePatientBiometricStatus(true);
-        })
-        .catch((error) => {
-          toast.error("Something went wrong saving biometrics", {
-            position: toast.POSITION.BOTTOM_CENTER,
-          });
-          console.log(error);
+      if (capturedObj.deviceName.includes("Futronic")) {
+        let fingersObj = [];
+        capturedFingered.forEach((obj) => {
+          fingersObj.push(obj.capturedBiometricsList[0]);
         });
+
+        if (fingersObj.length > 0) {
+          axios
+            .post(
+              `${devices.url.substr(0, 39)}/deduplicate/${props.patientId}`,
+              fingersObj,
+              {
+                headers: { Authorization: `Bearer ${token}` },
+              }
+            )
+            .then((response) => {
+              console.log("duplicate", response.data);
+              if (response.data.numberOfMatchedFingers > 0) {
+              } else {
+                axios
+                  .post(`${baseUrl}biometrics/templates`, capturedObj, {
+                    headers: { Authorization: `Bearer ${token}` },
+                  })
+                  .then((response) => {
+                    console.log("saved", response);
+                    toast.success("Biometric saved successfully", {
+                      position: toast.POSITION.BOTTOM_CENTER,
+                    });
+                    setCapturedFingered([]);
+                    getPersonBiometrics();
+                    props.updatePatientBiometricStatus(true);
+                  })
+                  .catch((error) => {
+                    toast.error("Something went wrong saving biometrics", {
+                      position: toast.POSITION.BOTTOM_CENTER,
+                    });
+                    console.log(error);
+                  });
+              }
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+        }
+      } else {
+        axios
+          .post(`${baseUrl}biometrics/templates`, capturedObj, {
+            headers: { Authorization: `Bearer ${token}` },
+          })
+          .then((response) => {
+            console.log("saved", response);
+            toast.success("Biometric save successful", {
+              position: toast.POSITION.BOTTOM_CENTER,
+            });
+            setCapturedFingered([]);
+            getPersonBiometrics();
+            props.updatePatientBiometricStatus(true);
+          })
+          .catch((error) => {
+            toast.error("Something went wrong saving biometrics", {
+              position: toast.POSITION.BOTTOM_CENTER,
+            });
+            console.log(error);
+          });
+      }
     } else {
       toast.error("You can't save less than 2 finger", {
         position: toast.POSITION.BOTTOM_CENTER,

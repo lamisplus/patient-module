@@ -267,16 +267,23 @@ const Recapture = (props) => {
         )
         .then((response) => {
           setLoading(false);
+          console.log(response.data);
 
           if (response.data.type === "ERROR") {
             setLoading(false);
             setTryAgain(true);
-            window.setTimeout(() => {
-              setTryAgain(false);
-            }, 5000);
+            // if (response.data.match === false) {
+            //   toast.error(response.data.message.match, { autoClose: 10000 });
+            // }
             toast.error(response.data.message.ERROR);
             setIsNewStatus(false);
           } else if (response.data.type === "WARNING") {
+            if (response.data.match === true) {
+              toast.info(response.data.message.match, { autoClose: 10000 });
+            } else if (response.data.match === false) {
+              toast.error(response.data.message.match, { autoClose: 10000 });
+            }
+
             if (
               response.data.imageQuality <= 60 &&
               calculate_age(props.age) <= 6
@@ -307,7 +314,7 @@ const Recapture = (props) => {
 
             setObjValues({ ...objValues, templateType: "" });
             setIsNewStatus(false);
-            toast.warning(response.data.message.WARNING);
+            //toast.info(response.data.message.match);
           } else if (response.data.type === "SUCCESS") {
             if (
               response.data.imageQuality <= 60 &&
@@ -323,6 +330,10 @@ const Recapture = (props) => {
             setTryAgain(false);
             setSuccess(true);
 
+            if (response.data.match === true) {
+              toast.success(response.data.message.match, { autoClose: 10000 });
+            }
+
             let biometricsEnrollments = response.data;
             biometricsEnrollments.capturedBiometricsList = _.uniqBy(
               biometricsEnrollments.capturedBiometricsList,
@@ -336,6 +347,7 @@ const Recapture = (props) => {
 
             setObjValues({ ...objValues, templateType: "" });
             setIsNewStatus(false);
+            //toast.success(response.data.message.match);
           } else {
             setLoading(false);
             setTryAgain(true);
@@ -499,6 +511,10 @@ const Recapture = (props) => {
                           value={objValues.device}
                           required
                           disabled
+                          style={{
+                            border: "1px solid #014D88",
+                            borderRadius: "0.2rem",
+                          }}
                         >
                           {biometricDevices.map(
                             ({ id, name, active, url, type }) => (
@@ -536,6 +552,10 @@ const Recapture = (props) => {
                           onChange={handleInputChange}
                           value={objValues.templateType}
                           required
+                          style={{
+                            border: "1px solid #014D88",
+                            borderRadius: "0.2rem",
+                          }}
                         >
                           <option value="">Select Finger </option>
 
@@ -558,9 +578,8 @@ const Recapture = (props) => {
                       </FormGroup>
                     </Col>
 
-                    {!imageQuality ? (
-                      ""
-                    ) : (
+                    {capturedFingered.length >= 6 &&
+                    capturedFingered.length < 10 ? (
                       <Col md={4}>
                         <FormGroup>
                           <Label
@@ -572,16 +591,22 @@ const Recapture = (props) => {
                             }}
                           >
                             {" "}
-                            Reason for capture{" "}
+                            Reason for recapturing less than 10 fingers{" "}
                           </Label>
                           <Input
                             type="textarea"
                             name="reason"
                             id="reason"
                             onChange={handleInputChange}
+                            style={{
+                              border: "1px solid #014D88",
+                              borderRadius: "0.2rem",
+                            }}
                           />
                         </FormGroup>
                       </Col>
+                    ) : (
+                      ""
                     )}
 
                     <Col md={2}>
@@ -633,7 +658,6 @@ const Recapture = (props) => {
               )}
 
               <Row>
-                {console.log(capturedFingered)}
                 {capturedFingered.length >= 1 ? (
                   <>
                     <Col

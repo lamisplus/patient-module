@@ -3,12 +3,14 @@ import { ToastContainer } from "react-toastify";
 import { Card, CardBody } from "reactstrap";
 import { Link } from "react-router-dom";
 import Button from "@material-ui/core/Button";
-import { FaUserPlus } from "react-icons/fa";
+import { FaUserPlus, FaFingerprint } from "react-icons/fa";
 import { makeStyles } from "@material-ui/core/styles";
 import axios from "axios";
 import { token, url as baseUrl } from "../../../api";
 import { Tab } from "semantic-ui-react";
+import RecallPatient from "./RecallPatient";
 import PatientBiometrics from "./PatientBiometrics";
+import Pims from "./Pims";
 import PatientList from "./Home/PatientList";
 import BiometricsCapture from "./Home/Biometrics";
 import Typography from "@mui/material/Typography";
@@ -69,6 +71,9 @@ function Index(props) {
   const [modal, setModal] = useState(false);
   const [patient, setPatient] = useState(false);
   const [enablePPI, setEnablePPI] = useState(true);
+  const [modalRecall, setModalRecall] = useState(false);
+  const toggleRecall = () => setModalRecall(!modalRecall);
+
   const toggle = (id) => {
     const patient = patients.find((obj) => obj.id == id);
     setPatient(patient);
@@ -116,11 +121,14 @@ function Index(props) {
         </Tab.Pane>
       ),
     },
-    //    { menuItem: 'Biometrics Capture', render: () =>
-    //            <Tab.Pane>
-    //                <PatientBiometrics permissions={permissions}/>
-    //            </Tab.Pane>
-    //    },
+    // {
+    //   menuItem: "PIMS",
+    //   render: () => (
+    //     <Tab.Pane>
+    //       <Pims permissions={permissions} />
+    //     </Tab.Pane>
+    //   ),
+    // },
     {
       menuItem: "Migration DQA",
       render: () => (
@@ -132,50 +140,72 @@ function Index(props) {
   ];
 
   return (
-    <div className={classes.root}>
-      <ToastContainer autoClose={3000} hideProgressBar />
-      {permissions.length > 0 && (
-        <Card>
-          <CardBody>
-            <div className="row mb-12 col-md-12">
-              <div className="mb-6 col-md-6">
-                <Breadcrumbs aria-label="breadcrumb">
-                  <Typography style={{ color: "#992E62" }}>Patient</Typography>
-                  <Typography style={{ color: "#014d88" }}>Home</Typography>
-                </Breadcrumbs>
-              </div>
-              <div className="mb-6 col-md-6">
-                {permissions.includes("view_patient") ||
-                permissions.includes("all_permission") ? (
-                  <Link to={"register-patient"}>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      className=" float-right mr-1"
-                      startIcon={<FaUserPlus size="25" />}
-                      style={{ backgroundColor: "#014d88" }}
-                    >
-                      <span
-                        style={{
-                          textTransform: "capitalize",
-                          fontWeight: "bolder",
-                        }}
+    <>
+      <div className={classes.root}>
+        <ToastContainer autoClose={3000} hideProgressBar />
+        {permissions.length > 0 && (
+          <Card>
+            <CardBody>
+              <div className="row mb-12 col-md-12">
+                <div className="mb-6 col-md-6">
+                  <Breadcrumbs aria-label="breadcrumb">
+                    <Typography style={{ color: "#992E62" }}>
+                      Patient
+                    </Typography>
+                    <Typography style={{ color: "#014d88" }}>Home</Typography>
+                  </Breadcrumbs>
+                </div>
+                <div className="mb-6 col-md-6">
+                  {permissions.includes("view_patient") ||
+                  permissions.includes("all_permission") ? (
+                    <Link to={"register-patient"}>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        className=" float-right mr-1"
+                        startIcon={<FaUserPlus size="25" />}
+                        style={{ backgroundColor: "#014d88" }}
                       >
-                        New Client
-                      </span>
-                    </Button>
-                  </Link>
-                ) : (
-                  ""
-                )}
+                        <span
+                          style={{
+                            textTransform: "capitalize",
+                            fontWeight: "bolder",
+                          }}
+                        >
+                          New Client
+                        </span>
+                      </Button>
+                    </Link>
+                  ) : (
+                    ""
+                  )}
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    className=" float-right mr-1"
+                    startIcon={<FaFingerprint size="25" />}
+                    style={{ backgroundColor: "#014d88" }}
+                    onClick={toggleRecall}
+                  >
+                    <span
+                      style={{
+                        textTransform: "capitalize",
+                        fontWeight: "bolder",
+                      }}
+                    >
+                      Patient Recall
+                    </span>
+                  </Button>
+                </div>
               </div>
-            </div>
 
-            <Tab panes={panes} />
-          </CardBody>
-        </Card>
-      )}
-    </div>
+              <Tab panes={panes} />
+            </CardBody>
+          </Card>
+        )}
+      </div>
+      <RecallPatient modal={modalRecall} toggle={toggleRecall} />
+    </>
   );
 }
 

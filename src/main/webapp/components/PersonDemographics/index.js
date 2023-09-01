@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { token, url as baseUrl } from "../../../../api";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
+import { useLocation } from "react-router-dom";
 import Typography from "@material-ui/core/Typography";
 import {
   Accordion,
@@ -49,7 +50,13 @@ const styles = (theme) => ({
 });
 function Index(props) {
   const { classes } = props;
-  const patientObj = props.patientObj ? props.patientObj : {};
+  const location = useLocation();
+
+  const patientData = location.state;
+
+  const patientObj =
+    Object.keys(props.patientObj).length > 0 ? props.patientObj : patientData;
+
   const permissions = props.permissions ? props.permissions : [];
   const [modal, setModal] = useState(false); //Modal to collect sample
   const [patientBiometricStatus, setPatientBiometricStatus] = useState(
@@ -89,7 +96,7 @@ function Index(props) {
       });
   };
   const getHospitalNumber = (identifier) => {
-    const hospitalNumber = identifier.identifier.find(
+    const hospitalNumber = identifier?.identifier?.find(
       (obj) => obj.type == "HospitalNumber"
     );
     return hospitalNumber ? hospitalNumber.value : "";

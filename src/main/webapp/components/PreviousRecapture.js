@@ -3,6 +3,7 @@ import MaterialTable from "material-table";
 import Button from "@material-ui/core/Button";
 import axios from "axios";
 import { url as baseUrl, token } from "../../../api";
+import Alert from "@mui/material/Alert";
 import { FaEye } from "react-icons/fa";
 import SplitActionButton from "./SplitActionButton";
 import PatientRecapture from "./PatientRecapture";
@@ -114,10 +115,10 @@ const PreviousRecapture = (props) => {
 
   return (
     <>
-      <h4>
+      <h5>
         {" "}
         Patient recapture count : <b>{recapturedFingered.length - 1}</b>
-      </h4>
+      </h5>
       {createdDate !== currentDate ? (
         <MatButton
           className=" float-right mr-1"
@@ -138,7 +139,14 @@ const PreviousRecapture = (props) => {
       ) : (
         ""
       )}
+
+      <Alert severity="info" style={{ width: "90%" }}>
+        <b style={{ textAlign: "center", fontSize: "16px" }}>Instruction: </b>
+        1.Maximum of 10 fingers to be captured. 2.Click the recapture button to
+        capture patient's fingers.
+      </Alert>
       <br />
+
       <br />
       <br />
       <MaterialTable
@@ -175,7 +183,7 @@ const PreviousRecapture = (props) => {
               captureDate: row.captureDate,
               count: row.count === null ? 0 : row.count,
               data: row.recapture >= 1 ? "Recapture" : "Baseline",
-              number: row.recapture + 1,
+              number: row.recapture,
               actions: (
                 <Button
                   style={{ backgroundColor: "#014d88", color: "#fff" }}
