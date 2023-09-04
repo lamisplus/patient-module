@@ -141,7 +141,7 @@ function Biometrics(props) {
     device: "",
     reason: "",
     age: "",
-    capturedBiometricsList: prevCapturedFingered,
+    capturedBiometricsList: [],
   });
   const [fingerType, setFingerType] = useState([]);
   const [devices, setDevices] = useState([]);
@@ -328,9 +328,19 @@ function Biometrics(props) {
   };
   //to capture  selected index finger
   const captureFinger = (e) => {
+    if (localStorage.getItem("capturedBiometricsList") !== null) {
+      const capturedBiometricsListObj = JSON.parse(
+        localStorage.getItem("capturedBiometricsList")
+      );
+
+      objValues.capturedBiometricsList = capturedBiometricsListObj;
+      localStorage.removeItem("capturedBiometricsList");
+    }
+
     e.preventDefault();
     if (validate()) {
       setLoading(true);
+
       axios
         .post(
           `${devices.url}?reader=${devices.name}&isNew=${isNewStatus}`,
@@ -360,6 +370,12 @@ function Biometrics(props) {
               );
               setImageQuality(true);
             }
+
+            localStorage.setItem(
+              "capturedBiometricsList",
+              JSON.stringify(response.data.capturedBiometricsList)
+            );
+
             const templateType = response.data.templateType;
             console.log("prev", response.data.capturedBiometricsList);
             setPrevCapturedFingered(response.data.capturedBiometricsList);
