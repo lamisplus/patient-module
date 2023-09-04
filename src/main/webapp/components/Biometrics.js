@@ -132,6 +132,8 @@ function Biometrics(props) {
       ? history.location.state.permissions
       : [];
   const [biometricDevices, setbiometricDevices] = useState([]);
+  const [capturedFingered, setCapturedFingered] = useState([]);
+  const [prevCapturedFingered, setPrevCapturedFingered] = useState([]);
   const [objValues, setObjValues] = useState({
     biometricType: "FINGERPRINT",
     patientId: props.patientId,
@@ -139,6 +141,7 @@ function Biometrics(props) {
     device: "",
     reason: "",
     age: "",
+    capturedBiometricsList: prevCapturedFingered,
   });
   const [fingerType, setFingerType] = useState([]);
   const [devices, setDevices] = useState([]);
@@ -150,7 +153,7 @@ function Biometrics(props) {
   const [errors, setErrors] = useState({});
   const [storedBiometrics, setStoredBiometrics] = useState([]);
   // const [responseImage, setResponseImage] = useState("")
-  const [capturedFingered, setCapturedFingered] = useState([]);
+
   const [selectedFingers, setSelectedFingers] = useState([]);
   const [imageQuality, setImageQuality] = useState(false);
   const [isNewStatus, setIsNewStatus] = useState(true);
@@ -358,6 +361,8 @@ function Biometrics(props) {
               setImageQuality(true);
             }
             const templateType = response.data.templateType;
+            console.log("prev", response.data.capturedBiometricsList);
+            setPrevCapturedFingered(response.data.capturedBiometricsList);
             setTryAgain(false);
             setSuccess(true);
             window.setTimeout(() => {
@@ -422,12 +427,6 @@ function Biometrics(props) {
   const saveBiometrics = (e) => {
     e.preventDefault();
 
-    const datax = capturedFingered.map(
-      ({ capturedBiometricsList }) => capturedBiometricsList
-    );
-
-    console.log(capturedFingered);
-
     if (capturedFingered.length >= 1) {
       const capturedObj = capturedFingered[capturedFingered.length - 1];
       //console.log({ ...capturedObj, recapture: true });
@@ -452,8 +451,11 @@ function Biometrics(props) {
               }
             )
             .then((response) => {
-              console.log("duplicate", response.data);
+              //console.log("duplicate", response.data);
               if (response.data.numberOfMatchedFingers > 0) {
+                toast.info("Client with finger print already exists", {
+                  position: toast.POSITION.TOP_CENTER,
+                });
               } else {
                 axios
                   .post(`${baseUrl}biometrics/templates`, capturedObj, {

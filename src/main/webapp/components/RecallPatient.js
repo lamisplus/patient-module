@@ -100,8 +100,9 @@ const RecallPatient = (props) => {
   const [fingerIndex, setFingerIndex] = useState("");
   const [patientDetails, setPatientDetails] = useState(null);
   const [isNewStatus, setIsNewStatus] = useState(true);
-  const [checked, setChecked] = useState(false);
+  const [checkedVal, setCheckedVal] = useState(false);
   const [facilities, setFacilities] = useState([]);
+  const [pimsEnrollment, setPimsEnrollment] = useState([]);
 
   const getPersonBiometrics = async () => {
     const fingersCodeset = await axios.get(
@@ -258,32 +259,38 @@ const RecallPatient = (props) => {
 
             let facilityId = facilities[0].organisationUnitId;
 
-            if (checked === true) {
+            if (checkedVal === true) {
               setSuccessPims(true);
               let pimsData = {
                 facilityId: facilityId,
                 finger: capturedFinger.template,
                 index: fingerIndex,
               };
-
+              console.log(checkedVal);
               axios
                 .post(`${baseUrl}pims/verify/${facilityId}`, pimsData, {
                   headers: { Authorization: `Bearer ${token}` },
                 })
                 .then((response) => {
                   setSuccessPims(false);
-                  setChecked(false);
+                  setCheckedVal(false);
                   if (response.data.code === 5) {
+                    setPimsEnrollment(response.data.enrollments);
                     toast.info(`PIMS MESSAGE: ${response.data.message}`, {
                       position: toast.POSITION.TOP_CENTER,
                       autoClose: 10000,
                     });
-                  } else {
-                    toast.success(`PIMS MESSAGE: Patient identified`, {
-                      position: toast.POSITION.TOP_CENTER,
-                      autoClose: 10000,
-                    });
                   }
+                  // else {
+                  //   setPimsEnrollment(response.data.enrollments);
+                  //   toast.success(
+                  //     `PIMS MESSAGE: Patient identified: ${response.data.message}`,
+                  //     {
+                  //       position: toast.POSITION.TOP_CENTER,
+                  //       autoClose: 10000,
+                  //     }
+                  //   );
+                  // }
                 })
                 .catch((error) => {
                   setSuccessPims(false);
@@ -322,7 +329,7 @@ const RecallPatient = (props) => {
   };
 
   const handleChange = () => {
-    setChecked(!checked);
+    setCheckedVal(!checkedVal);
   };
 
   return (
@@ -497,6 +504,7 @@ const RecallPatient = (props) => {
                     <br />
                     <Input
                       type="checkbox"
+                      checked={checkedVal}
                       onChange={handleChange}
                       style={{
                         border: "1px solid #014D88",
@@ -564,7 +572,8 @@ const RecallPatient = (props) => {
                 <Col md={12}>
                   <Table striped bordered hover>
                     <tbody>
-                      {patientDetails !== null ? (
+                      {patientDetails !== null &&
+                      pimsEnrollment.length === 0 ? (
                         <tr>
                           <td>
                             <b>Registration Date: </b>
@@ -616,7 +625,71 @@ const RecallPatient = (props) => {
                           </td>
                         </tr>
                       ) : (
-                        " "
+                        pimsEnrollment &&
+                        pimsEnrollment.map((pims) => {
+                          <tr>
+                            <td>
+                              <b>Art Start Date: </b>
+                              {pims.artStartDate}
+                            </td>
+                            <td>
+                              <b>Patient ID: </b>
+                              {pims.patientIdentifier}
+                            </td>
+                            <td>
+                              <b>Facility Id: </b>
+                              {pims.facilityId}
+                            </td>
+                            <td>
+                              <b>Facility Name: </b>
+                              {pims.facilityName}
+                            </td>
+                            <td>
+                              <b>DOB: </b>
+                              {pims.dateOfBirth}
+                            </td>
+                            <td>
+                              <b>Sex: </b>
+                              {pims.sex}
+                            </td>
+                            <td>
+                              <b>State: </b>
+                              {pims.stateName}
+                            </td>
+                            <td>
+                              <b>LGA: </b>
+                              {pims.lgaName}
+                            </td>
+                            {/* <td>
+                            <Link
+                              to={{
+                                pathname: "/patient-dashboard",
+                                state: {
+                                  patientObj: patientDetails,
+                                  permissions: permissions,
+                                },
+                              }}
+                            >
+                              <Button
+                                variant="contained"
+                                color="primary"
+                                className=" float-right mr-1"
+                                startIcon={<FaEye size="25" />}
+                                style={{ backgroundColor: "#014d88" }}
+                              >
+                                <span
+                                  style={{
+                                    textTransform: "capitalize",
+                                    fontWeight: "bolder",
+                                  }}
+                                >
+                                  Patient Records
+                                </span>
+                              </Button>
+                            </Link>
+                          </td> */}
+                          </tr>;
+                        })
                       )}
                     </tbody>
                   </Table>
