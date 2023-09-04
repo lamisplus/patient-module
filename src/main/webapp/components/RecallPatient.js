@@ -627,7 +627,7 @@ const RecallPatient = (props) => {
                         </tr>
                       ) : (
                         pimsEnrollment &&
-                        pimsEnrollment.map((pims) => {
+                        pimsEnrollment.map((pims) => (
                           <tr>
                             <td>
                               <b>Art Start Date: </b>
@@ -661,36 +661,8 @@ const RecallPatient = (props) => {
                               <b>LGA: </b>
                               {pims.lgaName}
                             </td>
-                            {/* <td>
-                            <Link
-                              to={{
-                                pathname: "/patient-dashboard",
-                                state: {
-                                  patientObj: patientDetails,
-                                  permissions: permissions,
-                                },
-                              }}
-                            >
-                              <Button
-                                variant="contained"
-                                color="primary"
-                                className=" float-right mr-1"
-                                startIcon={<FaEye size="25" />}
-                                style={{ backgroundColor: "#014d88" }}
-                              >
-                                <span
-                                  style={{
-                                    textTransform: "capitalize",
-                                    fontWeight: "bolder",
-                                  }}
-                                >
-                                  Patient Records
-                                </span>
-                              </Button>
-                            </Link>
-                          </td> */}
-                          </tr>;
-                        })
+                          </tr>
+                        ))
                       )}
                     </tbody>
                   </Table>
