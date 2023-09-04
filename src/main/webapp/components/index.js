@@ -71,10 +71,12 @@ function Index(props) {
   const [modal, setModal] = useState(false);
   const [patient, setPatient] = useState(false);
   const [patientDetails, setPatientDetails] = useState(null);
+  const [pimsEnrollment, setPimsEnrollment] = useState([]);
   const [enablePPI, setEnablePPI] = useState(true);
   const [modalRecall, setModalRecall] = useState(false);
   const toggleRecall = () => {
     setPatientDetails(null);
+    setPimsEnrollment([]);
     setModalRecall(!modalRecall);
   };
 
@@ -213,6 +215,8 @@ function Index(props) {
         toggle={toggleRecall}
         patientDetails={patientDetails}
         setPatientDetails={setPatientDetails}
+        pimsEnrollment={pimsEnrollment}
+        setPimsEnrollment={setPimsEnrollment}
       />
     </>
   );

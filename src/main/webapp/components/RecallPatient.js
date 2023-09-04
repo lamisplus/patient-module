@@ -102,7 +102,6 @@ const RecallPatient = (props) => {
   const [isNewStatus, setIsNewStatus] = useState(true);
   const [checkedVal, setCheckedVal] = useState(false);
   const [facilities, setFacilities] = useState([]);
-  const [pimsEnrollment, setPimsEnrollment] = useState([]);
 
   const getPersonBiometrics = async () => {
     const fingersCodeset = await axios.get(
@@ -266,7 +265,7 @@ const RecallPatient = (props) => {
                 finger: capturedFinger.template,
                 index: fingerIndex,
               };
-              console.log(checkedVal);
+              // console.log(checkedVal);
               axios
                 .post(`${baseUrl}pims/verify/${facilityId}`, pimsData, {
                   headers: { Authorization: `Bearer ${token}` },
@@ -275,7 +274,7 @@ const RecallPatient = (props) => {
                   setSuccessPims(false);
                   setCheckedVal(false);
                   if (response.data.code === 5) {
-                    setPimsEnrollment(response.data.enrollments);
+                    props.setPimsEnrollment(response.data.enrollments);
                     toast.info(`PIMS MESSAGE: ${response.data.message}`, {
                       position: toast.POSITION.TOP_CENTER,
                       autoClose: 10000,
@@ -574,7 +573,7 @@ const RecallPatient = (props) => {
                   <Table striped bordered hover>
                     <tbody>
                       {props.patientDetails !== null &&
-                      pimsEnrollment.length === 0 ? (
+                      props.pimsEnrollment.length === 0 ? (
                         <tr>
                           <td>
                             <b>Registration Date: </b>
@@ -629,8 +628,8 @@ const RecallPatient = (props) => {
                           </td>
                         </tr>
                       ) : (
-                        pimsEnrollment &&
-                        pimsEnrollment.map((pims) => (
+                        props.pimsEnrollment &&
+                        props.pimsEnrollment.map((pims) => (
                           <tr>
                             <td>
                               <b>Art Start Date: </b>
