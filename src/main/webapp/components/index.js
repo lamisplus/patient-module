@@ -70,9 +70,13 @@ function Index(props) {
   const [loading, setLoading] = useState("");
   const [modal, setModal] = useState(false);
   const [patient, setPatient] = useState(false);
+  const [patientDetails, setPatientDetails] = useState(null);
   const [enablePPI, setEnablePPI] = useState(true);
   const [modalRecall, setModalRecall] = useState(false);
-  const toggleRecall = () => setModalRecall(!modalRecall);
+  const toggleRecall = () => {
+    setPatientDetails(null);
+    setModalRecall(!modalRecall);
+  };
 
   const toggle = (id) => {
     const patient = patients.find((obj) => obj.id == id);
@@ -204,7 +208,12 @@ function Index(props) {
           </Card>
         )}
       </div>
-      <RecallPatient modal={modalRecall} toggle={toggleRecall} />
+      <RecallPatient
+        modal={modalRecall}
+        toggle={toggleRecall}
+        patientDetails={patientDetails}
+        setPatientDetails={setPatientDetails}
+      />
     </>
   );
 }

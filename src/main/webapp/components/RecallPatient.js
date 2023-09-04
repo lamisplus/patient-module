@@ -98,7 +98,7 @@ const RecallPatient = (props) => {
   const [errors, setErrors] = useState({});
 
   const [fingerIndex, setFingerIndex] = useState("");
-  const [patientDetails, setPatientDetails] = useState(null);
+
   const [isNewStatus, setIsNewStatus] = useState(true);
   const [checkedVal, setCheckedVal] = useState(false);
   const [facilities, setFacilities] = useState([]);
@@ -221,7 +221,7 @@ const RecallPatient = (props) => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
-        setPatientDetails(response.data);
+        props.setPatientDetails(response.data);
       })
       .catch((error) => {
         console.log(error);
@@ -232,7 +232,7 @@ const RecallPatient = (props) => {
     e.preventDefault();
     if (validate()) {
       setLoading(true);
-      setPatientDetails(null);
+      props.setPatientDetails(null);
       axios
         .post(
           `${devices.url}?reader=${
@@ -445,7 +445,7 @@ const RecallPatient = (props) => {
                     </FormGroup>
                   </Col>
 
-                  {/* <Col md={3}>
+                  <Col md={3}>
                     <FormGroup>
                       <Label
                         for="device"
@@ -488,7 +488,7 @@ const RecallPatient = (props) => {
                         ""
                       )}
                     </FormGroup>
-                  </Col> */}
+                  </Col>
 
                   <Col md={3}>
                     <Label
@@ -573,24 +573,27 @@ const RecallPatient = (props) => {
                 <Col md={12}>
                   <Table striped bordered hover>
                     <tbody>
-                      {patientDetails !== null &&
+                      {props.patientDetails !== null &&
                       pimsEnrollment.length === 0 ? (
                         <tr>
                           <td>
                             <b>Registration Date: </b>
-                            {patientDetails.dateOfRegistration}
+                            {props.patientDetails.dateOfRegistration}
                           </td>
                           <td>
                             <b>Hospital No: </b>
-                            {patientDetails?.identifier?.identifier[0]?.value}
+                            {
+                              props.patientDetails?.identifier?.identifier[0]
+                                ?.value
+                            }
                           </td>
-                          <td>{patientDetails.firstName}</td>
-                          <td>{patientDetails.surname}</td>
-                          <td>{patientDetails.sex}</td>
+                          <td>{props.patientDetails.firstName}</td>
+                          <td>{props.patientDetails.surname}</td>
+                          <td>{props.patientDetails.sex}</td>
 
                           <td>
                             Biometrics{" "}
-                            {patientDetails.biometricStatus === true ? (
+                            {props.patientDetails.biometricStatus === true ? (
                               <Badge color="success"> Captured</Badge>
                             ) : (
                               <Badge color="danger">Not Captured</Badge>
@@ -601,7 +604,7 @@ const RecallPatient = (props) => {
                               to={{
                                 pathname: "/patient-dashboard",
                                 state: {
-                                  patientObj: patientDetails,
+                                  patientObj: props.patientDetails,
                                   permissions: permissions,
                                 },
                               }}
