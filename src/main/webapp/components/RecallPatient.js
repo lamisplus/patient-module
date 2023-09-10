@@ -236,7 +236,9 @@ const RecallPatient = (props) => {
         .post(
           `${devices.url}?reader=${
             devices.name
-          }&isNew=${"false"}&recapture=${"false"}&identify=true`,
+          }&isNew=${"false"}&recapture=${"false"}&identify=true&identificationType=${
+            !checkedVal ? "LOCAL" : "PIMS"
+          }`,
           objValues,
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -327,7 +329,8 @@ const RecallPatient = (props) => {
     }
   };
 
-  const handleChange = () => {
+  const handleChange = (e) => {
+    console.log(e);
     setCheckedVal(!checkedVal);
   };
 
@@ -546,9 +549,9 @@ const RecallPatient = (props) => {
                   </Col>
                   <br />
                   <Col md={12}>
-                    {loading ? (
+                    {checkedVal && loading ? (
                       <>
-                        <b>Validating finger...</b>
+                        <b>Scanning finger...</b>
                         <LinearProgress />
                       </>
                     ) : (
