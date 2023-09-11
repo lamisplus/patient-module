@@ -262,6 +262,7 @@ const RecallPatient = (props) => {
 
             if (checkedVal === true) {
               setSuccessPims(true);
+              props.setPimsEnrollment([]);
               let pimsData = {
                 facilityId: facilityId,
                 finger: capturedFinger.template,
@@ -282,16 +283,6 @@ const RecallPatient = (props) => {
                       autoClose: 10000,
                     });
                   }
-                  // else {
-                  //   setPimsEnrollment(response.data.enrollments);
-                  //   toast.success(
-                  //     `PIMS MESSAGE: Patient identified: ${response.data.message}`,
-                  //     {
-                  //       position: toast.POSITION.TOP_CENTER,
-                  //       autoClose: 10000,
-                  //     }
-                  //   );
-                  // }
                 })
                 .catch((error) => {
                   setSuccessPims(false);
