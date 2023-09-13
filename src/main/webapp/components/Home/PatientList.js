@@ -404,6 +404,7 @@ const PatientList = (props) => {
           pageSizeOptions: [10, 20, 100],
           pageSize: 10,
           debounceInterval: 400,
+          sorting: true,
         }}
         onChangePage={handleChangePage}
         //localization={localization}
