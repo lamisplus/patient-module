@@ -4,15 +4,16 @@ import Button from "@material-ui/core/Button";
 import axios from "axios";
 import { url as baseUrl, token } from "../../../api";
 import Alert from "@mui/material/Alert";
-import { FaEye } from "react-icons/fa";
-import SplitActionButton from "./SplitActionButton";
+
 import PatientRecapture from "./PatientRecapture";
 import Recapture from "./Recapture";
 import MatButton from "@material-ui/core/Button";
 import FingerprintIcon from "@mui/icons-material/Fingerprint";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import RestoreIcon from "@mui/icons-material/Restore";
 
 import { forwardRef } from "react";
-//import { Button} from "react-bootstrap";
+
 import AddBox from "@material-ui/icons/AddBox";
 import ArrowUpward from "@material-ui/icons/ArrowUpward";
 import Check from "@material-ui/icons/Check";
@@ -28,10 +29,6 @@ import Remove from "@material-ui/icons/Remove";
 import SaveAlt from "@material-ui/icons/SaveAlt";
 import Search from "@material-ui/icons/Search";
 import ViewColumn from "@material-ui/icons/ViewColumn";
-import FormGroup from "@mui/material/FormGroup";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
-import TablePagination from "@mui/material/TablePagination";
 
 const tableIcons = {
   Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -58,6 +55,7 @@ const tableIcons = {
 };
 
 const PreviousRecapture = (props) => {
+  console.log(props);
   let createdDate = props.patientObj.createdDate.split("T")[0];
   let currentDate = new Date().toISOString().split("T")[0];
 
@@ -69,7 +67,7 @@ const PreviousRecapture = (props) => {
 
   const tableRef = useRef(null);
   const [loading, setLoading] = useState("");
-  const [recaptures, setRecaptures] = useState([]);
+
   const [biometrics, setBiometrics] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -112,6 +110,10 @@ const PreviousRecapture = (props) => {
       });
     //.error((err) => console.log(err));
   }
+
+  const replaceBaselinePrints = (row) => {
+    console.log("replacing the baseline prints");
+  };
 
   return (
     <>
@@ -185,12 +187,29 @@ const PreviousRecapture = (props) => {
               data: row.recapture >= 1 ? "Recapture" : "Baseline",
               number: row.recapture,
               actions: (
-                <Button
-                  style={{ backgroundColor: "#014d88", color: "#fff" }}
-                  onClick={() => actionItems(row)}
-                >
-                  View
-                </Button>
+                <>
+                  <Button
+                    style={{ backgroundColor: "#014d88", color: "#fff" }}
+                    onClick={() => actionItems(row)}
+                    startIcon={<VisibilityIcon />}
+                  >
+                    View
+                  </Button>{" "}
+                  {row.recapture == 0 ? (
+                    <Button
+                      style={{
+                        backgroundColor: "rgb(153, 46, 98)",
+                        color: "#fff",
+                      }}
+                      onClick={() => replaceBaselinePrints(row)}
+                      startIcon={<RestoreIcon />}
+                    >
+                      Replace
+                    </Button>
+                  ) : (
+                    ""
+                  )}
+                </>
               ),
             }))
           // (query) =>

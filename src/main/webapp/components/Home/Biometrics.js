@@ -1,24 +1,16 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useRef } from "react";
 import MaterialTable from "material-table";
 import axios from "axios";
 import { url as baseUrl, token } from "../../../../api";
-import { Link } from "react-router-dom";
-import { Card, CardBody } from "reactstrap";
 import { Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
 import Button from "@material-ui/core/Button";
 import "react-toastify/dist/ReactToastify.css";
 import "react-widgets/dist/css/react-widgets.css";
-import { FaEye, FaUserPlus } from "react-icons/fa";
-import {
-  MdDashboard,
-  MdDeleteForever,
-  MdModeEdit,
-  MdPerson,
-} from "react-icons/md";
-import { Menu, MenuList, MenuButton } from "@reach/menu-button";
+import { FaEye } from "react-icons/fa";
+import { MdPerson } from "react-icons/md";
+
 import "@reach/menu-button/styles.css";
 import { ToastContainer } from "react-toastify";
-import { Label } from "semantic-ui-react";
 import { makeStyles } from "@material-ui/core/styles";
 import "../patient.css";
 import SplitActionButton from "../SplitActionButton";
@@ -28,7 +20,6 @@ import BiometricsList from "./BiometricsList";
 import NotCaptured from "./NotCaptured";
 
 import { forwardRef } from "react";
-//import { Button} from "react-bootstrap";
 import AddBox from "@material-ui/icons/AddBox";
 import ArrowUpward from "@material-ui/icons/ArrowUpward";
 import Check from "@material-ui/icons/Check";
@@ -47,7 +38,6 @@ import ViewColumn from "@material-ui/icons/ViewColumn";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
-import TablePagination from "@mui/material/TablePagination";
 
 const tableIcons = {
   Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -128,11 +118,7 @@ const Biometrics = (props) => {
   const [modal, setModal] = useState(false);
   const [patient, setPatient] = useState(false);
   const [enablePPI, setEnablePPI] = useState(true);
-  const [searchParams, setSearchParams] = useState("*");
-  const [totalPages, setTotalPages] = useState(0);
-  const [totalRecords, setTotalRecords] = useState(0);
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+
   const [currentPage, setCurrentPage] = useState(1);
   const [status, setStatus] = useState(1);
   const toggle = (id) => {
@@ -164,28 +150,6 @@ const Biometrics = (props) => {
             },
           })),
       },
-      //            {...(permissions.includes('edit_patient') || permissions.includes("all_permission")&&
-      //                    {
-      //                        name:'Edit',
-      //                        type:'link',
-      //                        icon:<MdModeEdit size="20" color='rgb(4, 196, 217)' />,
-      //                        to:{
-      //                            pathname: "/register-patient",
-      //                            state: { patientId : row.id, permissions:permissions  }
-      //                        }
-      //                    }
-      //                )},
-      //            {...(permissions.includes('delete_patient') || permissions.includes("all_permission")&&
-      //                    {
-      //                        name:'Delete',
-      //                        type:'link',
-      //                        icon:<MdDeleteForever size="20" color='rgb(4, 196, 217)'  />,
-      //                        to:{
-      //                            pathname: "/#",
-      //                            state: { patientObj: row, permissions:permissions  }
-      //                        }
-      //                    }
-      //                )}
     ];
   }
   const handleRemoteData = (query) =>
@@ -268,18 +232,6 @@ const Biometrics = (props) => {
     return hospitalNumber ? hospitalNumber.value : "";
   };
 
-  const getAddress = (address) => {
-    const city =
-      address && address.address && address.address.length > 0
-        ? address.address[0].city
-        : null;
-    return city;
-  };
-
-  const getGender = (gender) => {
-    return gender.display;
-  };
-
   const enablePPIColumns = () => {
     setEnablePPI(!enablePPI);
   };
@@ -308,11 +260,6 @@ const Biometrics = (props) => {
 
   const handleChangePage = (page) => {
     setCurrentPage(page + 1);
-  };
-  const localization = {
-    pagination: {
-      labelDisplayedRows: `${currentPage} - 10 of 2022`,
-    },
   };
 
   const handleChangeStatus = (e) => {
