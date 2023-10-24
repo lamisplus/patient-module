@@ -95,6 +95,17 @@ const Recapture = (props) => {
     device: "SECUGEN",
     reason: "",
     age: "",
+    deduplication: {
+      patientId: "",
+      deduplicationDate: null,
+      matchCount: 0,
+      unMatchCount: 0,
+      baselineFingerCount: 0,
+      recaptureFingerCount: 0,
+      perfectMatchCount: 0,
+      imperfectMatchCount: 0,
+      details: null,
+    },
   });
   const [fingerType, setFingerType] = useState([]);
   const [devices, setDevices] = useState([]);
@@ -111,7 +122,7 @@ const Recapture = (props) => {
   const [recapturedFingered, setRecapturedFingered] = useState([]);
   const [selectedFingers, setSelectedFingers] = useState([]);
   const [imageQuality, setImageQuality] = useState(false);
-  const [isNewStatus, setIsNewStatus] = useState(true);
+  const [isNewStatus, setIsNewStatus] = useState(false);
 
   const calculate_age = (dob) => {
     console.log(dob);
@@ -252,6 +263,15 @@ const Recapture = (props) => {
 
   const captureFinger = (e) => {
     e.preventDefault();
+    if (localStorage.getItem("deduplicates") !== null) {
+      const deduplicatesObj = JSON.parse(localStorage.getItem("deduplicates"));
+
+      objValues.deduplication = deduplicatesObj;
+      setObjValues({ ...objValues, deduplication: deduplicatesObj });
+      console.log("deduplicates", objValues);
+      localStorage.removeItem("deduplicates");
+    }
+
     if (validate()) {
       setLoading(true);
 
@@ -259,7 +279,7 @@ const Recapture = (props) => {
         .post(
           `${devices.url}?reader=${
             devices.name
-          }&isNew=${isNewStatus}&recapture=${true}`,
+          }&isNew=${isNewStatus}&recapture=${true}&identify=${false}`,
           objValues,
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -267,7 +287,6 @@ const Recapture = (props) => {
         )
         .then((response) => {
           setLoading(false);
-          console.log(response.data);
 
           if (response.data.type === "ERROR") {
             setLoading(false);
@@ -326,6 +345,12 @@ const Recapture = (props) => {
               );
               setImageQuality(true);
             }
+            console.log("get deduplications", response.data.deduplication);
+            localStorage.setItem(
+              "deduplicates",
+              JSON.stringify(response.data.deduplication)
+            );
+
             const templateType = response.data.templateType;
             setTryAgain(false);
             setSuccess(true);

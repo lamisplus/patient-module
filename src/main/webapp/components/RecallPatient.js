@@ -98,9 +98,9 @@ const RecallPatient = (props) => {
   const [errors, setErrors] = useState({});
 
   const [fingerIndex, setFingerIndex] = useState("");
-  const [patientDetails, setPatientDetails] = useState(null);
+
   const [isNewStatus, setIsNewStatus] = useState(true);
-  const [checked, setChecked] = useState(false);
+  const [checkedVal, setCheckedVal] = useState(false);
   const [facilities, setFacilities] = useState([]);
 
   const getPersonBiometrics = async () => {
@@ -220,7 +220,7 @@ const RecallPatient = (props) => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
-        setPatientDetails(response.data);
+        props.setPatientDetails(response.data);
       })
       .catch((error) => {
         console.log(error);
@@ -231,12 +231,14 @@ const RecallPatient = (props) => {
     e.preventDefault();
     if (validate()) {
       setLoading(true);
-      setPatientDetails(null);
+      props.setPatientDetails(null);
       axios
         .post(
           `${devices.url}?reader=${
             devices.name
-          }&isNew=${"false"}&recapture=${"false"}&identify=true`,
+          }&isNew=${"false"}&recapture=${"false"}&identify=true&identificationType=${
+            !checkedVal ? "LOCAL" : "PIMS"
+          }`,
           objValues,
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -258,28 +260,25 @@ const RecallPatient = (props) => {
 
             let facilityId = facilities[0].organisationUnitId;
 
-            if (checked === true) {
+            if (checkedVal === true) {
               setSuccessPims(true);
+              props.setPimsEnrollment([]);
               let pimsData = {
                 facilityId: facilityId,
                 finger: capturedFinger.template,
                 index: fingerIndex,
               };
-
+              // console.log(checkedVal);
               axios
                 .post(`${baseUrl}pims/verify/${facilityId}`, pimsData, {
                   headers: { Authorization: `Bearer ${token}` },
                 })
                 .then((response) => {
                   setSuccessPims(false);
-                  setChecked(false);
+                  setCheckedVal(false);
                   if (response.data.code === 5) {
+                    props.setPimsEnrollment(response.data.enrollments);
                     toast.info(`PIMS MESSAGE: ${response.data.message}`, {
-                      position: toast.POSITION.TOP_CENTER,
-                      autoClose: 10000,
-                    });
-                  } else {
-                    toast.success(`PIMS MESSAGE: Patient identified`, {
                       position: toast.POSITION.TOP_CENTER,
                       autoClose: 10000,
                     });
@@ -321,8 +320,9 @@ const RecallPatient = (props) => {
     }
   };
 
-  const handleChange = () => {
-    setChecked(!checked);
+  const handleChange = (e) => {
+    console.log(e);
+    setCheckedVal(!checkedVal);
   };
 
   return (
@@ -438,7 +438,7 @@ const RecallPatient = (props) => {
                     </FormGroup>
                   </Col>
 
-                  {/* <Col md={3}>
+                  <Col md={3}>
                     <FormGroup>
                       <Label
                         for="device"
@@ -481,7 +481,7 @@ const RecallPatient = (props) => {
                         ""
                       )}
                     </FormGroup>
-                  </Col> */}
+                  </Col>
 
                   <Col md={3}>
                     <Label
@@ -497,6 +497,7 @@ const RecallPatient = (props) => {
                     <br />
                     <Input
                       type="checkbox"
+                      checked={checkedVal}
                       onChange={handleChange}
                       style={{
                         border: "1px solid #014D88",
@@ -530,6 +531,7 @@ const RecallPatient = (props) => {
                           className={"mt-4"}
                           style={{ backgroundColor: "#992E62" }}
                           startIcon={<CircularProgress />}
+                          disabled={loading}
                         >
                           Validating...
                         </MatButton>
@@ -538,9 +540,9 @@ const RecallPatient = (props) => {
                   </Col>
                   <br />
                   <Col md={12}>
-                    {loading ? (
+                    {checkedVal && loading ? (
                       <>
-                        <b>Validating finger...</b>
+                        <b>Scanning finger...</b>
                         <LinearProgress />
                       </>
                     ) : (
@@ -564,23 +566,27 @@ const RecallPatient = (props) => {
                 <Col md={12}>
                   <Table striped bordered hover>
                     <tbody>
-                      {patientDetails !== null ? (
+                      {props.patientDetails !== null &&
+                      props.pimsEnrollment.length === 0 ? (
                         <tr>
                           <td>
                             <b>Registration Date: </b>
-                            {patientDetails.dateOfRegistration}
+                            {props.patientDetails.dateOfRegistration}
                           </td>
                           <td>
                             <b>Hospital No: </b>
-                            {patientDetails?.identifier?.identifier[0]?.value}
+                            {
+                              props.patientDetails?.identifier?.identifier[0]
+                                ?.value
+                            }
                           </td>
-                          <td>{patientDetails.firstName}</td>
-                          <td>{patientDetails.surname}</td>
-                          <td>{patientDetails.sex}</td>
+                          <td>{props.patientDetails.firstName}</td>
+                          <td>{props.patientDetails.surname}</td>
+                          <td>{props.patientDetails.sex}</td>
 
                           <td>
                             Biometrics{" "}
-                            {patientDetails.biometricStatus === true ? (
+                            {props.patientDetails.biometricStatus === true ? (
                               <Badge color="success"> Captured</Badge>
                             ) : (
                               <Badge color="danger">Not Captured</Badge>
@@ -591,7 +597,7 @@ const RecallPatient = (props) => {
                               to={{
                                 pathname: "/patient-dashboard",
                                 state: {
-                                  patientObj: patientDetails,
+                                  patientObj: props.patientDetails,
                                   permissions: permissions,
                                 },
                               }}
@@ -616,7 +622,43 @@ const RecallPatient = (props) => {
                           </td>
                         </tr>
                       ) : (
-                        " "
+                        props.pimsEnrollment &&
+                        props.pimsEnrollment.map((pims) => (
+                          <tr>
+                            <td>
+                              <b>Art Start Date: </b>
+                              {pims.artStartDate}
+                            </td>
+                            <td>
+                              <b>Patient ID: </b>
+                              {pims.patientIdentifier}
+                            </td>
+                            <td>
+                              <b>Facility Id: </b>
+                              {pims.facilityId}
+                            </td>
+                            <td>
+                              <b>Facility Name: </b>
+                              {pims.facilityName}
+                            </td>
+                            <td>
+                              <b>DOB: </b>
+                              {pims.dateOfBirth}
+                            </td>
+                            <td>
+                              <b>Sex: </b>
+                              {pims.sex}
+                            </td>
+                            <td>
+                              <b>State: </b>
+                              {pims.stateName}
+                            </td>
+                            <td>
+                              <b>LGA: </b>
+                              {pims.lgaName}
+                            </td>
+                          </tr>
+                        ))
                       )}
                     </tbody>
                   </Table>
