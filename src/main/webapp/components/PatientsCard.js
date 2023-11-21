@@ -49,6 +49,7 @@ const styles = (theme) => ({
 });
 
 function PatientsCard(props) {
+  console.log(props);
   const { classes } = props;
   const patientObj = props.patientObj ? props.patientObj : {};
   const permissions = props.permissions ? props.permissions : [];

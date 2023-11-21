@@ -4,6 +4,7 @@ import Button from "@material-ui/core/Button";
 import axios from "axios";
 import { url as baseUrl, token } from "../../../api";
 import Alert from "@mui/material/Alert";
+import swal from "sweetalert";
 
 import PatientRecapture from "./PatientRecapture";
 import Recapture from "./Recapture";
@@ -29,6 +30,7 @@ import Remove from "@material-ui/icons/Remove";
 import SaveAlt from "@material-ui/icons/SaveAlt";
 import Search from "@material-ui/icons/Search";
 import ViewColumn from "@material-ui/icons/ViewColumn";
+import BaselineWarning from "./BaselineWarning";
 
 const tableIcons = {
   Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -55,14 +57,17 @@ const tableIcons = {
 };
 
 const PreviousRecapture = (props) => {
-  console.log(props);
   let createdDate = props.patientObj.createdDate.split("T")[0];
   let currentDate = new Date().toISOString().split("T")[0];
 
   const [recapturedFingered, setRecapturedFingered] = useState([]);
   const [modal, setModal] = useState(false);
+  const [modal1, setModal1] = useState(false);
   const [modalNew, setModalNew] = useState(false);
+
+  const [submitStatus, setSubmitStatus] = useState(false);
   const toggle = () => setModal(!modal);
+  const toggle1 = () => setModal1(!modal1);
   const toggleNew = () => setModalNew(!modalNew);
 
   const tableRef = useRef(null);
@@ -70,6 +75,7 @@ const PreviousRecapture = (props) => {
 
   const [biometrics, setBiometrics] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [baselineVal, setBaselineVal] = useState({});
 
   const getRecaptureCount = () => {
     //console.log("get recaptures");
@@ -111,8 +117,25 @@ const PreviousRecapture = (props) => {
     //.error((err) => console.log(err));
   }
 
-  const replaceBaselinePrints = (row) => {
-    console.log("replacing the baseline prints");
+  const submitReplacedBaselinePrints = () => {
+    toggle1();
+    axios
+      .put(
+        `${baseUrl}biometrics/person?personUuid=${baselineVal?.personUuid}&captureDate=${baselineVal?.captureDate}`,
+        null,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      )
+      .then((response) => {
+        getRecaptureCount();
+      });
+  };
+
+  const replaceBaselinePrints = async (row) => {
+    console.log(`${row.captureDate} ${row.personUuid}`);
+    toggle1();
+    setBaselineVal(row);
   };
 
   return (
@@ -195,7 +218,7 @@ const PreviousRecapture = (props) => {
                   >
                     View
                   </Button>{" "}
-                  {row.recapture == 0 ? (
+                  {row.recapture >= 1 ? (
                     <Button
                       style={{
                         backgroundColor: "rgb(153, 46, 98)",
@@ -212,37 +235,6 @@ const PreviousRecapture = (props) => {
                 </>
               ),
             }))
-          // (query) =>
-          // new Promise((resolve, reject) =>
-          //   axios
-          //     .get(`${baseUrl}biometrics/grouped/person/${props.patientId}`, {
-          //       headers: { Authorization: `Bearer ${token}` },
-          //     })
-          //     .then((response) => response)
-          //     .then((result) => {
-          //       resolve({
-          //         data: result.data
-          //           .filter((record) => {
-          //             return record.archived === 0;
-          //           })
-          //           .map((row) => ({
-          //             captureDate: row.captureDate,
-          //             count: row.count === null ? 0 : row.count,
-          //             //data: actionItems(row),
-          //             actions: (
-          //               <Button
-          //                 style={{ backgroundColor: "#014d88", color: "#fff" }}
-          //                 onClick={() => actionItems(row)}
-          //               >
-          //                 View
-          //               </Button>
-          //             ),
-          //           })),
-          //         page: query.page,
-          //         totalCount: result.data.length,
-          //       });
-          //     })
-          // )
         }
         options={{
           headerStyle: {
@@ -276,6 +268,11 @@ const PreviousRecapture = (props) => {
         patientId={props.patientId}
         age={props.age}
         getRecaptureCount={getRecaptureCount}
+      />
+      <BaselineWarning
+        modal={modal1}
+        toggle={toggle1}
+        submitReplacedBaselinePrints={submitReplacedBaselinePrints}
       />
     </>
   );
