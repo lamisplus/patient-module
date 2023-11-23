@@ -291,16 +291,24 @@ const Recapture = (props) => {
           if (response.data.type === "ERROR") {
             setLoading(false);
             setTryAgain(true);
-            // if (response.data.match === false) {
-            //   toast.error(response.data.message.match, { autoClose: 10000 });
-            // }
+            //No matching
+            if (response.data.match === false) {
+              toast.error(response.data.message.RECAPTURE_MESSAGE, {
+                autoClose: 10000,
+              });
+            }
             toast.error(response.data.message.ERROR);
             setIsNewStatus(false);
           } else if (response.data.type === "WARNING") {
+            //Imperfect Match
             if (response.data.match === true) {
-              toast.info(response.data.message.match, { autoClose: 10000 });
+              toast.info(response.data.message.RECAPTURE_MESSAGE, {
+                autoClose: 10000,
+              });
             } else if (response.data.match === false) {
-              toast.error(response.data.message.match, { autoClose: 10000 });
+              toast.error(response.data.message.RECAPTURE_MESSAGE, {
+                autoClose: 10000,
+              });
             }
 
             if (
@@ -356,7 +364,9 @@ const Recapture = (props) => {
             setSuccess(true);
 
             if (response.data.match === true) {
-              toast.success(response.data.message.match, { autoClose: 10000 });
+              toast.success(response.data.message.RECAPTURE_MESSAGE, {
+                autoClose: 10000,
+              });
             }
 
             let biometricsEnrollments = response.data;
