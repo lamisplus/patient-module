@@ -138,11 +138,12 @@ public class PersonService {
     }
 
 
-    public void deletePersonById(Long id) {
+    public void deletePersonById(Long id, String message) {
         Person person = personRepository
                 .findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(PersonService.class, "errorMessage", PERSON_NOT_FOUND_MESSAGE + id));
         person.setArchived(1);
+        person.setReason(message);
         personRepository.save(person);
     }
 

@@ -57,10 +57,10 @@ public class PatientController {
         return ResponseEntity.ok(personService.updatePerson(id, patient));
     }
 
-    @DeleteMapping(value = "/{id}",
+    @DeleteMapping(value = "/{id}/{reason}",
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> deletePerson(@PathVariable("id") Long id) {
-        personService.deletePersonById(id);
+    public ResponseEntity<String> deletePerson(@PathVariable("id") Long id, @PathVariable("reason") String reason) {
+        personService.deletePersonById(id, reason);
         return ResponseEntity.accepted().build();
     }
 

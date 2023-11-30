@@ -200,8 +200,8 @@ const CheckedInPatients = (props) => {
                 .join(", "),
               id: getHospitalNumber(row.identifier),
               sex:
-                row.sex.toLowerCase().charAt(0).toUpperCase() +
-                row.sex.slice(1).toLowerCase(),
+                row.sex?.toLowerCase()?.charAt(0)?.toUpperCase() +
+                row.sex?.slice(1)?.toLowerCase(),
               dateOfBirth: row.dateOfBirth,
               age:
                 row.dateOfBirth === 0 ||
