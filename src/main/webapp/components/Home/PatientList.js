@@ -458,7 +458,7 @@ const PatientList = (props) => {
               Yes
             </Button>{" "}
             <Button
-              color="secondary"
+              color="primary"
               type="button"
               onClick={(e) => onCancelDelete()}
             >
