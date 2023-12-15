@@ -95,6 +95,7 @@ const Recapture = (props) => {
     device: "SECUGEN",
     reason: "",
     age: "",
+    capturedBiometricsList: [],
     deduplication: {
       patientId: "",
       deduplicationDate: null,
@@ -263,12 +264,21 @@ const Recapture = (props) => {
 
   const captureFinger = (e) => {
     e.preventDefault();
+    if (localStorage.getItem("capturedBiometricsList") !== null) {
+      const capturedBiometricsListObj = JSON.parse(
+        localStorage.getItem("capturedBiometricsList")
+      );
+
+      objValues.capturedBiometricsList = capturedBiometricsListObj;
+      localStorage.removeItem("capturedBiometricsList");
+    }
+
     if (localStorage.getItem("deduplicates") !== null) {
       const deduplicatesObj = JSON.parse(localStorage.getItem("deduplicates"));
 
       objValues.deduplication = deduplicatesObj;
       setObjValues({ ...objValues, deduplication: deduplicatesObj });
-      console.log("deduplicates", objValues);
+      //console.log("deduplicates", objValues);
       localStorage.removeItem("deduplicates");
     }
 
@@ -353,7 +363,12 @@ const Recapture = (props) => {
               );
               setImageQuality(true);
             }
-            console.log("get deduplications", response.data.deduplication);
+
+            localStorage.setItem(
+              "capturedBiometricsList",
+              JSON.stringify(response.data.capturedBiometricsList)
+            );
+
             localStorage.setItem(
               "deduplicates",
               JSON.stringify(response.data.deduplication)
@@ -370,6 +385,7 @@ const Recapture = (props) => {
             }
 
             let biometricsEnrollments = response.data;
+
             biometricsEnrollments.capturedBiometricsList = _.uniqBy(
               biometricsEnrollments.capturedBiometricsList,
               "templateType"
@@ -399,6 +415,7 @@ const Recapture = (props) => {
 
   const saveBiometrics = (e) => {
     e.preventDefault();
+
     if (capturedFingered.length >= 1) {
       const capturedObj = capturedFingered[capturedFingered.length - 1];
 
@@ -407,27 +424,58 @@ const Recapture = (props) => {
         "templateType"
       );
 
-      axios
-        .post(`${baseUrl}biometrics/templates`, capturedObj, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-        .then((response) => {
-          //console.log("saved", response);
-          toast.success("Biometric recaptured successfully", {
-            position: toast.POSITION.BOTTOM_CENTER,
-          });
-          setCapturedFingered([]);
-          getPersonBiometrics();
-          // props.updatePatientBiometricStatus(true);
-          props.getRecaptureCount();
-          props.toggle();
-        })
-        .catch((error) => {
-          toast.error("Something went wrong saving biometrics", {
-            position: toast.POSITION.BOTTOM_CENTER,
-          });
-          console.log(error.message);
+      if (capturedObj.deviceName.includes("Futronic")) {
+        let fingersObj = [];
+        capturedFingered.forEach((obj) => {
+          fingersObj.push(obj.capturedBiometricsList[0]);
         });
+
+        if (fingersObj.length > 0) {
+          axios
+            .post(`${baseUrl}biometrics/templates`, capturedObj, {
+              headers: { Authorization: `Bearer ${token}` },
+            })
+            .then((response) => {
+              console.log("saved", response);
+              toast.success("Biometric saved successfully", {
+                position: toast.POSITION.BOTTOM_CENTER,
+              });
+              setCapturedFingered([]);
+              getPersonBiometrics();
+              //props.updatePatientBiometricStatus(true);
+              props.getRecaptureCount();
+              props.toggle();
+            })
+            .catch((error) => {
+              toast.error("Something went wrong saving biometrics recapture", {
+                position: toast.POSITION.BOTTOM_CENTER,
+              });
+              console.log(error);
+            });
+        }
+      } else {
+        axios
+          .post(`${baseUrl}biometrics/templates`, capturedObj, {
+            headers: { Authorization: `Bearer ${token}` },
+          })
+          .then((response) => {
+            //console.log("saved", response);
+            toast.success("Biometric recaptured successfully", {
+              position: toast.POSITION.BOTTOM_CENTER,
+            });
+            setCapturedFingered([]);
+            getPersonBiometrics();
+
+            props.getRecaptureCount();
+            props.toggle();
+          })
+          .catch((error) => {
+            toast.error("Something went wrong saving biometrics recapture", {
+              position: toast.POSITION.BOTTOM_CENTER,
+            });
+            console.log(error.message);
+          });
+      }
     } else {
       toast.error("You can't save less than 2 finger", {
         position: toast.POSITION.BOTTOM_CENTER,
