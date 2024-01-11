@@ -152,7 +152,7 @@ function Biometrics(props) {
   const [success, setSuccess] = React.useState(false);
   const [errors, setErrors] = useState({});
   const [storedBiometrics, setStoredBiometrics] = useState([]);
-  // const [responseImage, setResponseImage] = useState("")
+  const [saved, setSaved] = useState(false);
 
   const [selectedFingers, setSelectedFingers] = useState([]);
   const [imageQuality, setImageQuality] = useState(false);
@@ -442,6 +442,7 @@ function Biometrics(props) {
   //Save Biometric capture
   const saveBiometrics = (e) => {
     e.preventDefault();
+    setSaved(true);
 
     if (capturedFingered.length >= 1) {
       const capturedObj = capturedFingered[capturedFingered.length - 1];
@@ -478,19 +479,21 @@ function Biometrics(props) {
                     headers: { Authorization: `Bearer ${token}` },
                   })
                   .then((response) => {
-                    console.log("saved", response);
+                    //console.log("saved", response);
                     toast.success("Biometric saved successfully", {
                       position: toast.POSITION.BOTTOM_CENTER,
                     });
                     setCapturedFingered([]);
                     getPersonBiometrics();
                     props.updatePatientBiometricStatus(true);
+                    setSaved(false);
                   })
                   .catch((error) => {
                     toast.error("Something went wrong saving biometrics", {
                       position: toast.POSITION.BOTTOM_CENTER,
                     });
-                    console.log(error);
+                    //console.log(error);
+                    setSaved(false);
                   });
               }
             })
@@ -504,19 +507,22 @@ function Biometrics(props) {
             headers: { Authorization: `Bearer ${token}` },
           })
           .then((response) => {
-            console.log("saved", response);
+            //console.log("saved", response);
+
             toast.success("Biometric save successful", {
               position: toast.POSITION.BOTTOM_CENTER,
             });
             setCapturedFingered([]);
             getPersonBiometrics();
             props.updatePatientBiometricStatus(true);
+            setSaved(false);
           })
           .catch((error) => {
             toast.error("Something went wrong saving biometrics", {
               position: toast.POSITION.BOTTOM_CENTER,
             });
-            console.log(error);
+            //console.log(error);
+            setSaved(false);
           });
       }
     } else {
@@ -881,7 +887,7 @@ function Biometrics(props) {
                     // className={classes.button}
                     startIcon={<SaveIcon />}
                   >
-                    Save Capture
+                    {saved === true ? "saving captured prints" : "Save Capture"}
                   </MatButton>
                 ) : (
                   <MatButton
@@ -893,7 +899,7 @@ function Biometrics(props) {
                     // className={classes.button}
                     startIcon={<SaveIcon />}
                   >
-                    Save Capture
+                    {saved === true ? "saving captured prints" : "Save Capture"}
                   </MatButton>
                 )}
               </Col>

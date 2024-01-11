@@ -117,7 +117,7 @@ const Recapture = (props) => {
   const [success, setSuccess] = React.useState(false);
   const [errors, setErrors] = useState({});
   const [storedBiometrics, setStoredBiometrics] = useState([]);
-  // const [responseImage, setResponseImage] = useState("")
+  const [saved, setSaved] = useState(false);
   const [capturedFingered, setCapturedFingered] = useState([]);
   const [capturedFingeredObj, setCapturedFingeredObj] = useState([]);
   const [recapturedFingered, setRecapturedFingered] = useState([]);
@@ -264,7 +264,10 @@ const Recapture = (props) => {
 
   const captureFinger = (e) => {
     e.preventDefault();
-    if (localStorage.getItem("capturedBiometricsList") !== null) {
+    if (
+      localStorage.getItem("capturedBiometricsList") !== null ||
+      localStorage.getItem("deduplicates") !== undefined
+    ) {
       const capturedBiometricsListObj = JSON.parse(
         localStorage.getItem("capturedBiometricsList")
       );
@@ -273,7 +276,10 @@ const Recapture = (props) => {
       localStorage.removeItem("capturedBiometricsList");
     }
 
-    if (localStorage.getItem("deduplicates") !== null) {
+    if (
+      localStorage.getItem("deduplicates") !== null ||
+      localStorage.getItem("deduplicates") !== undefined
+    ) {
       const deduplicatesObj = JSON.parse(localStorage.getItem("deduplicates"));
 
       objValues.deduplication = deduplicatesObj;
@@ -424,6 +430,7 @@ const Recapture = (props) => {
 
   const saveBiometrics = (e) => {
     e.preventDefault();
+    setSaved(true);
 
     if (capturedFingered.length >= 1) {
       const capturedObj = capturedFingered[capturedFingered.length - 1];
@@ -445,7 +452,7 @@ const Recapture = (props) => {
               headers: { Authorization: `Bearer ${token}` },
             })
             .then((response) => {
-              console.log("saved", response);
+              //console.log("saved", response);
               toast.success("Biometric saved successfully", {
                 position: toast.POSITION.BOTTOM_CENTER,
               });
@@ -454,12 +461,14 @@ const Recapture = (props) => {
               //props.updatePatientBiometricStatus(true);
               props.getRecaptureCount();
               props.toggle();
+              setSaved(false);
             })
             .catch((error) => {
               toast.error("Something went wrong saving biometrics recapture", {
                 position: toast.POSITION.BOTTOM_CENTER,
               });
-              console.log(error + "1");
+              //console.log(error + "1");
+              setSaved(false);
             });
         }
       } else {
@@ -477,12 +486,14 @@ const Recapture = (props) => {
 
             props.getRecaptureCount();
             props.toggle();
+            setSaved(false);
           })
           .catch((error) => {
             toast.error("Something went wrong saving biometrics recapture", {
               position: toast.POSITION.BOTTOM_CENTER,
             });
-            console.log(error + "2");
+            //console.log(error.message);
+            setSaved(false);
           });
       }
     } else {
@@ -855,7 +866,9 @@ const Recapture = (props) => {
                         onClick={saveBiometrics}
                         startIcon={<SaveIcon />}
                       >
-                        Save Capture
+                        {saved === true
+                          ? "saving recaptured prints"
+                          : "Save recapture"}
                       </MatButton>
                     </Col>
                     <br />
