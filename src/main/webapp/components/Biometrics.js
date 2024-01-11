@@ -853,7 +853,7 @@ function Biometrics(props) {
                             }}
                             startIcon={<RestartAltIcon />}
                           >
-                            Reset Biometric
+                            Reset Finger
                           </MatButton>
                         ) : (
                           " "
