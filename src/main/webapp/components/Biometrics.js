@@ -473,6 +473,7 @@ function Biometrics(props) {
                 toast.info("Client with finger print already exists", {
                   position: toast.POSITION.TOP_CENTER,
                 });
+                setSaved(false);
               } else {
                 axios
                   .post(`${baseUrl}biometrics/templates`, capturedObj, {
@@ -886,6 +887,7 @@ function Biometrics(props) {
                     onClick={saveBiometrics}
                     // className={classes.button}
                     startIcon={<SaveIcon />}
+                    disabled={saved === true ? true : false}
                   >
                     {saved === true ? "saving captured prints" : "Save Capture"}
                   </MatButton>
@@ -894,7 +896,13 @@ function Biometrics(props) {
                     type="button"
                     variant="contained"
                     color="primary"
-                    disabled={capturedFingered.length < 6 ? true : false}
+                    disabled={
+                      capturedFingered.length < 6
+                        ? true
+                        : false || saved === true
+                        ? true
+                        : false
+                    }
                     onClick={saveBiometrics}
                     // className={classes.button}
                     startIcon={<SaveIcon />}

@@ -264,10 +264,7 @@ const Recapture = (props) => {
 
   const captureFinger = (e) => {
     e.preventDefault();
-    if (
-      localStorage.getItem("capturedBiometricsList") !== null ||
-      localStorage.getItem("deduplicates") !== undefined
-    ) {
+    if (localStorage.getItem("capturedBiometricsList") !== null) {
       const capturedBiometricsListObj = JSON.parse(
         localStorage.getItem("capturedBiometricsList")
       );
@@ -862,7 +859,12 @@ const Recapture = (props) => {
                         type="button"
                         variant="contained"
                         color="primary"
-                        disabled={capturedFingered.length < 6 ? true : false}
+                        disabled={
+                          capturedFingered.length < 6
+                            ? true
+                            : false || saved === true ? true
+                            : false
+                        }
                         onClick={saveBiometrics}
                         startIcon={<SaveIcon />}
                       >
