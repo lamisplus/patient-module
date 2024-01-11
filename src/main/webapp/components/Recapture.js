@@ -298,15 +298,15 @@ const Recapture = (props) => {
         .then((response) => {
           setLoading(false);
 
-          if (response.data.type === "ERROR") {
+          if (response.data.type === "ERROR" && response.data.match !== false) {
             setLoading(false);
             setTryAgain(true);
             //No matching
-            if (response.data.match === false) {
-              toast.error(response.data.message.RECAPTURE_MESSAGE, {
-                autoClose: 10000,
-              });
-            }
+            // if (response.data.match === false) {
+            //   toast.error(response.data.message.RECAPTURE_MESSAGE, {
+            //     autoClose: 10000,
+            //   });
+            // }
             toast.error(response.data.message.ERROR);
             setIsNewStatus(false);
           } else if (response.data.type === "WARNING") {
@@ -352,7 +352,10 @@ const Recapture = (props) => {
             setObjValues({ ...objValues, templateType: "" });
             setIsNewStatus(false);
             //toast.info(response.data.message.match);
-          } else if (response.data.type === "SUCCESS") {
+          } else if (
+            response.data.type === "SUCCESS" ||
+            response.data.match === false
+          ) {
             if (
               response.data.imageQuality <= 60 &&
               calculate_age(props.age) <= 6
@@ -380,6 +383,12 @@ const Recapture = (props) => {
 
             if (response.data.match === true) {
               toast.success(response.data.message.RECAPTURE_MESSAGE, {
+                autoClose: 10000,
+              });
+            }
+
+            if (response.data.match === false) {
+              toast.error(response.data.message.RECAPTURE_MESSAGE, {
                 autoClose: 10000,
               });
             }
@@ -450,7 +459,7 @@ const Recapture = (props) => {
               toast.error("Something went wrong saving biometrics recapture", {
                 position: toast.POSITION.BOTTOM_CENTER,
               });
-              console.log(error);
+              console.log(error + "1");
             });
         }
       } else {
@@ -473,7 +482,7 @@ const Recapture = (props) => {
             toast.error("Something went wrong saving biometrics recapture", {
               position: toast.POSITION.BOTTOM_CENTER,
             });
-            console.log(error.message);
+            console.log(error + "2");
           });
       }
     } else {
