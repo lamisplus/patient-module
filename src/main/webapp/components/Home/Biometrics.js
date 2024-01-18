@@ -213,16 +213,14 @@ const Biometrics = (props) => {
   const calculate_age = (dob) => {
     const today = new Date();
     const dateParts = dob.split("-");
-    const birthDate = new Date(dob); // create a date object directlyfrom`dob1`argument
+    const birthDate = new Date(dob);
     let age_now = today.getFullYear() - birthDate.getFullYear();
     const m = today.getMonth() - birthDate.getMonth();
 
     if (age_now <= 0 && m < 0 && today.getDate() < birthDate.getDate()) {
       age_now--;
     }
-    // if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-    //   age_now--;
-    // }
+
     if (age_now === 0) {
       return m + " month(s)";
     }

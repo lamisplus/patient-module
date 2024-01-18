@@ -275,25 +275,6 @@ const Recapture = (props) => {
       objValues.capturedBiometricsList = [];
       localStorage.removeItem("capturedBiometricsList");
       props.setCapturedFingered([]);
-      // axios
-      //   .post(
-      //     `${devices.url}?reader=${
-      //       devices.name
-      //     }&isNew=${isNewStatus}&recapture=${true}&identify=${false}`,
-      //     objValues,
-      //     {
-      //       headers: { Authorization: `Bearer ${token}` },
-      //     }
-      //   )
-      //   .then((response) => {
-      //     const templateTypeOld = response.data.templateType;
-      //     _.find(props.fingerType, {
-      //       display: templateTypeOld,
-      //     }).captured = false;
-      //     props.setFingerType([...props.fingerType]);
-      //   })
-      //   .catch((err) => console.error(err));
-      // getPersonBiometrics();
     }
 
     if (localStorage.getItem("deduplicates") !== null) {

@@ -69,16 +69,121 @@ const PreviousRecapture = (props) => {
   const [submitStatus, setSubmitStatus] = useState(false);
   const [capturedFingered, setCapturedFingered] = useState([]);
 
+  const fingers = [
+    {
+      id: 429,
+      codesetGroup: "BIOMETRIC_CAPTURE_FINGERS",
+      language: "en",
+      display: "Left Index Finger",
+      version: "1",
+      code: "BIOMETRIC_CAPTURE_FINGERS_LEFT_INDEX_FINGER",
+      archived: 0,
+      captured: false,
+    },
+    {
+      id: 453,
+      codesetGroup: "BIOMETRIC_CAPTURE_FINGERS",
+      language: "en",
+      display: "Left Little Finger",
+      version: "1",
+      code: "BIOMETRIC_CAPTURE_FINGERS_LEFT_LITTLE_FINGER",
+      archived: 0,
+      captured: false,
+    },
+    {
+      id: 430,
+      codesetGroup: "BIOMETRIC_CAPTURE_FINGERS",
+      language: "en",
+      display: "Left Middle Finger",
+      version: "1",
+      code: "BIOMETRIC_CAPTURE_FINGERS_LEFT_MIDDLE_FINGER",
+      archived: 0,
+      captured: false,
+    },
+    {
+      id: 452,
+      codesetGroup: "BIOMETRIC_CAPTURE_FINGERS",
+      language: "en",
+      display: "Left Ring Finger",
+      version: "1",
+      code: "BIOMETRIC_CAPTURE_FINGERS_LEFT_RING_FINGER",
+      archived: 0,
+      captured: false,
+    },
+    {
+      id: 428,
+      codesetGroup: "BIOMETRIC_CAPTURE_FINGERS",
+      language: "en",
+      display: "Left Thumb",
+      version: "1",
+      code: "BIOMETRIC_CAPTURE_FINGERS_LEFT_THUMB",
+      archived: 0,
+      captured: false,
+    },
+    {
+      id: 432,
+      codesetGroup: "BIOMETRIC_CAPTURE_FINGERS",
+      language: "en",
+      display: "Right Index Finger",
+      version: "1",
+      code: "BIOMETRIC_CAPTURE_FINGERS_RIGHT_INDEX_FINGER",
+      archived: 0,
+      captured: false,
+    },
+    {
+      id: 455,
+      codesetGroup: "BIOMETRIC_CAPTURE_FINGERS",
+      language: "en",
+      display: "Right Little Finger",
+      version: "1",
+      code: "BIOMETRIC_CAPTURE_FINGERS_RIGHT_LITTLE_FINGER",
+      archived: 0,
+      captured: false,
+    },
+    {
+      id: 433,
+      codesetGroup: "BIOMETRIC_CAPTURE_FINGERS",
+      language: "en",
+      display: "Right Middle Finger",
+      version: "1",
+      code: "BIOMETRIC_CAPTURE_FINGERS_RIGHT_MIDDLE_FINGER",
+      archived: 0,
+      captured: false,
+    },
+    {
+      id: 454,
+      codesetGroup: "BIOMETRIC_CAPTURE_FINGERS",
+      language: "en",
+      display: "Right Ring Finger",
+      version: "1",
+      code: "BIOMETRIC_CAPTURE_FINGERS_RIGHT_RING_FINGER",
+      archived: 0,
+      captured: false,
+    },
+    {
+      id: 431,
+      codesetGroup: "BIOMETRIC_CAPTURE_FINGERS",
+      language: "en",
+      display: "Right Thumb",
+      version: "1",
+      code: "BIOMETRIC_CAPTURE_FINGERS_RIGHT_THUMB",
+      archived: 0,
+      captured: false,
+    },
+  ];
+
   const toggle = () => {
     setModal(!modal);
     localStorage.removeItem("capturedBiometricsList");
     setCapturedFingered([]);
+    setFingerType(fingers);
   };
   const toggle1 = () => setModal1(!modal1);
   const toggleNew = () => {
     setModalNew(!modalNew);
     localStorage.removeItem("capturedBiometricsList");
     setCapturedFingered([]);
+    setFingerType(fingers);
   };
 
   const tableRef = useRef(null);
