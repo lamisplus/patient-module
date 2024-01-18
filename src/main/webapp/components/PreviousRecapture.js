@@ -61,14 +61,25 @@ const PreviousRecapture = (props) => {
   let currentDate = new Date().toISOString().split("T")[0];
 
   const [recapturedFingered, setRecapturedFingered] = useState([]);
+  const [fingerType, setFingerType] = useState([]);
   const [modal, setModal] = useState(false);
   const [modal1, setModal1] = useState(false);
   const [modalNew, setModalNew] = useState(false);
 
   const [submitStatus, setSubmitStatus] = useState(false);
-  const toggle = () => setModal(!modal);
+  const [capturedFingered, setCapturedFingered] = useState([]);
+
+  const toggle = () => {
+    setModal(!modal);
+    localStorage.removeItem("capturedBiometricsList");
+    setCapturedFingered([]);
+  };
   const toggle1 = () => setModal1(!modal1);
-  const toggleNew = () => setModalNew(!modalNew);
+  const toggleNew = () => {
+    setModalNew(!modalNew);
+    localStorage.removeItem("capturedBiometricsList");
+    setCapturedFingered([]);
+  };
 
   const tableRef = useRef(null);
   const [loading, setLoading] = useState("");
@@ -86,6 +97,7 @@ const PreviousRecapture = (props) => {
       .then((response) => {
         //console.log(response.data);
         setRecapturedFingered(response.data);
+        // localStorage.removeItem("capturedBiometricsList");
       });
   };
 
@@ -268,6 +280,10 @@ const PreviousRecapture = (props) => {
         patientId={props.patientId}
         age={props.age}
         getRecaptureCount={getRecaptureCount}
+        capturedFingered={capturedFingered}
+        setCapturedFingered={setCapturedFingered}
+        fingerType={fingerType}
+        setFingerType={setFingerType}
       />
       <BaselineWarning
         modal={modal1}
