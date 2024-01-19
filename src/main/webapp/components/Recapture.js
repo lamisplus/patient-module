@@ -81,6 +81,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const Recapture = (props) => {
+  //console.log("patient Id", props.patientId);
   const classes = useStyles();
   let history = useHistory();
   const permissions =

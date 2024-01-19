@@ -59,6 +59,7 @@ const tableIcons = {
 const PreviousRecapture = (props) => {
   let createdDate = props.patientObj.createdDate.split("T")[0];
   let currentDate = new Date().toISOString().split("T")[0];
+  const [previousCaptureDate, setPreviousCaptureDate] = useState("");
 
   const [recapturedFingered, setRecapturedFingered] = useState([]);
   const [fingerType, setFingerType] = useState([]);
@@ -95,7 +96,9 @@ const PreviousRecapture = (props) => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
-        //console.log(response.data);
+        let capturedDate = response.data[0].captureDate;
+        setPreviousCaptureDate(capturedDate);
+
         setRecapturedFingered(response.data);
         // localStorage.removeItem("capturedBiometricsList");
       });
@@ -150,13 +153,30 @@ const PreviousRecapture = (props) => {
     setBaselineVal(row);
   };
 
+  const is30DaysPassed = (timestamp) => {
+    console.log(timestamp);
+    const startDate = new Date(timestamp);
+    const currentDate = new Date();
+    const timeDifference = currentDate - startDate;
+
+    const daysDifference = timeDifference / (1000 * 60 * 60 * 24);
+
+    if (daysDifference >= 30) {
+      return true;
+    } else {
+      const remainingDays = 30 - daysDifference;
+      console.log(`remaining ${remainingDays} days`);
+      return false;
+    }
+  };
+
   return (
     <>
       <h5>
         {" "}
         Patient recapture count : <b>{recapturedFingered.length - 1}</b>
       </h5>
-      {createdDate !== currentDate ? (
+      {is30DaysPassed(previousCaptureDate) === true ? (
         <MatButton
           className=" float-right mr-1"
           variant="contained"
@@ -230,7 +250,7 @@ const PreviousRecapture = (props) => {
                   >
                     View
                   </Button>{" "}
-                  {row.recapture >= 1 ? (
+                  {/* {row.recapture >= 1 ? (
                     <Button
                       style={{
                         backgroundColor: "rgb(153, 46, 98)",
@@ -243,7 +263,7 @@ const PreviousRecapture = (props) => {
                     </Button>
                   ) : (
                     ""
-                  )}
+                  )} */}
                 </>
               ),
             }))
