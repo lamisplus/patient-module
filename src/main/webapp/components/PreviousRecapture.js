@@ -78,6 +78,7 @@ const PreviousRecapture = (props) => {
   const toggleNew = () => {
     setModalNew(!modalNew);
     localStorage.removeItem("capturedBiometricsList");
+    setCapturedFingered([]);
   };
 
   const tableRef = useRef(null);
