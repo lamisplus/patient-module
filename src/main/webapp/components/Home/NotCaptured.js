@@ -188,7 +188,7 @@ function NotCaptured(props) {
                 row.dateOfBirth === null ||
                 row.dateOfBirth === ""
                   ? 0
-                  : calculate_age(row.dateOfBirth),
+                  : calculateAge(row.dateOfBirth),
               actions: (
                 <div>
                   <SplitActionButton actions={actionItems(row)} />
@@ -204,21 +204,28 @@ function NotCaptured(props) {
     userPermission();
     loadPatients();
   }, []);
-  const calculate_age = (dob) => {
+  const calculateAge = (dob) => {
     const today = new Date();
-    const dateParts = dob.split("-");
-    const birthDate = new Date(dob); 
-    let age_now = today.getFullYear() - birthDate.getFullYear();
-    const m = today.getMonth() - birthDate.getMonth();
+    const birthDate = new Date(dob);
 
-    if (age_now <= 0 && m < 0 && today.getDate() < birthDate.getDate()) {
-      age_now--;
+    let ageYears = today.getFullYear() - birthDate.getFullYear();
+    const monthDifference = today.getMonth() - birthDate.getMonth();
+
+    if (
+      ageYears <= 0 &&
+      monthDifference < 0 &&
+      today.getDate() < birthDate.getDate()
+    ) {
+      ageYears--;
     }
-   
-    if (age_now === 0) {
-      return m + " month(s)";
+
+    if (ageYears === 0) {
+      return monthDifference === 0
+        ? "Less than a month"
+        : `${monthDifference} month(s)`;
     }
-    return age_now + " year(s)";
+
+    return ageYears === 1 ? "1 year" : `${ageYears} years`;
   };
   const getHospitalNumber = (identifier) => {
     const hospitalNumber = identifier.identifier.find(
