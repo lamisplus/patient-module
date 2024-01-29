@@ -183,6 +183,16 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
     @Query(value = "SELECT * FROM patient_person WHERE uuid NOT IN (SELECT person_uuid FROM biometric) and  (p.first_name ilike ?1 OR p.surname ilike ?1 OR p.other_name ilike ?1 OR p.full_name ilike ?1 OR p.hospital_number ilike ?1) and archived=?2 and facility_id =?3 ORDER BY id desc", nativeQuery = true)
     Page<Person> findPersonWithOutBiometrics4(String queryParam, Integer archived, Long facilityId, Pageable pageable);
 
+    @Query(value = "SELECT DISTINCT p.* FROM patient_person p\n" +
+            "LEFT JOIN biometric b on p.uuid = b.person_uuid\n" +
+            "WHERE b.recapture = 0 and p.archived=?1 and p.facility_id =?2", nativeQuery = true)
+    Page<Person> findPersonWithOutRecapture3(Integer archived, Long facilityId, Pageable pageable);
+    @Query(value = "SELECT DISTINCT p.* FROM patient_person p\n" +
+            "LEFT JOIN biometric b on p.uuid = b.person_uuid\n" +
+            "WHERE b.recapture = 0 and (p.first_name ilike ?1 OR p.surname ilike ?1 OR p.other_name ilike ?1 OR p.full_name ilike ?1 OR p.hospital_number ilike ?1) \n" +
+            "and p.archived=?2 and p.facility_id =?3", nativeQuery = true)
+    Page<Person> findPersonWithOutRecapture4(String queryParam, Integer archived, Long facilityId, Pageable pageable);
+
     List<Person> findAllByFacilityIdAndArchived(Long facilityId, Integer archived);
     Optional<Person> findByUuidAndFacilityIdAndArchived(String uuid, Long facilityId, Integer archived);
     Optional<Person> findByUuidAndFacilityId(String uuid, Long facilityId);

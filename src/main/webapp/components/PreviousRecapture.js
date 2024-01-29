@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { Link, useHistory } from "react-router-dom";
 import MaterialTable from "material-table";
 import Button from "@material-ui/core/Button";
 import axios from "axios";
@@ -60,7 +61,7 @@ const PreviousRecapture = (props) => {
   let createdDate = props.patientObj.createdDate.split("T")[0];
   let currentDate = new Date().toISOString().split("T")[0];
   const [previousCaptureDate, setPreviousCaptureDate] = useState("");
-
+  const [permissions, setPermissions] = useState([]);
   const [recapturedFingered, setRecapturedFingered] = useState([]);
   const [fingerType, setFingerType] = useState([]);
   const [modal, setModal] = useState(false);
@@ -89,6 +90,17 @@ const PreviousRecapture = (props) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [baselineVal, setBaselineVal] = useState({});
 
+  const userPermission = () => {
+    axios
+      .get(`${baseUrl}account`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((response) => {
+        setPermissions(response.data.permissions);
+      })
+      .catch((error) => {});
+  };
+
   const getRecaptureCount = () => {
     //console.log("get recaptures");
     axios
@@ -106,6 +118,7 @@ const PreviousRecapture = (props) => {
 
   useEffect(() => {
     getRecaptureCount();
+    userPermission();
   }, []);
 
   const handleChangePage = (page) => {
@@ -177,6 +190,12 @@ const PreviousRecapture = (props) => {
         Patient recapture count : <b>{recapturedFingered.length - 1}</b>
       </h5>
       {is30DaysPassed(previousCaptureDate) === true ? (
+        // <Link
+        //   to={{
+        //     pathname: "/biometrics-recapture",
+        //     state: { patientObj: props, permissions: permissions },
+        //   }}
+        // >
         <MatButton
           className=" float-right mr-1"
           variant="contained"
@@ -194,6 +213,7 @@ const PreviousRecapture = (props) => {
           <span style={{ textTransform: "capitalize" }}>Recapture</span>
         </MatButton>
       ) : (
+        // </Link>
         ""
       )}
 

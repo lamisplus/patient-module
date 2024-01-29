@@ -194,4 +194,14 @@ public class PatientController {
         return new ResponseEntity<>(personMetaDataDto, new HttpHeaders(), HttpStatus.OK);
     }
 
+    @GetMapping(value = "/getall-patients-with-no-recapture")
+    public ResponseEntity<PersonMetaDataDto> getAllPatientWithNoRecapture(
+            @RequestParam(defaultValue = "*") String searchParam,
+            @RequestParam(defaultValue = "0") Integer pageNo,
+            @RequestParam(defaultValue = "10") Integer pageSize) {
+
+        PersonMetaDataDto personMetaDataDto = personService.getAllPatientWithoutRecapture(searchParam, pageNo, pageSize);
+        return new ResponseEntity<>(personMetaDataDto, new HttpHeaders(), HttpStatus.OK);
+    }
+
 }

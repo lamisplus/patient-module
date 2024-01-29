@@ -13,7 +13,7 @@ import {
   Badge,
 } from "reactstrap";
 import { makeStyles } from "@material-ui/core/styles";
-
+import { TiArrowBack } from "react-icons/ti";
 import "react-toastify/dist/ReactToastify.css";
 import "react-widgets/dist/css/react-widgets.css";
 import SaveIcon from "@material-ui/icons/Save";
@@ -80,14 +80,16 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Recapture = (props) => {
-  //console.log("patient Id", props.patientId);
+const BiometricRecapture = (props) => {
   const classes = useStyles();
   let history = useHistory();
+  //console.log(history.location.state);
   const permissions =
     history.location && history.location.state
       ? history.location.state.permissions
       : [];
+  let currentPatientId = history?.location?.state?.patientObj?.patientId;
+  let currentAge = history?.location?.state?.patientObj?.age;
   const [biometricDevices, setbiometricDevices] = useState([]);
   const [objValues, setObjValues] = useState({
     biometricType: "FINGERPRINT",
@@ -122,12 +124,12 @@ const Recapture = (props) => {
   const [capturedFingered, setCapturedFingered] = useState([]);
   const [capturedFingeredObj, setCapturedFingeredObj] = useState([]);
   const [recapturedFingered, setRecapturedFingered] = useState([]);
-  const [selectedDeduplication, setSelectedDeduplication] = useState([]);
+  // const [selectedFingers, setSelectedFingers] = useState([]);
   const [imageQuality, setImageQuality] = useState(false);
   const [isNewStatus, setIsNewStatus] = useState(false);
 
   const calculate_age = (dob) => {
-    console.log(dob);
+    //console.log(dob);
     const today = new Date();
     const dateParts = dob.split("-");
     const birthDate = new Date(dob);
@@ -143,7 +145,7 @@ const Recapture = (props) => {
     );
 
     axios
-      .get(`${baseUrl}biometrics/person/${props.patientId}`, {
+      .get(`${baseUrl}biometrics/person/${currentPatientId}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then(async (response) => {
@@ -189,8 +191,8 @@ const Recapture = (props) => {
   const clear_storelist = () => {
     axios
       .post(
-        `${baseUrl}biometrics/store-list/${props.patientId}`,
-        props.patientId,
+        `${baseUrl}biometrics/store-list/${currentPatientId}`,
+        currentPatientId,
         { headers: { Authorization: `Bearer ${token}` } }
       )
       .then((response) => {
@@ -204,7 +206,7 @@ const Recapture = (props) => {
 
   const getRecaptureCount = () => {
     axios
-      .get(`${baseUrl}biometrics/grouped/person/${props.patientId}`, {
+      .get(`${baseUrl}biometrics/grouped/person/${currentPatientId}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
@@ -250,7 +252,7 @@ const Recapture = (props) => {
     setObjValues({
       ...objValues,
       [e.target.name]: e.target.value,
-      age: calculate_age(props.age),
+      age: calculate_age(currentAge),
     });
   };
 
@@ -269,21 +271,17 @@ const Recapture = (props) => {
       const capturedBiometricsListObj = JSON.parse(
         localStorage.getItem("capturedBiometricsList")
       );
-      setCapturedFingeredObj(capturedBiometricsListObj);
+
       objValues.capturedBiometricsList = capturedBiometricsListObj;
       localStorage.removeItem("capturedBiometricsList");
     } else {
-      //console.log("capturedBiometricsList", capturedFingeredObj);
-      objValues.capturedBiometricsList = capturedFingeredObj;
-      setObjValues({
-        ...objValues,
-        capturedBiometricsList: capturedFingeredObj,
-      });
+      objValues.capturedBiometricsList = [];
+      localStorage.removeItem("capturedBiometricsList");
     }
 
     if (localStorage.getItem("deduplicates") !== null) {
       const deduplicatesObj = JSON.parse(localStorage.getItem("deduplicates"));
-      setSelectedDeduplication(deduplicatesObj);
+
       objValues.deduplication = deduplicatesObj;
       setObjValues({ ...objValues, deduplication: deduplicatesObj });
 
@@ -300,7 +298,6 @@ const Recapture = (props) => {
         imperfectMatchCount: 0,
         details: null,
       };
-      //console.log("deduplication", selectedDeduplication);
       objValues.deduplication = deduplicationObj;
       setObjValues({ ...objValues, deduplication: deduplicationObj });
     }
@@ -326,15 +323,18 @@ const Recapture = (props) => {
             setTryAgain(true);
 
             toast.error(response.data.message.ERROR);
-
-            //console.log("captured BiometricsList error", capturedFingeredObj);
-            objValues.capturedBiometricsList = capturedFingeredObj;
-            setObjValues({
-              ...objValues,
-              capturedBiometricsList: capturedFingeredObj,
-            });
-
             setIsNewStatus(false);
+            // if (response.data.deviceName.contains("Futronic")) {
+            //   localStorage.setItem(
+            //     "capturedBiometricsList",
+            //     JSON.stringify(response.data.capturedBiometricsList)
+            //   );
+
+            //   localStorage.setItem(
+            //     "deduplicates",
+            //     JSON.stringify(response.data.deduplication)
+            //   );
+            // }
           } else if (response.data.type === "WARNING") {
             //Imperfect Match
             if (response.data.match === true) {
@@ -349,7 +349,7 @@ const Recapture = (props) => {
 
             if (
               response.data.imageQuality <= 60 &&
-              calculate_age(props.age) <= 6
+              calculate_age(currentAge) <= 6
             ) {
               toast.info(
                 "Image quality captured is poor, Kindly give a reason for capture above.",
@@ -369,10 +369,7 @@ const Recapture = (props) => {
               "templateType"
             );
 
-            props.setCapturedFingered([
-              ...props.capturedFingered,
-              biometricsEnrollments,
-            ]);
+            setCapturedFingered([...capturedFingered, biometricsEnrollments]);
 
             _.find(fingerType, { display: templateType }).captured = true;
 
@@ -387,7 +384,7 @@ const Recapture = (props) => {
           ) {
             if (
               response.data.imageQuality <= 60 &&
-              calculate_age(props.age) <= 6
+              calculate_age(currentAge) <= 6
             ) {
               toast.info(
                 "Image quality captured is poor, Kindly give a reason for capture above.",
@@ -429,10 +426,7 @@ const Recapture = (props) => {
               "templateType"
             );
 
-            props.setCapturedFingered([
-              ...props.capturedFingered,
-              biometricsEnrollments,
-            ]);
+            setCapturedFingered([...capturedFingered, biometricsEnrollments]);
 
             _.find(fingerType, { display: templateType }).captured = true;
             setFingerType([...fingerType]);
@@ -457,9 +451,8 @@ const Recapture = (props) => {
   const saveBiometrics = (e) => {
     e.preventDefault();
 
-    if (props.capturedFingered.length >= 1) {
-      const capturedObj =
-        props.capturedFingered[props.capturedFingered.length - 1];
+    if (capturedFingered.length >= 1) {
+      const capturedObj = capturedFingered[capturedFingered.length - 1];
 
       capturedObj.capturedBiometricsList = _.uniqBy(
         capturedObj.capturedBiometricsList,
@@ -468,7 +461,7 @@ const Recapture = (props) => {
 
       if (capturedObj.deviceName.includes("Futronic")) {
         let fingersObj = [];
-        props.capturedFingered.forEach((obj) => {
+        capturedFingered.forEach((obj) => {
           fingersObj.push(obj.capturedBiometricsList[0]);
         });
 
@@ -482,11 +475,11 @@ const Recapture = (props) => {
               toast.success("Biometric saved successfully", {
                 position: toast.POSITION.BOTTOM_CENTER,
               });
-              props.setCapturedFingered([]);
+              setCapturedFingered([]);
               getPersonBiometrics();
               //props.updatePatientBiometricStatus(true);
-              props.getRecaptureCount();
-              props.toggle();
+              getRecaptureCount();
+              //props.toggle();
             })
             .catch((error) => {
               toast.error("Something went wrong saving biometrics recapture", {
@@ -505,11 +498,11 @@ const Recapture = (props) => {
             toast.success("Biometric recaptured successfully", {
               position: toast.POSITION.BOTTOM_CENTER,
             });
-            props.setCapturedFingered([]);
+            setCapturedFingered([]);
             getPersonBiometrics();
 
-            props.getRecaptureCount();
-            props.toggle();
+            getRecaptureCount();
+            //props.toggle();
           })
           .catch((error) => {
             toast.error("Something went wrong saving biometrics recapture", {
@@ -536,11 +529,11 @@ const Recapture = (props) => {
       .then((resp) => {
         _.find(fingerType, { display: x.templateType }).captured = false;
         setFingerType([...fingerType]);
-        let deletedRecord = props.capturedFingered.filter(
+        let deletedRecord = capturedFingered.filter(
           (data) => data.templateType !== x.templateType
         );
 
-        props.setCapturedFingered(deletedRecord);
+        setCapturedFingered(deletedRecord);
         toast.info(x.templateType + " captured removed successfully!");
       })
       .catch((error) => {
@@ -575,29 +568,20 @@ const Recapture = (props) => {
 
   return (
     <>
-      <Modal
-        isOpen={props.modal}
-        toggle={props.toggle}
-        style={{ display: "flex", maxWidth: "100%", maxHeight: "100%" }}
-        fullscreen="true"
-      >
-        <ModalHeader toggle={props.toggle}>Recapture Fingerprints</ModalHeader>
-        {/* <ModalBody></ModalBody> */}
-        <ModalFooter>
-          <div className={classes.root}>
-            <div>
-              {permissions.includes("capture_patient_biometrics") ||
-              permissions.includes("all_permission") ? (
-                <div
-                  style={{
-                    flex: "10",
-                    padding: "5px",
-                    marginLeft: "5px",
-                    border: "1px solid rgba(99, 99, 99, 0.2)",
-                    boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
-                  }}
-                >
-                  {/* <Row>
+      <div className={classes.root}>
+        <div>
+          {permissions.includes("capture_patient_biometrics") ||
+          permissions.includes("all_permission") ? (
+            <div
+              style={{
+                flex: "10",
+                padding: "5px",
+                marginLeft: "5px",
+                border: "1px solid rgba(99, 99, 99, 0.2)",
+                boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
+              }}
+            >
+              {/* <Row>
                     <Col>
                       <br />
                       <p>
@@ -608,303 +592,314 @@ const Recapture = (props) => {
                       <br />
                     </Col>
                   </Row> */}
-                  <Row>
-                    <p>
+              <Row>
+                <p>
+                  {" "}
+                  Patient recapture count :{" "}
+                  <b>{recapturedFingered.length - 1}</b>
+                  <Link to={"/"}>
+                    <MatButton
+                      className=" float-right mr-1"
+                      variant="contained"
+                      floated="left"
+                      startIcon={<TiArrowBack />}
+                      style={{
+                        backgroundColor: "rgb(153, 46, 98)",
+                        color: "#fff",
+                        height: "35px",
+                      }}
+                    >
+                      <span style={{ textTransform: "capitalize" }}>Back</span>
+                    </MatButton>
+                  </Link>
+                </p>
+                <ToastContainer />
+                <Col md={3}>
+                  <FormGroup>
+                    <Label
+                      for="device"
+                      style={{
+                        color: "#014d88",
+                        fontWeight: "bold",
+                        fontSize: "14px",
+                      }}
+                    >
                       {" "}
-                      Patient recapture count :{" "}
-                      <b>{recapturedFingered.length - 1}</b>
-                    </p>
-                    <ToastContainer />
-                    <Col md={3}>
-                      <FormGroup>
-                        <Label
-                          for="device"
-                          style={{
-                            color: "#014d88",
-                            fontWeight: "bold",
-                            fontSize: "14px",
-                          }}
-                        >
-                          {" "}
-                          Device{" "}
-                        </Label>
-                        <Input
-                          type="select"
-                          name="device"
-                          id="device"
-                          //onChange={checkDevice}
-                          value={objValues.device}
-                          required
-                          disabled
-                          style={{
-                            border: "1px solid #014D88",
-                            borderRadius: "0.2rem",
-                          }}
-                        >
-                          {biometricDevices.map(
-                            ({ id, name, active, url, type }) => (
-                              <option key={id} value={url}>
-                                {type}
-                              </option>
-                            )
-                          )}
-                        </Input>
+                      Device{" "}
+                    </Label>
+                    <Input
+                      type="select"
+                      name="device"
+                      id="device"
+                      //onChange={checkDevice}
+                      value={objValues.device}
+                      required
+                      disabled
+                      style={{
+                        border: "1px solid #014D88",
+                        borderRadius: "0.2rem",
+                      }}
+                    >
+                      {biometricDevices.map(
+                        ({ id, name, active, url, type }) => (
+                          <option key={id} value={url}>
+                            {type}
+                          </option>
+                        )
+                      )}
+                    </Input>
 
-                        {errors.device !== "" ? (
-                          <span className={classes.error}>{errors.device}</span>
-                        ) : (
-                          ""
-                        )}
-                      </FormGroup>
-                    </Col>
-
-                    <Col md={3}>
-                      <FormGroup>
-                        <Label
-                          for="device"
-                          style={{
-                            color: "#014d88",
-                            fontWeight: "bold",
-                            fontSize: "14px",
-                          }}
-                        >
-                          Select Finger
-                        </Label>
-                        <Input
-                          type="select"
-                          name="templateType"
-                          id="templateType"
-                          onChange={handleInputChange}
-                          value={objValues.templateType}
-                          required
-                          style={{
-                            border: "1px solid #014D88",
-                            borderRadius: "0.2rem",
-                          }}
-                        >
-                          <option value="">Select Finger </option>
-
-                          {fingerType &&
-                            _.filter(fingerType, ["captured", false]).map(
-                              (value) => (
-                                <option key={value.id} value={value.display}>
-                                  {value.display}
-                                </option>
-                              )
-                            )}
-                        </Input>
-                        {errors.templateType !== "" ? (
-                          <span className={classes.error}>
-                            {errors.templateType}
-                          </span>
-                        ) : (
-                          ""
-                        )}
-                      </FormGroup>
-                    </Col>
-
-                    {props.capturedFingered.length >= 6 &&
-                    props.capturedFingered.length < 10 ? (
-                      <Col md={4}>
-                        <FormGroup>
-                          <Label
-                            for="device"
-                            style={{
-                              color: "#014d88",
-                              fontWeight: "bold",
-                              fontSize: "14px",
-                            }}
-                          >
-                            {" "}
-                            Reason for recapturing less than 10 fingers{" "}
-                          </Label>
-                          <Input
-                            type="textarea"
-                            name="reason"
-                            id="reason"
-                            onChange={handleInputChange}
-                            style={{
-                              border: "1px solid #014D88",
-                              borderRadius: "0.2rem",
-                            }}
-                          />
-                        </FormGroup>
-                      </Col>
+                    {errors.device !== "" ? (
+                      <span className={classes.error}>{errors.device}</span>
                     ) : (
                       ""
                     )}
+                  </FormGroup>
+                </Col>
 
-                    <Col md={2}>
-                      {!loading ? (
-                        <>
-                          <MatButton
-                            type="button"
-                            variant="contained"
-                            color="primary"
-                            onClick={captureFinger}
-                            className={"mt-4"}
-                            style={{ backgroundColor: "#992E62" }}
-                            startIcon={<FingerprintIcon />}
-                            disabled={loading}
-                          >
-                            Capture Finger
-                          </MatButton>
-                        </>
-                      ) : (
-                        <>
-                          <MatButton
-                            type="button"
-                            variant="contained"
-                            color="primary"
-                            className={"mt-4"}
-                            style={{ backgroundColor: "#992E62" }}
-                            startIcon={<CircularProgress />}
-                          >
-                            Capturing...
-                          </MatButton>
-                        </>
-                      )}
-                    </Col>
-                    <br />
-                    <Col md={12}>
-                      {loading ? (
-                        <>
-                          <b>Capturing finger...</b>
-                          <LinearProgress />
-                        </>
-                      ) : (
-                        ""
-                      )}
-                    </Col>
-                  </Row>
-                </div>
-              ) : (
-                ""
-              )}
-
-              <Row>
-                {props.capturedFingered.length >= 1 ? (
-                  <>
-                    <Col
-                      md={12}
-                      style={{ marginTop: "10px", paddingBottom: "20px" }}
+                <Col md={3}>
+                  <FormGroup>
+                    <Label
+                      for="device"
+                      style={{
+                        color: "#014d88",
+                        fontWeight: "bold",
+                        fontSize: "14px",
+                      }}
                     >
-                      <List celled horizontal>
-                        {props.capturedFingered.map((x) => (
-                          <List.Item
-                            style={{
-                              width: "200px",
-                              height: "200px",
-                              border: "1px dotted #014d88",
-                              margin: "5px",
-                            }}
-                          >
-                            <List.Header
-                              style={{
-                                paddingLeft: "0px",
-                                height: "0.5rem",
+                      Select Finger
+                    </Label>
+                    <Input
+                      type="select"
+                      name="templateType"
+                      id="templateType"
+                      onChange={handleInputChange}
+                      value={objValues.templateType}
+                      required
+                      style={{
+                        border: "1px solid #014D88",
+                        borderRadius: "0.2rem",
+                      }}
+                    >
+                      <option value="">Select Finger </option>
 
-                                alignItems: "right",
-                              }}
-                            >
-                              {getFingerprintsQuality(x.mainImageQuality)}
-                              <span
-                                onClick={() => {
-                                  deleteTempBiometrics(x);
-                                }}
-                              >
-                                <Icon
-                                  name="cancel"
-                                  color="red"
-                                  style={{ float: "right" }}
-                                />{" "}
-                              </span>
-                            </List.Header>
-                            <List.Content
-                              style={{
-                                width: "200px",
-                                height: "150px",
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center",
-                              }}
-                            >
-                              {" "}
-                              <FingerprintIcon
-                                style={{ color: "#992E62", fontSize: 150 }}
-                              />
-                            </List.Content>
-                            <List.Content
-                              style={{
-                                width: "200px",
-                                height: "30px",
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center",
-                                fontSize: "16px",
-                                color: "#014d88",
-                                fontWeight: "bold",
-                                fontFamily: '"poppins", sans-serif',
-                              }}
-                            >
-                              {x.templateType}
-                            </List.Content>
-                            <List.Content>
-                              <br />
-                              {x.mainImageQuality < 75 ? (
-                                <MatButton
-                                  type="button"
-                                  variant="contained"
-                                  color="secondary"
-                                  onClick={() => {
-                                    deleteTempBiometrics(x);
-                                  }}
-                                  startIcon={<RestartAltIcon />}
-                                >
-                                  Reset recapture
-                                </MatButton>
-                              ) : (
-                                " "
-                              )}
-                            </List.Content>
-                          </List.Item>
-                        ))}
-                      </List>
-                    </Col>
-                    <br />
-                    <br />
-                    <br />
-                    <br />
-                    <br />
-                    <br />
-                    <Col md={12}>
-                      <br />
+                      {fingerType &&
+                        _.filter(fingerType, ["captured", false]).map(
+                          (value) => (
+                            <option key={value.id} value={value.display}>
+                              {value.display}
+                            </option>
+                          )
+                        )}
+                    </Input>
+                    {errors.templateType !== "" ? (
+                      <span className={classes.error}>
+                        {errors.templateType}
+                      </span>
+                    ) : (
+                      ""
+                    )}
+                  </FormGroup>
+                </Col>
 
+                {capturedFingered.length >= 6 &&
+                capturedFingered.length < 10 ? (
+                  <Col md={4}>
+                    <FormGroup>
+                      <Label
+                        for="device"
+                        style={{
+                          color: "#014d88",
+                          fontWeight: "bold",
+                          fontSize: "14px",
+                        }}
+                      >
+                        {" "}
+                        Reason for recapturing less than 10 fingers{" "}
+                      </Label>
+                      <Input
+                        type="textarea"
+                        name="reason"
+                        id="reason"
+                        onChange={handleInputChange}
+                        style={{
+                          border: "1px solid #014D88",
+                          borderRadius: "0.2rem",
+                        }}
+                      />
+                    </FormGroup>
+                  </Col>
+                ) : (
+                  ""
+                )}
+
+                <Col md={2}>
+                  {!loading ? (
+                    <>
                       <MatButton
                         type="button"
                         variant="contained"
                         color="primary"
-                        disabled={
-                          props.capturedFingered.length < 6 ? true : false
-                        }
-                        onClick={saveBiometrics}
-                        startIcon={<SaveIcon />}
+                        onClick={captureFinger}
+                        className={"mt-4"}
+                        style={{ backgroundColor: "#992E62" }}
+                        startIcon={<FingerprintIcon />}
+                        disabled={loading}
                       >
-                        Save Capture
+                        Capture Finger
                       </MatButton>
-                    </Col>
-                    <br />
-                  </>
-                ) : (
-                  ""
-                )}
+                    </>
+                  ) : (
+                    <>
+                      <MatButton
+                        type="button"
+                        variant="contained"
+                        color="primary"
+                        className={"mt-4"}
+                        style={{ backgroundColor: "#992E62" }}
+                        startIcon={<CircularProgress />}
+                      >
+                        Capturing...
+                      </MatButton>
+                    </>
+                  )}
+                </Col>
+                <br />
+                <Col md={12}>
+                  {loading ? (
+                    <>
+                      <b>Capturing finger...</b>
+                      <LinearProgress />
+                    </>
+                  ) : (
+                    ""
+                  )}
+                </Col>
               </Row>
             </div>
-          </div>
-        </ModalFooter>
-      </Modal>
+          ) : (
+            ""
+          )}
+
+          <Row>
+            {capturedFingered.length >= 1 ? (
+              <>
+                <Col
+                  md={12}
+                  style={{ marginTop: "10px", paddingBottom: "20px" }}
+                >
+                  <List celled horizontal>
+                    {capturedFingered.map((x) => (
+                      <List.Item
+                        style={{
+                          width: "200px",
+                          height: "200px",
+                          border: "1px dotted #014d88",
+                          margin: "5px",
+                        }}
+                      >
+                        <List.Header
+                          style={{
+                            paddingLeft: "0px",
+                            height: "0.5rem",
+
+                            alignItems: "right",
+                          }}
+                        >
+                          {getFingerprintsQuality(x.mainImageQuality)}
+                          <span
+                            onClick={() => {
+                              deleteTempBiometrics(x);
+                            }}
+                          >
+                            <Icon
+                              name="cancel"
+                              color="red"
+                              style={{ float: "right" }}
+                            />{" "}
+                          </span>
+                        </List.Header>
+                        <List.Content
+                          style={{
+                            width: "200px",
+                            height: "150px",
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                          }}
+                        >
+                          {" "}
+                          <FingerprintIcon
+                            style={{ color: "#992E62", fontSize: 150 }}
+                          />
+                        </List.Content>
+                        <List.Content
+                          style={{
+                            width: "200px",
+                            height: "30px",
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            fontSize: "16px",
+                            color: "#014d88",
+                            fontWeight: "bold",
+                            fontFamily: '"poppins", sans-serif',
+                          }}
+                        >
+                          {x.templateType}
+                        </List.Content>
+                        <List.Content>
+                          <br />
+                          {x.mainImageQuality < 75 ? (
+                            <MatButton
+                              type="button"
+                              variant="contained"
+                              color="secondary"
+                              onClick={() => {
+                                deleteTempBiometrics(x);
+                              }}
+                              startIcon={<RestartAltIcon />}
+                            >
+                              Reset recapture
+                            </MatButton>
+                          ) : (
+                            " "
+                          )}
+                        </List.Content>
+                      </List.Item>
+                    ))}
+                  </List>
+                </Col>
+                <br />
+                <br />
+                <br />
+                <br />
+                <br />
+                <br />
+                <Col md={12}>
+                  <br />
+
+                  <MatButton
+                    type="button"
+                    variant="contained"
+                    color="primary"
+                    disabled={capturedFingered.length < 6 ? true : false}
+                    onClick={saveBiometrics}
+                    startIcon={<SaveIcon />}
+                  >
+                    Save Capture
+                  </MatButton>
+                </Col>
+                <br />
+              </>
+            ) : (
+              ""
+            )}
+          </Row>
+        </div>
+      </div>
     </>
   );
 };
 
-export default Recapture;
+export default BiometricRecapture;

@@ -101,7 +101,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function NotCaptured(props) {
+function NoRecapture(props) {
   const classes = useStyles();
   const [patients, setPatients] = useState([]);
   const [permissions, setPermissions] = useState(props.permissions);
@@ -155,7 +155,7 @@ function NotCaptured(props) {
             type: "link",
             icon: <MdFingerprint size="22" />,
             to: {
-              pathname: "/patient-dashboard",
+              pathname: "/patient-biometrics",
               state: { patientObj: row, permissions: permissions },
             },
           })),
@@ -167,7 +167,7 @@ function NotCaptured(props) {
     new Promise((resolve, reject) => {
       axios
         .get(
-          `${baseUrl}patient/getall-patients-with-no-biometric?pageSize=${query.pageSize}&pageNo=${query.page}&searchParam=${query.search}`,
+          `${baseUrl}patient/getall-patients-with-no-recapture?pageSize=${query.pageSize}&pageNo=${query.page}&searchParam=${query.search}`,
           { headers: { Authorization: `Bearer ${token}` } }
         )
         .then((response) => response)
@@ -270,7 +270,7 @@ function NotCaptured(props) {
   return (
     <div>
       {/*<ToastContainer autoClose={3000} hideProgressBar />*/}
-      <h4>Patients not captured</h4>
+      <h4>Patients with no biometrics recapture</h4>
       <MaterialTable
         icons={tableIcons}
         title={<PPISelect />}
@@ -314,4 +314,4 @@ function NotCaptured(props) {
   );
 }
 
-export default NotCaptured;
+export default NoRecapture;

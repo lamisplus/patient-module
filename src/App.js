@@ -6,6 +6,7 @@ import PatientDashboard from "./main/webapp/components/PatientDashboard";
 import Dashboard from "./main/webapp/components/ClientDashboard";
 import ClientDashboard from "./main/webapp/components/ClientDashboard";
 import BiometricsDashboard from "./main/webapp/components/biometrics/";
+import BiometricRecapture from "./main/webapp/components/BiometricRecapture";
 /*import PatientVitals from './main/webapp/components/PatientVitals';
 import AddPatientVitals from './main/webapp/components/Add-Patient-Vitals';*/
 import { ToastContainer } from "react-toastify";
@@ -22,6 +23,9 @@ export default function App() {
         {/*          <Switch> looks through its children <Route>s and
             renders the first one that matches the current URL.*/}
         <Switch>
+          <Route path="/biometrics-recapture">
+            <BiometricRecapture />
+          </Route>
           <Route path="/patient-biometrics">
             <BiometricsDashboard />
           </Route>

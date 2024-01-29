@@ -18,6 +18,7 @@ import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
 import BiometricsList from "./BiometricsList";
 import NotCaptured from "./NotCaptured";
+import NoRecapture from "./NoRecapture";
 
 import { forwardRef } from "react";
 import AddBox from "@material-ui/icons/AddBox";
@@ -279,6 +280,8 @@ const Biometrics = (props) => {
       setStatus(2);
     } else if (count === "3") {
       setStatus(3);
+    } else if (count === "4") {
+      setStatus(4);
     } else {
       setStatus(1);
     }
@@ -303,6 +306,9 @@ const Biometrics = (props) => {
         </MenuItem>
         <MenuItem key="3" value="3">
           No Biometrics Captured
+        </MenuItem>
+        <MenuItem key="4" value="4">
+          No Biometrics Re-captured
         </MenuItem>
       </TextField>
       {status === 1 ? (
@@ -362,6 +368,8 @@ const Biometrics = (props) => {
         <BiometricsList permissions={props.permissions} />
       ) : status === 3 ? (
         <NotCaptured permissions={props.permissions} />
+      ) : status === 4 ? (
+        <NoRecapture permissions={props.permissions} />
       ) : (
         ""
       )}
