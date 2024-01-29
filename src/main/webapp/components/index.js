@@ -171,6 +171,7 @@ function Index(props) {
                         className=" float-right mr-1"
                         startIcon={<FaUserPlus size="25" />}
                         style={{ backgroundColor: "#014d88" }}
+                        id="new-patient"
                       >
                         <span
                           style={{

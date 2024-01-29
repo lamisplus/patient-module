@@ -119,10 +119,10 @@ const Recapture = (props) => {
   const [errors, setErrors] = useState({});
   const [storedBiometrics, setStoredBiometrics] = useState([]);
   const [responseImage, setResponseImage] = useState("");
-  // const [capturedFingered, setCapturedFingered] = useState([]);
+  const [capturedFingered, setCapturedFingered] = useState([]);
   const [capturedFingeredObj, setCapturedFingeredObj] = useState([]);
   const [recapturedFingered, setRecapturedFingered] = useState([]);
-  // const [selectedFingers, setSelectedFingers] = useState([]);
+  const [selectedDeduplication, setSelectedDeduplication] = useState([]);
   const [imageQuality, setImageQuality] = useState(false);
   const [isNewStatus, setIsNewStatus] = useState(false);
 
@@ -269,20 +269,21 @@ const Recapture = (props) => {
       const capturedBiometricsListObj = JSON.parse(
         localStorage.getItem("capturedBiometricsList")
       );
-
+      setCapturedFingeredObj(capturedBiometricsListObj);
       objValues.capturedBiometricsList = capturedBiometricsListObj;
       localStorage.removeItem("capturedBiometricsList");
     } else {
-      objValues.capturedBiometricsList = [];
-      localStorage.removeItem("capturedBiometricsList");
-      if (objValues.capturedBiometricsList.length === 0) {
-        props.setCapturedFingered([]);
-      }
+      //console.log("capturedBiometricsList", capturedFingeredObj);
+      objValues.capturedBiometricsList = capturedFingeredObj;
+      setObjValues({
+        ...objValues,
+        capturedBiometricsList: capturedFingeredObj,
+      });
     }
 
     if (localStorage.getItem("deduplicates") !== null) {
       const deduplicatesObj = JSON.parse(localStorage.getItem("deduplicates"));
-
+      setSelectedDeduplication(deduplicatesObj);
       objValues.deduplication = deduplicatesObj;
       setObjValues({ ...objValues, deduplication: deduplicatesObj });
 
@@ -299,6 +300,7 @@ const Recapture = (props) => {
         imperfectMatchCount: 0,
         details: null,
       };
+      //console.log("deduplication", selectedDeduplication);
       objValues.deduplication = deduplicationObj;
       setObjValues({ ...objValues, deduplication: deduplicationObj });
     }
@@ -324,18 +326,15 @@ const Recapture = (props) => {
             setTryAgain(true);
 
             toast.error(response.data.message.ERROR);
-            setIsNewStatus(false);
-            if (response.data.deviceName.contains("Futronic")) {
-              localStorage.setItem(
-                "capturedBiometricsList",
-                JSON.stringify(response.data.capturedBiometricsList)
-              );
 
-              localStorage.setItem(
-                "deduplicates",
-                JSON.stringify(response.data.deduplication)
-              );
-            }
+            //console.log("captured BiometricsList error", capturedFingeredObj);
+            objValues.capturedBiometricsList = capturedFingeredObj;
+            setObjValues({
+              ...objValues,
+              capturedBiometricsList: capturedFingeredObj,
+            });
+
+            setIsNewStatus(false);
           } else if (response.data.type === "WARNING") {
             //Imperfect Match
             if (response.data.match === true) {

@@ -270,7 +270,7 @@ function NotCaptured(props) {
   return (
     <div>
       {/*<ToastContainer autoClose={3000} hideProgressBar />*/}
-      <h3>Patients not captured</h3>
+      <h4>Patients not captured</h4>
       <MaterialTable
         icons={tableIcons}
         title={<PPISelect />}
