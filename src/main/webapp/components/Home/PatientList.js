@@ -4,8 +4,17 @@ import axios from "axios";
 import { url as baseUrl, token } from "../../../../api";
 import { Link, useHistory } from "react-router-dom";
 import { Card, CardBody } from "reactstrap";
-import { Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
-import Button from "@material-ui/core/Button";
+import {
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Form,
+  Input,
+  Label,
+  Button,
+} from "reactstrap";
+// import Button from "@material-ui/core/Button";
 import "react-toastify/dist/ReactToastify.css";
 import "react-widgets/dist/css/react-widgets.css";
 import { FaEye, FaUserPlus } from "react-icons/fa";
@@ -18,7 +27,7 @@ import {
 import { Menu, MenuList, MenuButton, MenuItem } from "@reach/menu-button";
 import "@reach/menu-button/styles.css";
 import { ToastContainer } from "react-toastify";
-import { Label } from "semantic-ui-react";
+//import { Label } from "semantic-ui-react";
 import { makeStyles } from "@material-ui/core/styles";
 import "../patient.css";
 import SplitActionButton from "../SplitActionButton";
@@ -129,6 +138,7 @@ const PatientList = (props) => {
   const [searchParams, setSearchParams] = useState("*");
   const [totalPages, setTotalPages] = useState(0);
   const [totalRecords, setTotalRecords] = useState(0);
+  const [reason, setReason] = useState({});
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
@@ -142,8 +152,9 @@ const PatientList = (props) => {
 
   const handleDelete = () => {
     const patientId = localStorage.getItem("patientID");
+    console.log(patientId, reason.reason);
     axios
-      .delete(`${baseUrl}patient/${patientId}`, {
+      .delete(`${baseUrl}patient/${patientId}/${reason.reason}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
@@ -234,18 +245,15 @@ const PatientList = (props) => {
               totalCount: 0,
             });
           } else {
-            let data = result.data.records.filter(
-              (b) => b.biometricStatus !== true
-            );
             resolve({
-              data: data.map((row) => ({
+              data: result.data.records.map((row) => ({
                 name: [row.firstName, row.otherName, row.surname]
                   .filter(Boolean)
                   .join(", "),
                 id: getHospitalNumber(row.identifier),
                 sex:
-                  row.sex.toLowerCase().charAt(0).toUpperCase() +
-                  row.sex.slice(1).toLowerCase(),
+                  row.sex?.toLowerCase()?.charAt(0)?.toUpperCase() +
+                  row.sex?.slice(1)?.toLowerCase(),
                 dateOfBirth: row.dateOfBirth,
                 age:
                   row.dateOfBirth === 0 ||
@@ -253,7 +261,7 @@ const PatientList = (props) => {
                   row.dateOfBirth === null ||
                   row.dateOfBirth === ""
                     ? 0
-                    : calculate_age(row.dateOfBirth),
+                    : calculateAge(row.dateOfBirth),
                 actions: (
                   <div>
                     {permissions.includes("view_patient") ||
@@ -287,23 +295,28 @@ const PatientList = (props) => {
     setModal(false);
   };
 
-  const calculate_age = (dob) => {
+  const calculateAge = (dob) => {
     const today = new Date();
-    const dateParts = dob.split("-");
-    const birthDate = new Date(dob); // create a date object directlyfrom`dob1`argument
-    let age_now = today.getFullYear() - birthDate.getFullYear();
-    const m = today.getMonth() - birthDate.getMonth();
+    const birthDate = new Date(dob);
 
-    if (age_now <= 0 && m < 0 && today.getDate() < birthDate.getDate()) {
-      age_now--;
+    let ageYears = today.getFullYear() - birthDate.getFullYear();
+    const monthDifference = today.getMonth() - birthDate.getMonth();
+
+    if (
+      ageYears <= 0 &&
+      monthDifference < 0 &&
+      today.getDate() < birthDate.getDate()
+    ) {
+      ageYears--;
     }
-    // if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-    //   age_now--;
-    // }
-    if (age_now === 0) {
-      return m + " month(s)";
+
+    if (ageYears === 0) {
+      return monthDifference === 0
+        ? "Less than a month"
+        : `${monthDifference} month(s)`;
     }
-    return age_now + " year(s)";
+
+    return ageYears === 1 ? "1 year" : `${ageYears} years`;
   };
 
   const getHospitalNumber = (identifier) => {
@@ -360,6 +373,10 @@ const PatientList = (props) => {
     },
   };
 
+  const handleInputChangeBasic = (e) => {
+    setReason({ [e.target.name]: e.target.value });
+  };
+
   return (
     <div className={classes.root}>
       <ToastContainer autoClose={3000} hideProgressBar />
@@ -404,6 +421,7 @@ const PatientList = (props) => {
           pageSizeOptions: [10, 20, 100],
           pageSize: 10,
           debounceInterval: 400,
+          sorting: true,
         }}
         onChangePage={handleChangePage}
         //localization={localization}
@@ -418,20 +436,42 @@ const PatientList = (props) => {
               patient.firstname +
               " " +
               patient.otherName
-            : ""}
+            : ""}{" "}
+          <Form>
+            <br />
+            <div className="row">
+              <div className="form-group mb-3 col-md-12">
+                <Label for="reason">
+                  Kindly provide a reason
+                  <span style={{ color: "red" }}> *</span>
+                </Label>
+                <Input
+                  className="form-control"
+                  type="textarea"
+                  name="reason"
+                  id="reason"
+                  onChange={handleInputChangeBasic}
+                  style={{
+                    border: "1px solid #014D88",
+                    borderRadius: "0.2rem",
+                  }}
+                  required
+                />
+              </div>
+            </div>
+            <Button color="danger" type="button" onClick={handleDelete}>
+              Yes
+            </Button>{" "}
+            <Button
+              color="primary"
+              type="button"
+              onClick={(e) => onCancelDelete()}
+            >
+              No
+            </Button>
+          </Form>
         </ModalBody>
-        <ModalFooter>
-          <Button color="primary" type="button" onClick={handleDelete}>
-            Yes
-          </Button>{" "}
-          <Button
-            color="secondary"
-            type="button"
-            onClick={(e) => onCancelDelete()}
-          >
-            No
-          </Button>
-        </ModalFooter>
+        <ModalFooter></ModalFooter>
       </Modal>
     </div>
   );

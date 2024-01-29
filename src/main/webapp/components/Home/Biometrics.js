@@ -1,24 +1,16 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useRef } from "react";
 import MaterialTable from "material-table";
 import axios from "axios";
 import { url as baseUrl, token } from "../../../../api";
-import { Link } from "react-router-dom";
-import { Card, CardBody } from "reactstrap";
 import { Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
 import Button from "@material-ui/core/Button";
 import "react-toastify/dist/ReactToastify.css";
 import "react-widgets/dist/css/react-widgets.css";
-import { FaEye, FaUserPlus } from "react-icons/fa";
-import {
-  MdDashboard,
-  MdDeleteForever,
-  MdModeEdit,
-  MdPerson,
-} from "react-icons/md";
-import { Menu, MenuList, MenuButton } from "@reach/menu-button";
+import { FaEye } from "react-icons/fa";
+import { MdPerson } from "react-icons/md";
+
 import "@reach/menu-button/styles.css";
 import { ToastContainer } from "react-toastify";
-import { Label } from "semantic-ui-react";
 import { makeStyles } from "@material-ui/core/styles";
 import "../patient.css";
 import SplitActionButton from "../SplitActionButton";
@@ -26,9 +18,9 @@ import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
 import BiometricsList from "./BiometricsList";
 import NotCaptured from "./NotCaptured";
+import NoRecapture from "./NoRecapture";
 
 import { forwardRef } from "react";
-//import { Button} from "react-bootstrap";
 import AddBox from "@material-ui/icons/AddBox";
 import ArrowUpward from "@material-ui/icons/ArrowUpward";
 import Check from "@material-ui/icons/Check";
@@ -47,7 +39,6 @@ import ViewColumn from "@material-ui/icons/ViewColumn";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
-import TablePagination from "@mui/material/TablePagination";
 
 const tableIcons = {
   Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -128,11 +119,7 @@ const Biometrics = (props) => {
   const [modal, setModal] = useState(false);
   const [patient, setPatient] = useState(false);
   const [enablePPI, setEnablePPI] = useState(true);
-  const [searchParams, setSearchParams] = useState("*");
-  const [totalPages, setTotalPages] = useState(0);
-  const [totalRecords, setTotalRecords] = useState(0);
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+
   const [currentPage, setCurrentPage] = useState(1);
   const [status, setStatus] = useState(1);
   const toggle = (id) => {
@@ -164,28 +151,6 @@ const Biometrics = (props) => {
             },
           })),
       },
-      //            {...(permissions.includes('edit_patient') || permissions.includes("all_permission")&&
-      //                    {
-      //                        name:'Edit',
-      //                        type:'link',
-      //                        icon:<MdModeEdit size="20" color='rgb(4, 196, 217)' />,
-      //                        to:{
-      //                            pathname: "/register-patient",
-      //                            state: { patientId : row.id, permissions:permissions  }
-      //                        }
-      //                    }
-      //                )},
-      //            {...(permissions.includes('delete_patient') || permissions.includes("all_permission")&&
-      //                    {
-      //                        name:'Delete',
-      //                        type:'link',
-      //                        icon:<MdDeleteForever size="20" color='rgb(4, 196, 217)'  />,
-      //                        to:{
-      //                            pathname: "/#",
-      //                            state: { patientObj: row, permissions:permissions  }
-      //                        }
-      //                    }
-      //                )}
     ];
   }
   const handleRemoteData = (query) =>
@@ -213,7 +178,7 @@ const Biometrics = (props) => {
                 row.dateOfBirth === null ||
                 row.dateOfBirth === ""
                   ? 0
-                  : calculate_age(row.dateOfBirth),
+                  : calculateAge(row.dateOfBirth),
               actions: (
                 <div>
                   {permissions.includes("view_patient") ||
@@ -246,19 +211,28 @@ const Biometrics = (props) => {
     setModal(false);
   };
 
-  const calculate_age = (dob) => {
+  const calculateAge = (dob) => {
     const today = new Date();
-    const dateParts = dob.split("-");
-    const birthDate = new Date(dob); // create a date object directlyfrom`dob1`argument
-    let age_now = today.getFullYear() - birthDate.getFullYear();
-    const m = today.getMonth() - birthDate.getMonth();
-    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-      age_now--;
+    const birthDate = new Date(dob);
+
+    let ageYears = today.getFullYear() - birthDate.getFullYear();
+    const monthDifference = today.getMonth() - birthDate.getMonth();
+
+    if (
+      ageYears <= 0 &&
+      monthDifference < 0 &&
+      today.getDate() < birthDate.getDate()
+    ) {
+      ageYears--;
     }
-    if (age_now === 0) {
-      return m + " month(s)";
+
+    if (ageYears === 0) {
+      return monthDifference === 0
+        ? "Less than a month"
+        : `${monthDifference} month(s)`;
     }
-    return age_now + " year(s)";
+
+    return ageYears === 1 ? "1 year" : `${ageYears} years`;
   };
 
   const getHospitalNumber = (identifier) => {
@@ -266,18 +240,6 @@ const Biometrics = (props) => {
       (obj) => obj.type == "HospitalNumber"
     );
     return hospitalNumber ? hospitalNumber.value : "";
-  };
-
-  const getAddress = (address) => {
-    const city =
-      address && address.address && address.address.length > 0
-        ? address.address[0].city
-        : null;
-    return city;
-  };
-
-  const getGender = (gender) => {
-    return gender.display;
   };
 
   const enablePPIColumns = () => {
@@ -309,11 +271,6 @@ const Biometrics = (props) => {
   const handleChangePage = (page) => {
     setCurrentPage(page + 1);
   };
-  const localization = {
-    pagination: {
-      labelDisplayedRows: `${currentPage} - 10 of 2022`,
-    },
-  };
 
   const handleChangeStatus = (e) => {
     let count = e.target.value;
@@ -323,6 +280,8 @@ const Biometrics = (props) => {
       setStatus(2);
     } else if (count === "3") {
       setStatus(3);
+    } else if (count === "4") {
+      setStatus(4);
     } else {
       setStatus(1);
     }
@@ -347,6 +306,9 @@ const Biometrics = (props) => {
         </MenuItem>
         <MenuItem key="3" value="3">
           No Biometrics Captured
+        </MenuItem>
+        <MenuItem key="4" value="4">
+          No Biometrics Re-captured
         </MenuItem>
       </TextField>
       {status === 1 ? (
@@ -406,6 +368,8 @@ const Biometrics = (props) => {
         <BiometricsList permissions={props.permissions} />
       ) : status === 3 ? (
         <NotCaptured permissions={props.permissions} />
+      ) : status === 4 ? (
+        <NoRecapture permissions={props.permissions} />
       ) : (
         ""
       )}

@@ -72,22 +72,20 @@ public class Person extends PatientAuditEntity implements Persistable<Long>  , S
 
     @Column(name = "uuid", nullable = false, unique = true, updatable = false)
     private String uuid;
-
     @Column(name = "first_name")
     private String firstName;
-
     @Column(name = "surname")
     private String surname;
-
     @Column(name = "other_name")
     private String otherName;
     @Column(name = "hospital_number")
     private String hospitalNumber;
     @Column(name = "is_date_of_birth_estimated")
     private Boolean isDateOfBirthEstimated;
-
     @Column(name = "full_name")
     private String fullName;
+    @Column(name = "reason")
+    private String reason;
 //
 //    @Column(name = "case_manager_id")
 //    private Long caseManagerId;

@@ -138,11 +138,12 @@ public class PersonService {
     }
 
 
-    public void deletePersonById(Long id) {
+    public void deletePersonById(Long id, String message) {
         Person person = personRepository
                 .findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(PersonService.class, "errorMessage", PERSON_NOT_FOUND_MESSAGE + id));
         person.setArchived(1);
+        person.setReason(message);
         personRepository.save(person);
     }
 
@@ -677,6 +678,37 @@ public class PersonService {
         personMetaDataDto.setRecords(persons.getContent());
         return personMetaDataDto;
         //return checkedInPeople;
+    }
+
+    public PersonMetaDataDto getAllPatientWithoutRecapture(String searchValue, int pageNo, int pageSize) {
+        Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by("id").descending());
+        Optional<User> currentUser = this.userService.getUserWithRoles();
+        Long currentOrganisationUnitId = 0L;
+        if (currentUser.isPresent()) {
+            User user = (User) currentUser.get();
+            currentOrganisationUnitId = user.getCurrentOrganisationUnitId();
+
+        }
+        Page<Person> persons = null;
+        if (!((searchValue == null) || (searchValue.equals("*")))) {
+            searchValue = searchValue.replaceAll("\\s", "");
+            searchValue = searchValue.replaceAll(",", "");
+            String queryParam = "%" + searchValue + "%";
+            persons = personRepository.findPersonWithOutRecapture4(queryParam, 0, currentOrganisationUnitId, paging);
+        } else {
+            persons = personRepository.findPersonWithOutRecapture3(0, currentOrganisationUnitId, paging);
+
+        }
+
+        PageDTO pageDTO = this.generatePagination(persons);
+        PersonMetaDataDto personMetaDataDto = new PersonMetaDataDto();
+        personMetaDataDto.setTotalRecords(pageDTO.getTotalRecords());
+        personMetaDataDto.setPageSize(pageDTO.getPageSize());
+        personMetaDataDto.setTotalPages(pageDTO.getTotalPages());
+        personMetaDataDto.setCurrentPage(pageDTO.getPageNumber());
+        personMetaDataDto.setRecords(persons.getContent());
+        return personMetaDataDto;
+
     }
 
 }

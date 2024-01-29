@@ -1,18 +1,21 @@
 import React, { useState, useRef, useEffect } from "react";
+import { Link, useHistory } from "react-router-dom";
 import MaterialTable from "material-table";
 import Button from "@material-ui/core/Button";
 import axios from "axios";
 import { url as baseUrl, token } from "../../../api";
 import Alert from "@mui/material/Alert";
-import { FaEye } from "react-icons/fa";
-import SplitActionButton from "./SplitActionButton";
+import swal from "sweetalert";
+
 import PatientRecapture from "./PatientRecapture";
 import Recapture from "./Recapture";
 import MatButton from "@material-ui/core/Button";
 import FingerprintIcon from "@mui/icons-material/Fingerprint";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import RestoreIcon from "@mui/icons-material/Restore";
 
 import { forwardRef } from "react";
-//import { Button} from "react-bootstrap";
+
 import AddBox from "@material-ui/icons/AddBox";
 import ArrowUpward from "@material-ui/icons/ArrowUpward";
 import Check from "@material-ui/icons/Check";
@@ -28,10 +31,7 @@ import Remove from "@material-ui/icons/Remove";
 import SaveAlt from "@material-ui/icons/SaveAlt";
 import Search from "@material-ui/icons/Search";
 import ViewColumn from "@material-ui/icons/ViewColumn";
-import FormGroup from "@mui/material/FormGroup";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
-import TablePagination from "@mui/material/TablePagination";
+import BaselineWarning from "./BaselineWarning";
 
 const tableIcons = {
   Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -60,18 +60,46 @@ const tableIcons = {
 const PreviousRecapture = (props) => {
   let createdDate = props.patientObj.createdDate.split("T")[0];
   let currentDate = new Date().toISOString().split("T")[0];
-
+  const [previousCaptureDate, setPreviousCaptureDate] = useState("");
+  const [permissions, setPermissions] = useState([]);
   const [recapturedFingered, setRecapturedFingered] = useState([]);
+  const [fingerType, setFingerType] = useState([]);
   const [modal, setModal] = useState(false);
+  const [modal1, setModal1] = useState(false);
   const [modalNew, setModalNew] = useState(false);
-  const toggle = () => setModal(!modal);
-  const toggleNew = () => setModalNew(!modalNew);
+
+  const [submitStatus, setSubmitStatus] = useState(false);
+  const [capturedFingered, setCapturedFingered] = useState([]);
+
+  const toggle = () => {
+    setModal(!modal);
+    localStorage.removeItem("capturedBiometricsList");
+    setCapturedFingered([]);
+  };
+  const toggle1 = () => setModal1(!modal1);
+  const toggleNew = () => {
+    setModalNew(!modalNew);
+    localStorage.removeItem("capturedBiometricsList");
+    setCapturedFingered([]);
+  };
 
   const tableRef = useRef(null);
   const [loading, setLoading] = useState("");
-  const [recaptures, setRecaptures] = useState([]);
+
   const [biometrics, setBiometrics] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [baselineVal, setBaselineVal] = useState({});
+
+  const userPermission = () => {
+    axios
+      .get(`${baseUrl}account`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((response) => {
+        setPermissions(response.data.permissions);
+      })
+      .catch((error) => {});
+  };
 
   const getRecaptureCount = () => {
     //console.log("get recaptures");
@@ -80,13 +108,17 @@ const PreviousRecapture = (props) => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
-        //console.log(response.data);
+        let capturedDate = response.data[0].captureDate;
+        setPreviousCaptureDate(capturedDate);
+
         setRecapturedFingered(response.data);
+        // localStorage.removeItem("capturedBiometricsList");
       });
   };
 
   useEffect(() => {
     getRecaptureCount();
+    userPermission();
   }, []);
 
   const handleChangePage = (page) => {
@@ -113,13 +145,57 @@ const PreviousRecapture = (props) => {
     //.error((err) => console.log(err));
   }
 
+  const submitReplacedBaselinePrints = () => {
+    toggle1();
+    axios
+      .put(
+        `${baseUrl}biometrics/person?personUuid=${baselineVal?.personUuid}&captureDate=${baselineVal?.captureDate}`,
+        null,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      )
+      .then((response) => {
+        getRecaptureCount();
+      });
+  };
+
+  const replaceBaselinePrints = async (row) => {
+    console.log(`${row.captureDate} ${row.personUuid}`);
+    toggle1();
+    setBaselineVal(row);
+  };
+
+  const is30DaysPassed = (timestamp) => {
+    console.log(timestamp);
+    const startDate = new Date(timestamp);
+    const currentDate = new Date();
+    const timeDifference = currentDate - startDate;
+
+    const daysDifference = timeDifference / (1000 * 60 * 60 * 24);
+
+    if (daysDifference >= 30) {
+      return true;
+    } else {
+      const remainingDays = 30 - daysDifference;
+      console.log(`remaining ${remainingDays} days`);
+      return false;
+    }
+  };
+
   return (
     <>
       <h5>
         {" "}
         Patient recapture count : <b>{recapturedFingered.length - 1}</b>
       </h5>
-      {createdDate !== currentDate ? (
+      {is30DaysPassed(previousCaptureDate) === true ? (
+        // <Link
+        //   to={{
+        //     pathname: "/biometrics-recapture",
+        //     state: { patientObj: props, permissions: permissions },
+        //   }}
+        // >
         <MatButton
           className=" float-right mr-1"
           variant="contained"
@@ -137,6 +213,7 @@ const PreviousRecapture = (props) => {
           <span style={{ textTransform: "capitalize" }}>Recapture</span>
         </MatButton>
       ) : (
+        // </Link>
         ""
       )}
 
@@ -185,45 +262,31 @@ const PreviousRecapture = (props) => {
               data: row.recapture >= 1 ? "Recapture" : "Baseline",
               number: row.recapture,
               actions: (
-                <Button
-                  style={{ backgroundColor: "#014d88", color: "#fff" }}
-                  onClick={() => actionItems(row)}
-                >
-                  View
-                </Button>
+                <>
+                  <Button
+                    style={{ backgroundColor: "#014d88", color: "#fff" }}
+                    onClick={() => actionItems(row)}
+                    startIcon={<VisibilityIcon />}
+                  >
+                    View
+                  </Button>{" "}
+                  {/* {row.recapture >= 1 ? (
+                    <Button
+                      style={{
+                        backgroundColor: "rgb(153, 46, 98)",
+                        color: "#fff",
+                      }}
+                      onClick={() => replaceBaselinePrints(row)}
+                      startIcon={<RestoreIcon />}
+                    >
+                      Replace
+                    </Button>
+                  ) : (
+                    ""
+                  )} */}
+                </>
               ),
             }))
-          // (query) =>
-          // new Promise((resolve, reject) =>
-          //   axios
-          //     .get(`${baseUrl}biometrics/grouped/person/${props.patientId}`, {
-          //       headers: { Authorization: `Bearer ${token}` },
-          //     })
-          //     .then((response) => response)
-          //     .then((result) => {
-          //       resolve({
-          //         data: result.data
-          //           .filter((record) => {
-          //             return record.archived === 0;
-          //           })
-          //           .map((row) => ({
-          //             captureDate: row.captureDate,
-          //             count: row.count === null ? 0 : row.count,
-          //             //data: actionItems(row),
-          //             actions: (
-          //               <Button
-          //                 style={{ backgroundColor: "#014d88", color: "#fff" }}
-          //                 onClick={() => actionItems(row)}
-          //               >
-          //                 View
-          //               </Button>
-          //             ),
-          //           })),
-          //         page: query.page,
-          //         totalCount: result.data.length,
-          //       });
-          //     })
-          // )
         }
         options={{
           headerStyle: {
@@ -257,6 +320,13 @@ const PreviousRecapture = (props) => {
         patientId={props.patientId}
         age={props.age}
         getRecaptureCount={getRecaptureCount}
+        capturedFingered={capturedFingered}
+        setCapturedFingered={setCapturedFingered}
+      />
+      <BaselineWarning
+        modal={modal1}
+        toggle={toggle1}
+        submitReplacedBaselinePrints={submitReplacedBaselinePrints}
       />
     </>
   );

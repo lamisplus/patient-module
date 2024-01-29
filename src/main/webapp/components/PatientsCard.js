@@ -49,6 +49,7 @@ const styles = (theme) => ({
 });
 
 function PatientsCard(props) {
+  console.log(props);
   const { classes } = props;
   const patientObj = props.patientObj ? props.patientObj : {};
   const permissions = props.permissions ? props.permissions : [];
@@ -97,12 +98,14 @@ function PatientsCard(props) {
   const calculate_age = (dob) => {
     const today = new Date();
     const dateParts = dob.split("-");
-    const birthDate = new Date(dob); // create a date object directlyfrom`dob1`argument
+    const birthDate = new Date(dob);
     let age_now = today.getFullYear() - birthDate.getFullYear();
     const m = today.getMonth() - birthDate.getMonth();
-    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+
+    if (age_now <= 0 && m < 0 && today.getDate() < birthDate.getDate()) {
       age_now--;
     }
+
     if (age_now === 0) {
       return m + " month(s)";
     }

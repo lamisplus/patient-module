@@ -20,6 +20,17 @@
                  stripComments="true"/>
     </changeSet>
 
+    <changeSet failOnError="true" author="Ajor Victor" id="20231130-001">
+        <preConditions onFail="MARK_RAN">
+        <not>
+            <columnExists tableName="patient_person" columnName="Reason" />
+        </not>
+        </preConditions>
+        <sql>
+            ALTER TABLE patient_person ADD Reason VARCHAR(255);
+        </sql>
+    </changeSet>
+
     <!--    <changeSet failOnError="false" author="Aniwange Amos" id="20220609-018">-->
     <!--        <sqlFile dbms="postgresql"-->
     <!--                 path="sql/patient_permission_query.sql"-->

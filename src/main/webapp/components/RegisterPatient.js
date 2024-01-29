@@ -1849,6 +1849,7 @@ const RegisterPatient = (props) => {
                 hidden={disabledAgeBaseOnAge}
                 disabled={saving}
                 style={{ backgroundColor: "#014d88", fontWeight: "bolder" }}
+                id="save-patient"
               >
                 {!saving ? (
                   <span style={{ textTransform: "capitalize" }}>Save</span>

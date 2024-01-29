@@ -81,6 +81,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const Recapture = (props) => {
+  //console.log("patient Id", props.patientId);
   const classes = useStyles();
   let history = useHistory();
   const permissions =
@@ -95,6 +96,18 @@ const Recapture = (props) => {
     device: "SECUGEN",
     reason: "",
     age: "",
+    capturedBiometricsList: [],
+    deduplication: {
+      patientId: "",
+      deduplicationDate: null,
+      matchCount: 0,
+      unMatchCount: 0,
+      baselineFingerCount: 0,
+      recaptureFingerCount: 0,
+      perfectMatchCount: 0,
+      imperfectMatchCount: 0,
+      details: null,
+    },
   });
   const [fingerType, setFingerType] = useState([]);
   const [devices, setDevices] = useState([]);
@@ -105,13 +118,13 @@ const Recapture = (props) => {
   const [success, setSuccess] = React.useState(false);
   const [errors, setErrors] = useState({});
   const [storedBiometrics, setStoredBiometrics] = useState([]);
-  // const [responseImage, setResponseImage] = useState("")
+  const [responseImage, setResponseImage] = useState("");
   const [capturedFingered, setCapturedFingered] = useState([]);
   const [capturedFingeredObj, setCapturedFingeredObj] = useState([]);
   const [recapturedFingered, setRecapturedFingered] = useState([]);
-  const [selectedFingers, setSelectedFingers] = useState([]);
+  const [selectedDeduplication, setSelectedDeduplication] = useState([]);
   const [imageQuality, setImageQuality] = useState(false);
-  const [isNewStatus, setIsNewStatus] = useState(true);
+  const [isNewStatus, setIsNewStatus] = useState(false);
 
   const calculate_age = (dob) => {
     console.log(dob);
@@ -252,6 +265,46 @@ const Recapture = (props) => {
 
   const captureFinger = (e) => {
     e.preventDefault();
+    if (localStorage.getItem("capturedBiometricsList") !== null) {
+      const capturedBiometricsListObj = JSON.parse(
+        localStorage.getItem("capturedBiometricsList")
+      );
+      setCapturedFingeredObj(capturedBiometricsListObj);
+      objValues.capturedBiometricsList = capturedBiometricsListObj;
+      localStorage.removeItem("capturedBiometricsList");
+    } else {
+      //console.log("capturedBiometricsList", capturedFingeredObj);
+      objValues.capturedBiometricsList = capturedFingeredObj;
+      setObjValues({
+        ...objValues,
+        capturedBiometricsList: capturedFingeredObj,
+      });
+    }
+
+    if (localStorage.getItem("deduplicates") !== null) {
+      const deduplicatesObj = JSON.parse(localStorage.getItem("deduplicates"));
+      setSelectedDeduplication(deduplicatesObj);
+      objValues.deduplication = deduplicatesObj;
+      setObjValues({ ...objValues, deduplication: deduplicatesObj });
+
+      localStorage.removeItem("deduplicates");
+    } else {
+      let deduplicationObj = {
+        patientId: "",
+        deduplicationDate: null,
+        matchCount: 0,
+        unMatchCount: 0,
+        baselineFingerCount: 0,
+        recaptureFingerCount: 0,
+        perfectMatchCount: 0,
+        imperfectMatchCount: 0,
+        details: null,
+      };
+      //console.log("deduplication", selectedDeduplication);
+      objValues.deduplication = deduplicationObj;
+      setObjValues({ ...objValues, deduplication: deduplicationObj });
+    }
+
     if (validate()) {
       setLoading(true);
 
@@ -259,7 +312,7 @@ const Recapture = (props) => {
         .post(
           `${devices.url}?reader=${
             devices.name
-          }&isNew=${isNewStatus}&recapture=${true}`,
+          }&isNew=${isNewStatus}&recapture=${true}&identify=${false}`,
           objValues,
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -267,21 +320,31 @@ const Recapture = (props) => {
         )
         .then((response) => {
           setLoading(false);
-          console.log(response.data);
 
           if (response.data.type === "ERROR") {
             setLoading(false);
             setTryAgain(true);
-            // if (response.data.match === false) {
-            //   toast.error(response.data.message.match, { autoClose: 10000 });
-            // }
+
             toast.error(response.data.message.ERROR);
+
+            //console.log("captured BiometricsList error", capturedFingeredObj);
+            objValues.capturedBiometricsList = capturedFingeredObj;
+            setObjValues({
+              ...objValues,
+              capturedBiometricsList: capturedFingeredObj,
+            });
+
             setIsNewStatus(false);
           } else if (response.data.type === "WARNING") {
+            //Imperfect Match
             if (response.data.match === true) {
-              toast.info(response.data.message.match, { autoClose: 10000 });
+              toast.info(response.data.message.RECAPTURE_MESSAGE, {
+                autoClose: 10000,
+              });
             } else if (response.data.match === false) {
-              toast.error(response.data.message.match, { autoClose: 10000 });
+              toast.error(response.data.message.RECAPTURE_MESSAGE, {
+                autoClose: 10000,
+              });
             }
 
             if (
@@ -306,7 +369,10 @@ const Recapture = (props) => {
               "templateType"
             );
 
-            setCapturedFingered([...capturedFingered, biometricsEnrollments]);
+            props.setCapturedFingered([
+              ...props.capturedFingered,
+              biometricsEnrollments,
+            ]);
 
             _.find(fingerType, { display: templateType }).captured = true;
 
@@ -315,7 +381,10 @@ const Recapture = (props) => {
             setObjValues({ ...objValues, templateType: "" });
             setIsNewStatus(false);
             //toast.info(response.data.message.match);
-          } else if (response.data.type === "SUCCESS") {
+          } else if (
+            response.data.type === "SUCCESS" ||
+            response.data.match === false
+          ) {
             if (
               response.data.imageQuality <= 60 &&
               calculate_age(props.age) <= 6
@@ -326,21 +395,44 @@ const Recapture = (props) => {
               );
               setImageQuality(true);
             }
+
+            localStorage.setItem(
+              "capturedBiometricsList",
+              JSON.stringify(response.data.capturedBiometricsList)
+            );
+
+            localStorage.setItem(
+              "deduplicates",
+              JSON.stringify(response.data.deduplication)
+            );
+
             const templateType = response.data.templateType;
             setTryAgain(false);
             setSuccess(true);
 
             if (response.data.match === true) {
-              toast.success(response.data.message.match, { autoClose: 10000 });
+              toast.success(response.data.message.RECAPTURE_MESSAGE, {
+                autoClose: 10000,
+              });
+            }
+
+            if (response.data.match === false) {
+              toast.error(response.data.message.RECAPTURE_MESSAGE, {
+                autoClose: 10000,
+              });
             }
 
             let biometricsEnrollments = response.data;
+
             biometricsEnrollments.capturedBiometricsList = _.uniqBy(
               biometricsEnrollments.capturedBiometricsList,
               "templateType"
             );
 
-            setCapturedFingered([...capturedFingered, biometricsEnrollments]);
+            props.setCapturedFingered([
+              ...props.capturedFingered,
+              biometricsEnrollments,
+            ]);
 
             _.find(fingerType, { display: templateType }).captured = true;
             setFingerType([...fingerType]);
@@ -364,35 +456,68 @@ const Recapture = (props) => {
 
   const saveBiometrics = (e) => {
     e.preventDefault();
-    if (capturedFingered.length >= 1) {
-      const capturedObj = capturedFingered[capturedFingered.length - 1];
+
+    if (props.capturedFingered.length >= 1) {
+      const capturedObj =
+        props.capturedFingered[props.capturedFingered.length - 1];
 
       capturedObj.capturedBiometricsList = _.uniqBy(
         capturedObj.capturedBiometricsList,
         "templateType"
       );
 
-      axios
-        .post(`${baseUrl}biometrics/templates`, capturedObj, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-        .then((response) => {
-          //console.log("saved", response);
-          toast.success("Biometric recaptured successfully", {
-            position: toast.POSITION.BOTTOM_CENTER,
-          });
-          setCapturedFingered([]);
-          getPersonBiometrics();
-          // props.updatePatientBiometricStatus(true);
-          props.getRecaptureCount();
-          props.toggle();
-        })
-        .catch((error) => {
-          toast.error("Something went wrong saving biometrics", {
-            position: toast.POSITION.BOTTOM_CENTER,
-          });
-          console.log(error.message);
+      if (capturedObj.deviceName.includes("Futronic")) {
+        let fingersObj = [];
+        props.capturedFingered.forEach((obj) => {
+          fingersObj.push(obj.capturedBiometricsList[0]);
         });
+
+        if (fingersObj.length > 0) {
+          axios
+            .post(`${baseUrl}biometrics/templates`, capturedObj, {
+              headers: { Authorization: `Bearer ${token}` },
+            })
+            .then((response) => {
+              console.log("saved", response);
+              toast.success("Biometric saved successfully", {
+                position: toast.POSITION.BOTTOM_CENTER,
+              });
+              props.setCapturedFingered([]);
+              getPersonBiometrics();
+              //props.updatePatientBiometricStatus(true);
+              props.getRecaptureCount();
+              props.toggle();
+            })
+            .catch((error) => {
+              toast.error("Something went wrong saving biometrics recapture", {
+                position: toast.POSITION.BOTTOM_CENTER,
+              });
+              console.log(error + "1");
+            });
+        }
+      } else {
+        axios
+          .post(`${baseUrl}biometrics/templates`, capturedObj, {
+            headers: { Authorization: `Bearer ${token}` },
+          })
+          .then((response) => {
+            //console.log("saved", response);
+            toast.success("Biometric recaptured successfully", {
+              position: toast.POSITION.BOTTOM_CENTER,
+            });
+            props.setCapturedFingered([]);
+            getPersonBiometrics();
+
+            props.getRecaptureCount();
+            props.toggle();
+          })
+          .catch((error) => {
+            toast.error("Something went wrong saving biometrics recapture", {
+              position: toast.POSITION.BOTTOM_CENTER,
+            });
+            console.log(error + "2");
+          });
+      }
     } else {
       toast.error("You can't save less than 2 finger", {
         position: toast.POSITION.BOTTOM_CENTER,
@@ -411,11 +536,11 @@ const Recapture = (props) => {
       .then((resp) => {
         _.find(fingerType, { display: x.templateType }).captured = false;
         setFingerType([...fingerType]);
-        let deletedRecord = capturedFingered.filter(
+        let deletedRecord = props.capturedFingered.filter(
           (data) => data.templateType !== x.templateType
         );
 
-        setCapturedFingered(deletedRecord);
+        props.setCapturedFingered(deletedRecord);
         toast.info(x.templateType + " captured removed successfully!");
       })
       .catch((error) => {
@@ -578,8 +703,8 @@ const Recapture = (props) => {
                       </FormGroup>
                     </Col>
 
-                    {capturedFingered.length >= 6 &&
-                    capturedFingered.length < 10 ? (
+                    {props.capturedFingered.length >= 6 &&
+                    props.capturedFingered.length < 10 ? (
                       <Col md={4}>
                         <FormGroup>
                           <Label
@@ -658,14 +783,14 @@ const Recapture = (props) => {
               )}
 
               <Row>
-                {capturedFingered.length >= 1 ? (
+                {props.capturedFingered.length >= 1 ? (
                   <>
                     <Col
                       md={12}
                       style={{ marginTop: "10px", paddingBottom: "20px" }}
                     >
                       <List celled horizontal>
-                        {capturedFingered.map((x) => (
+                        {props.capturedFingered.map((x) => (
                           <List.Item
                             style={{
                               width: "200px",
@@ -759,7 +884,9 @@ const Recapture = (props) => {
                         type="button"
                         variant="contained"
                         color="primary"
-                        disabled={capturedFingered.length < 6 ? true : false}
+                        disabled={
+                          props.capturedFingered.length < 6 ? true : false
+                        }
                         onClick={saveBiometrics}
                         startIcon={<SaveIcon />}
                       >

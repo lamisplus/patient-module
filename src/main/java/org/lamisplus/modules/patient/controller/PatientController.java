@@ -57,10 +57,10 @@ public class PatientController {
         return ResponseEntity.ok(personService.updatePerson(id, patient));
     }
 
-    @DeleteMapping(value = "/{id}",
+    @DeleteMapping(value = "/{id}/{reason}",
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> deletePerson(@PathVariable("id") Long id) {
-        personService.deletePersonById(id);
+    public ResponseEntity<String> deletePerson(@PathVariable("id") Long id, @PathVariable("reason") String reason) {
+        personService.deletePersonById(id, reason);
         return ResponseEntity.accepted().build();
     }
 
@@ -191,6 +191,16 @@ public class PatientController {
             @RequestParam(defaultValue = "10") Integer pageSize) {
 
         PersonMetaDataDto personMetaDataDto = personService.getAllPatientWithoutBiomentic(searchParam, pageNo, pageSize);
+        return new ResponseEntity<>(personMetaDataDto, new HttpHeaders(), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/getall-patients-with-no-recapture")
+    public ResponseEntity<PersonMetaDataDto> getAllPatientWithNoRecapture(
+            @RequestParam(defaultValue = "*") String searchParam,
+            @RequestParam(defaultValue = "0") Integer pageNo,
+            @RequestParam(defaultValue = "10") Integer pageSize) {
+
+        PersonMetaDataDto personMetaDataDto = personService.getAllPatientWithoutRecapture(searchParam, pageNo, pageSize);
         return new ResponseEntity<>(personMetaDataDto, new HttpHeaders(), HttpStatus.OK);
     }
 
