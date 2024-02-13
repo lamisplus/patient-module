@@ -711,6 +711,8 @@ const RegisterPatient = (props) => {
         patientForm.id = patientId;
         patientDTO.person = patientForm;
 
+        console.log("INPUT ", patientForm);
+
         if (patientId) {
           // console.log("Edit data", patientForm);
 

@@ -42,4 +42,12 @@ public interface VisitRepository extends JpaRepository<Visit, Long> {
 
     @Query(value ="SELECT * FROM patient_visit WHERE last_modified_date > ?1 AND facility_id=?2", nativeQuery = true)
     List<Visit> getAllDueForServerUpload(LocalDateTime dateLastSync, Long facilityId);
+
+    @Query(value ="SELECT * from patient_visit \n" +
+            "WHERE person_uuid = ?1\n" +
+            "AND visit_start_date IS NOT NULL\n" +
+            "AND archived = 0\n" +
+            "ORDER By last_modified_date DESC\n" +
+            "LIMIT 1", nativeQuery = true)
+    Optional<Visit> getRecentPatientVisit(String uuid);
 }

@@ -89,6 +89,7 @@ const PreviousRecapture = (props) => {
   const [biometrics, setBiometrics] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [baselineVal, setBaselineVal] = useState({});
+  const [replaceDate, setReplacement] = useState(null);
 
   const userPermission = () => {
     axios
@@ -108,7 +109,15 @@ const PreviousRecapture = (props) => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
+        console.log(response.data);
         let capturedDate = response.data[0].captureDate;
+        let replacementDate =
+          response.data[response.data.length - 1]?.replaceDate;
+
+        if (replacementDate != null) {
+          setReplacement(replacementDate);
+        }
+
         setPreviousCaptureDate(capturedDate);
 
         setRecapturedFingered(response.data);
@@ -149,7 +158,7 @@ const PreviousRecapture = (props) => {
     toggle1();
     axios
       .put(
-        `${baseUrl}biometrics/person?personUuid=${baselineVal?.personUuid}&captureDate=${baselineVal?.captureDate}`,
+        `${baseUrl}biometrics/person?personUuid=${baselineVal?.personUuid}&captureDate=${baselineVal?.captureDate}&recapture=${baselineVal?.recapture}`,
         null,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -270,7 +279,9 @@ const PreviousRecapture = (props) => {
                   >
                     View
                   </Button>{" "}
-                  {/* {row.recapture >= 1 ? (
+                  {row.recapture === 1 &&
+                  row.replaceDate === null &&
+                  replaceDate === null ? (
                     <Button
                       style={{
                         backgroundColor: "rgb(153, 46, 98)",
@@ -278,12 +289,13 @@ const PreviousRecapture = (props) => {
                       }}
                       onClick={() => replaceBaselinePrints(row)}
                       startIcon={<RestoreIcon />}
+                      //disabled={true}
                     >
                       Replace
                     </Button>
                   ) : (
                     ""
-                  )} */}
+                  )}
                 </>
               ),
             }))
