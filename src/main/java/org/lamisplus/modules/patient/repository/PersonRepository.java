@@ -184,13 +184,26 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
     Page<Person> findPersonWithOutBiometrics4(String queryParam, Integer archived, Long facilityId, Pageable pageable);
 
     @Query(value = "SELECT DISTINCT p.* FROM patient_person p\n" +
-            "LEFT JOIN biometric b on p.uuid = b.person_uuid\n" +
-            "WHERE b.recapture = 0 and p.archived=?1 and p.facility_id =?2", nativeQuery = true)
+            "            JOIN (\n" +
+            "\t\t\tSELECT person_uuid, MAX(recapture) FROM BIOMETRIC\n" +
+            "\t\t\t\tWHERE archived = 0\n" +
+            "\t\t\tGROUP BY person_uuid\t\n" +
+            "\t\t) b on p.uuid = b.person_uuid\n" +
+            "            WHERE \n" +
+            "\t\t\tb.max = 0 AND \n" +
+            "\t\t\tp.archived=?1 and p.facility_id =?2", nativeQuery = true)
     Page<Person> findPersonWithOutRecapture3(Integer archived, Long facilityId, Pageable pageable);
     @Query(value = "SELECT DISTINCT p.* FROM patient_person p\n" +
-            "LEFT JOIN biometric b on p.uuid = b.person_uuid\n" +
-            "WHERE b.recapture = 0 and (p.first_name ilike ?1 OR p.surname ilike ?1 OR p.other_name ilike ?1 OR p.full_name ilike ?1 OR p.hospital_number ilike ?1) \n" +
-            "and p.archived=?2 and p.facility_id =?3", nativeQuery = true)
+            "            JOIN (\n" +
+            "\t\t\tSELECT person_uuid, MAX(recapture) FROM BIOMETRIC\n" +
+            "\t\t\t\tWHERE archived = 0\n" +
+            "\t\t\tGROUP BY person_uuid\t\n" +
+            "\t\t) b on p.uuid = b.person_uuid\n" +
+            "            WHERE \n" +
+            "\t\t\tb.max = 0 \n" +
+            "\t\t\tAND (p.first_name ilike ?1 OR p.surname ilike ?1 OR p.other_name ilike ?1 OR p.full_name ilike ?1 OR p.hospital_number ilike ?1)\n" +
+            "\t\t\tAND \n" +
+            "\t\t\tp.archived=?2 and p.facility_id =?3", nativeQuery = true)
     Page<Person> findPersonWithOutRecapture4(String queryParam, Integer archived, Long facilityId, Pageable pageable);
 
     List<Person> findAllByFacilityIdAndArchived(Long facilityId, Integer archived);

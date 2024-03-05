@@ -126,8 +126,6 @@ public class PersonService {
                 .map(Encounter::getPerson)
                 .map(this::getDtoFromPerson)
                 .collect(Collectors.toList());
-
-
     }
 
     public PersonResponseDto getPersonById(Long id) {
@@ -267,11 +265,13 @@ public class PersonService {
 
 
     public PersonResponseDto getDtoFromPerson(Person person) {
-       // Optional<Visit> visit = visitRepository.findVisitByPersonAndVisitStartDateNotNullAndVisitEndDateIsNull(person);
+//        Optional<Visit> visit = visitRepository.findVisitByPersonAndVisitStartDateNotNullAndVisitEndDateIsNull(person);
+//        log.info("visit id {}", visit.get().getId());
         PersonResponseDto personResponseDto = new PersonResponseDto();
-//       if (visit.isPresent()) {
-//           personResponseDto.setVisitId(visit.get().getId());
-//       }
+        Optional<Visit> visit = visitRepository.getRecentPatientVisit(person.getUuid());
+       if (visit.isPresent()) {
+           personResponseDto.setVisitId(visit.get().getId());
+       }
         personResponseDto.setId(person.getId());
         personResponseDto.setIsDateOfBirthEstimated(person.getIsDateOfBirthEstimated());
         personResponseDto.setDateOfBirth(person.getDateOfBirth());
@@ -444,7 +444,6 @@ public class PersonService {
         }
 
         person.forEach(visit -> {
-
             checkedInPeople.add(this.getDtoFromPersonWithoutBiometric(visit, Boolean.TRUE));
         });
         PageDTO pageDTO = this.generatePagination(person);
