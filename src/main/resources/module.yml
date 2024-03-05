@@ -8,6 +8,7 @@ menus:
     state: patient
     url: /across/resources/static/patient/index.html
 umdLocation: /across/resources/static/patient/index.html
+gitHubLink: https://api.github.com/repos/lamisplus/Patient-Module/releases/latest
 webModules:
   - breadcrumb: PATIENT
     name: PatientModule
