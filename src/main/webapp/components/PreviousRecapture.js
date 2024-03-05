@@ -279,7 +279,7 @@ const PreviousRecapture = (props) => {
                   >
                     View
                   </Button>{" "}
-                  {row.recapture === 1 &&
+                  {row.recapture > 0 &&
                   row.replaceDate === null &&
                   replaceDate === null ? (
                     <Button
