@@ -126,6 +126,8 @@ public class PersonService {
                 .map(Encounter::getPerson)
                 .map(this::getDtoFromPerson)
                 .collect(Collectors.toList());
+
+
     }
 
     public PersonResponseDto getPersonById(Long id) {
@@ -265,13 +267,11 @@ public class PersonService {
 
 
     public PersonResponseDto getDtoFromPerson(Person person) {
-//        Optional<Visit> visit = visitRepository.findVisitByPersonAndVisitStartDateNotNullAndVisitEndDateIsNull(person);
-//        log.info("visit id {}", visit.get().getId());
+        // Optional<Visit> visit = visitRepository.findVisitByPersonAndVisitStartDateNotNullAndVisitEndDateIsNull(person);
         PersonResponseDto personResponseDto = new PersonResponseDto();
-        Optional<Visit> visit = visitRepository.getRecentPatientVisit(person.getUuid());
-       if (visit.isPresent()) {
-           personResponseDto.setVisitId(visit.get().getId());
-       }
+//       if (visit.isPresent()) {
+//           personResponseDto.setVisitId(visit.get().getId());
+//       }
         personResponseDto.setId(person.getId());
         personResponseDto.setIsDateOfBirthEstimated(person.getIsDateOfBirthEstimated());
         personResponseDto.setDateOfBirth(person.getDateOfBirth());
@@ -296,7 +296,7 @@ public class PersonService {
         personResponseDto.setArchived(person.getArchived());
         personResponseDto.setUuid(person.getUuid());
         personResponseDto.setBiometricStatus(getPatientBiometricStatus(person.getUuid()));
-        
+
         return personResponseDto;
     }
 
@@ -444,6 +444,7 @@ public class PersonService {
         }
 
         person.forEach(visit -> {
+
             checkedInPeople.add(this.getDtoFromPersonWithoutBiometric(visit, Boolean.TRUE));
         });
         PageDTO pageDTO = this.generatePagination(person);
@@ -615,7 +616,7 @@ public class PersonService {
             persons = personRepository.findPersonWithOutBiometrics2(queryParam, 0, currentOrganisationUnitId, paging);
         } else {
             persons = personRepository.findPersonWithOutBiometrics(0, currentOrganisationUnitId, paging);
-           // System.out.println("Testng the number of records "+persons.getNumberOfElements());
+            // System.out.println("Testng the number of records "+persons.getNumberOfElements());
 
         }
 //        List<PersonResponseDto> personResponseDtoList = new ArrayList<>();
