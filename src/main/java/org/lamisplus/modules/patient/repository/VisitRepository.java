@@ -50,4 +50,8 @@ public interface VisitRepository extends JpaRepository<Visit, Long> {
             "ORDER By last_modified_date DESC\n" +
             "LIMIT 1", nativeQuery = true)
     Optional<Visit> getRecentPatientVisit(String uuid);
+
+    Optional<Visit> findByVisitStartDateAndPerson(LocalDateTime visitStartDate, Person person);
+
+    Optional<Visit> findByUuid(String uuid);
 }
