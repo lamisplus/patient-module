@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
+import org.hibernate.annotations.Where;
 import org.springframework.data.domain.Persistable;
 
 import javax.persistence.*;
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 @Table(name = "patient_person")
 @Data
 @NoArgsConstructor
+@Where(clause = "archived = 0")
 public class Person extends PatientAuditEntity implements Persistable<Long>  , Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
