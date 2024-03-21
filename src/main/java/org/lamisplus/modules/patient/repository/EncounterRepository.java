@@ -12,7 +12,6 @@ import java.util.Optional;
 public interface EncounterRepository extends JpaRepository<Encounter, Long> {
     List<Encounter> findAllByArchivedAndFacilityId(Integer archived, Long facilityId);
 
-
     List<Encounter> findAllByServiceCodeAndStatus(String serviceCode, String status);
 
     Optional<Encounter> getEncounterByVisitAndStatusAndServiceCode(Visit visit, String status, String serviceCode);

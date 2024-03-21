@@ -183,10 +183,10 @@ const PreviousRecapture = (props) => {
 
     const daysDifference = timeDifference / (1000 * 60 * 60 * 24);
 
-    if (daysDifference >= 30) {
+    if (daysDifference >= 15) {
       return true;
     } else {
-      const remainingDays = 30 - daysDifference;
+      const remainingDays = 15 - daysDifference;
       console.log(`remaining ${remainingDays} days`);
       return false;
     }

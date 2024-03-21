@@ -269,9 +269,10 @@ public class PersonService {
 //        log.info("visit id {}", visit.get().getId());
         PersonResponseDto personResponseDto = new PersonResponseDto();
         Optional<Visit> visit = visitRepository.getRecentPatientVisit(person.getUuid());
-       if (visit.isPresent()) {
-           personResponseDto.setVisitId(visit.get().getId());
-       }
+           if (visit.isPresent()) {
+               //log.info("visit id {}", visit.get().getId());
+               personResponseDto.setVisitId(visit.get().getId());
+           }
         personResponseDto.setId(person.getId());
         personResponseDto.setIsDateOfBirthEstimated(person.getIsDateOfBirthEstimated());
         personResponseDto.setDateOfBirth(person.getDateOfBirth());
@@ -573,7 +574,7 @@ public class PersonService {
             searchValue = searchValue.replaceAll("\\s", "");
             searchValue = searchValue.replaceAll(",", "");
             String queryParam = "%" + searchValue + "%";
-            persons = personRepository.findPersonWithBiometrics2(queryParam, 0, currentOrganisationUnitId, paging);
+            persons = personRepository.findPersonWithBiometricsUsingSearchParam(queryParam, 0, currentOrganisationUnitId, paging);
         } else {
             persons = personRepository.findPersonWithBiometrics(0, currentOrganisationUnitId, paging);
             System.out.println("Testng the number of records "+persons.getNumberOfElements());
@@ -612,7 +613,7 @@ public class PersonService {
             searchValue = searchValue.replaceAll("\\s", "");
             searchValue = searchValue.replaceAll(",", "");
             String queryParam = "%" + searchValue + "%";
-            persons = personRepository.findPersonWithOutBiometrics2(queryParam, 0, currentOrganisationUnitId, paging);
+            persons = personRepository.findPersonWithOutBiometricsUsingSearchParam(queryParam, 0, currentOrganisationUnitId, paging);
         } else {
             persons = personRepository.findPersonWithOutBiometrics(0, currentOrganisationUnitId, paging);
            // System.out.println("Testng the number of records "+persons.getNumberOfElements());

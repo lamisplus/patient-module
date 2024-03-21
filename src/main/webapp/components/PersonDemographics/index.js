@@ -58,7 +58,7 @@ function Index(props) {
     Object.keys(props.patientObj).length > 0 ? props.patientObj : patientData;
 
   const permissions = props.permissions ? props.permissions : [];
-  const [modal, setModal] = useState(false); //Modal to collect sample
+  const [modal, setModal] = useState(false);
   const [patientBiometricStatus, setPatientBiometricStatus] = useState(
     props.patientBiometricStatus
   );

@@ -152,7 +152,7 @@ function PatientsCard(props) {
                 >
                   <span style={{ color: "#000" }}>
                     {" "}
-                    Hospital Number :{" "}
+                    Hospital Numbers :{" "}
                     <b style={{ color: "#0B72AA" }}>
                       {getHospitalNumber(patientObj.identifier)}
                     </b>
