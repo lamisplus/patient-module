@@ -219,6 +219,15 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
     @Query(value ="SELECT * FROM patient_person WHERE last_modified_date > ?1 AND facility_id=?2", nativeQuery = true)
     public List<Person> getAllDueForServerUpload(LocalDateTime dateLastSync, Long facilityId);
 
+    @Query(value = "SELECT CASE WHEN sex = 'Female' THEN 'Female' WHEN sex = 'Male' THEN 'Male' ELSE 'Others' END AS name, COUNT(*) AS count FROM patient_person GROUP BY sex", nativeQuery = true)
+    List<Object[]> countRegistrationsBySex();
+
+    @Query(value = "SELECT EXTRACT(YEAR FROM date_of_registration) AS year, " +
+            "SUM(CASE WHEN sex = 'Male' THEN 1 ELSE 0 END) AS male, " +
+            "SUM(CASE WHEN sex = 'Female' THEN 1 ELSE 0 END) AS female " +
+            "FROM patient_person " +
+            "GROUP BY EXTRACT(YEAR FROM date_of_registration)", nativeQuery = true)
+    List<Object[]> countRegistrationsByYearAndSex();
 
 }
 
