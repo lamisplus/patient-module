@@ -91,7 +91,7 @@ public class Person extends PatientAuditEntity implements Persistable<Long>  , S
     private String reason;
 
     @Type(type = "jsonb-node")
-    @Column(columnDefinition = "jsonb")
+    @Column(columnDefinition = "jsonb", name = "mobile_extra")
     private JsonNode mobileExtra;
 //
 //    @Column(name = "case_manager_id")
