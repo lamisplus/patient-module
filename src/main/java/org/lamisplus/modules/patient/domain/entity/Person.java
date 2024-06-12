@@ -11,6 +11,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "patient_person")
@@ -88,6 +89,10 @@ public class Person extends PatientAuditEntity implements Persistable<Long>  , S
     private String fullName;
     @Column(name = "reason")
     private String reason;
+
+    @Type(type = "jsonb-node")
+    @Column(columnDefinition = "jsonb")
+    private JsonNode mobileExtra;
 //
 //    @Column(name = "case_manager_id")
 //    private Long caseManagerId;

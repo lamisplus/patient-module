@@ -219,6 +219,26 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
     @Query(value ="SELECT * FROM patient_person WHERE last_modified_date > ?1 AND facility_id=?2", nativeQuery = true)
     public List<Person> getAllDueForServerUpload(LocalDateTime dateLastSync, Long facilityId);
 
+    @Query(value =
+            "SELECT * " +
+                    "FROM patient_person p " +
+                    "JOIN (" +
+                    "    SELECT DISTINCT person_uuid, jsonb_build_object('recapture', array_agg(DISTINCT recapture)) AS mobileExtra " +
+                    "    FROM biometric b " +
+                    "    WHERE archived = ?1 " +
+                    " AND facility_id = ?2 " +
+                    "    GROUP BY person_uuid " +
+                    "    HAVING COUNT(person_uuid) >= 6 " +
+                    ") b ON p.uuid = b.person_uuid " +
+                    "JOIN LATERAL ( " +
+                    "    SELECT 1 " +
+                    "    FROM jsonb_array_elements(p.address->'address') AS addr " +
+                    "    WHERE addr->>'district' IN (?3) " +
+                    ") addr_filter ON true", nativeQuery = true)
+    Page<Person> findPersonByLga(Integer archived, Long facilityId, List<String> lgaIds, Pageable pageable);
+
+
+
 
 }
 
