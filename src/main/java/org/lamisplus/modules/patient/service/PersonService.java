@@ -723,9 +723,7 @@ public class PersonService {
             log.info("LGA IDs not supplied");
             return null;
         } else {
-            System.out.println("In else");
             persons = personRepository.findPersonByLga(0, currentOrganisationUnitId, lgaIds, paging);
-            System.out.println("after else");
         }
 
         PageDTO pageDTO = this.generatePagination(persons);
