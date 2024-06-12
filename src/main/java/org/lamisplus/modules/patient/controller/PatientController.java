@@ -204,9 +204,9 @@ public class PatientController {
         return new ResponseEntity<>(personMetaDataDto, new HttpHeaders(), HttpStatus.OK);
     }
 
-    @GetMapping(value = "/getall-patients-by-lga")
+    @PostMapping(value = "/getall-patients-by-lga")
     public ResponseEntity<PersonMetaDataDto> getAllPatientsByLga(
-            @RequestParam List<String> lgaIds,
+            @RequestBody List<String> lgaIds,
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize) {
 
