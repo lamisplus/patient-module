@@ -223,7 +223,7 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
             "SELECT * " +
                     "FROM patient_person p " +
                     "JOIN (" +
-                    "    SELECT DISTINCT person_uuid, jsonb_build_object('recapture', array_agg(DISTINCT recapture)) AS mobileExtra " +
+                    "    SELECT DISTINCT person_uuid, jsonb_build_object('recapture', array_agg(DISTINCT recapture)) AS mobile_extra " +
                     "    FROM biometric b " +
                     "    WHERE archived = ?1 " +
                     " AND facility_id = ?2 " +
