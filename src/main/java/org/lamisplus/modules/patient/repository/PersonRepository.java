@@ -219,7 +219,6 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
     @Query(value ="SELECT * FROM patient_person WHERE last_modified_date > ?1 AND facility_id=?2", nativeQuery = true)
     public List<Person> getAllDueForServerUpload(LocalDateTime dateLastSync, Long facilityId);
 
-
 }
 
 
