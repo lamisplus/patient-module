@@ -730,6 +730,15 @@ public class PersonService {
         return getPersonMetdaDataDtoObject(pageDTO, persons);
     }
 
+    public PersonMetaDataDto getAllPatientByUser(String userId, int pageNo, int pageSize) {
+        Pageable paging = PageRequest.of(pageNo, pageSize);
+        Page<Person> persons;
+        persons = personRepository.findPersonByUser(userId, paging);
+
+        PageDTO pageDTO = this.generatePagination(persons);
+        return getPersonMetdaDataDtoObject(pageDTO, persons);
+    }
+
     PersonMetaDataDto getPersonMetdaDataDtoObject(PageDTO pageDTO, Page persons){
         PersonMetaDataDto personMetaDataDto = new PersonMetaDataDto();
         personMetaDataDto.setTotalRecords(pageDTO.getTotalRecords());

@@ -214,4 +214,14 @@ public class PatientController {
         return new ResponseEntity<>(personMetaDataDto, new HttpHeaders(), HttpStatus.OK);
     }
 
+    @GetMapping(value = "/getall-patients-by-user")
+    public ResponseEntity<PersonMetaDataDto> getAllPatientsByUser(
+            @RequestParam String userId,
+            @RequestParam(defaultValue = "0") Integer pageNo,
+            @RequestParam(defaultValue = "10") Integer pageSize) {
+
+        PersonMetaDataDto personMetaDataDto = personService.getAllPatientByUser(userId, pageNo, pageSize);
+        return new ResponseEntity<>(personMetaDataDto, new HttpHeaders(), HttpStatus.OK);
+    }
+
 }

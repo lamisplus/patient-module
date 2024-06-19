@@ -237,6 +237,46 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
                     ") addr_filter ON true", nativeQuery = true)
     Page<Person> findPersonByLga(Integer archived, Long facilityId, List<String> lgaIds, Pageable pageable);
 
+    @Query(value = "with patients_case_manager as (\n" +
+            "select pp.*,case_manager_info.*\n" +
+            "from patient_person pp\n" +
+            "join (select distinct cmp.person_uuid,cm.id,cm.first_name,cm.last_name,cm.user_id,cm.designation\n" +
+            "\t  from case_manager cm join case_manager_patients cmp on cm.id=cmp.case_manager_id) case_manager_info\n" +
+            "on pp.uuid=case_manager_info.person_uuid)\n" +
+            "\n" +
+            "select pcm.*,labtests.*,patient_latest_vL_results.*,dsd_results.*,\n" +
+            "jsonb_build_object('lab_test_name', lab_test_name, 'group_name', group_name, 'result_reported',result_reported,\n" +
+            "'last_vl_date', last_vl_date, 'max_dsd_date',max_dsd_date) AS mobile_extra\n" +
+            "\n" +
+            "from patients_case_manager pcm\n" +
+            "left join(\n" +
+            "select distinct lt.patient_uuid, llt.lab_test_name,lltg.group_name \n" +
+            "from laboratory_test lt\n" +
+            "join laboratory_labtest llt on llt.id=lt.lab_test_id\n" +
+            "join laboratory_labtestgroup lltg on lltg.id=llt.labtestgroup_id \n" +
+            "\tand lt.lab_test_group_id=lltg.id) labtests on pcm.person_uuid=labtests.patient_uuid\n" +
+            "\n" +
+            "left join (\n" +
+            "select distinct lr.patient_uuid,lr.result_reported,mvld.last_vl_date\n" +
+            "from laboratory_result lr \n" +
+            "join (select patient_uuid,max(date_result_reported) last_vl_date\n" +
+            "from laboratory_result group by 1) mvld\n" +
+            "on lr.patient_uuid=mvld.patient_uuid and lr.date_result_reported=mvld.last_vl_date\n" +
+            "where lr.date_result_reported is not null) patient_latest_vL_results\n" +
+            "on pcm.person_uuid=patient_latest_vL_results.patient_uuid\n" +
+            "\n" +
+            "left join (select dde.person_uuid dsd_person_uuid,mdd.max_dsd_date\n" +
+            "from dsd_devolvement dde\n" +
+            "join (select person_uuid,max(date_devolved) max_dsd_date\n" +
+            "from dsd_devolvement group by 1) mdd\n" +
+            "on dde.person_uuid=mdd.person_uuid and dde.date_devolved=mdd.max_dsd_date\n" +
+            "where dde.date_devolved is not null) dsd_results \n" +
+            "on pcm.person_uuid=dsd_results.dsd_person_uuid\n" +
+            "where pcm.user_id= ?1", nativeQuery = true)
+    Page<Person> findPersonByUser(String userId, Pageable pageable);
+
+
+
 
 
 
