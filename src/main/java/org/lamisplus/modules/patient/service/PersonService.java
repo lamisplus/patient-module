@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.HashMap;
 
 @Service
 @RequiredArgsConstructor
@@ -759,6 +761,35 @@ public class PersonService {
         }
 
         return currentOrganisationUnitId;
+    }
+
+    public List<Map<String, Object>> countRegistrationsBySex() {
+        List<Object[]> result = personRepository.countRegistrationsBySex();
+        List<Map<String, Object>> formattedResult = new ArrayList<>();
+
+        for (Object[] row : result) {
+            Map<String, Object> entry = new HashMap<>();
+            entry.put("name", row[0]);
+            entry.put("y", row[1]);
+            formattedResult.add(entry);
+        }
+
+        return formattedResult;
+    }
+
+    public List<Map<String, Object>> countRegistrationsByYearAndSex() {
+        List<Object[]> result = personRepository.countRegistrationsByYearAndSex();
+        List<Map<String, Object>> formattedResult = new ArrayList<>();
+
+        for (Object[] row : result) {
+            Map<String, Object> entry = new HashMap<>();
+            entry.put("year", row[0]);
+            entry.put("male", row[1]);
+            entry.put("female", row[2]);
+            formattedResult.add(entry);
+        }
+
+        return formattedResult;
     }
 
 }

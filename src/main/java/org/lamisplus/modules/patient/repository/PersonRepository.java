@@ -165,16 +165,16 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
     @Query(value = "SELECT * FROM patient_person pp INNER JOIN pmtct_anc pa ON (pp.uuid=pa.person_uuid and pa.archived=0) WHERE (first_name ilike ?1 OR surname ilike ?1 OR other_name ilike ?1 OR full_name ilike ?1 OR hospital_number ilike ?1) AND pp.archived=?2 AND pp.facility_id=?3 AND pp.sex ilike 'FEMALE' AND (EXTRACT (YEAR FROM now()) - EXTRACT(YEAR FROM pp.date_of_birth) >= 10 ) ORDER BY pa.id desc", nativeQuery = true)
     Page<Person> getActiveOnANCBySearchParameters(String queryParam, Integer archived, Long facilityId, Pageable pageable);
 
-    @Query(value = "SELECT p.* from patient_person p JOIN (select person_uuid FROM biometric b Group by person_uuid, archived, recapture HAVING count(person_uuid) >= 6 AND archived = 0 and recapture = 0) b on p.uuid = b.person_uuid WHERE p.archived=?1 and p.facility_id =?2 ORDER BY p.id desc", nativeQuery = true)
+    @Query(value = "SELECT p.* from patient_person p JOIN (select person_uuid FROM biometric b Group by person_uuid HAVING count(person_uuid) >= 6) b on p.uuid = b.person_uuid WHERE p.archived=?1 and p.facility_id =?2 ORDER BY p.id desc", nativeQuery = true)
     Page<Person> findPersonWithBiometrics(Integer archived, Long facilityId, Pageable pageable);
 
-    @Query(value = "SELECT * FROM patient_person p JOIN (select person_uuid FROM biometric b Group by person_uuid, archived, recapture HAVING count(person_uuid) >= 6 AND archived = 0 and recapture = 0) b on p.uuid = b.person_uuid  WHERE (p.first_name ilike ?1 OR p.surname ilike ?1 OR p.other_name ilike ?1 OR p.full_name ilike ?1 OR p.hospital_number ilike ?1) AND p.archived=?2 AND p.facility_id=?3 ORDER BY p.id desc", nativeQuery = true)
+    @Query(value = "SELECT * FROM patient_person p JOIN (select person_uuid FROM biometric b Group by person_uuid HAVING count(person_uuid) >= 6) b on p.uuid = b.person_uuid  WHERE (p.first_name ilike ?1 OR p.surname ilike ?1 OR p.other_name ilike ?1 OR p.full_name ilike ?1 OR p.hospital_number ilike ?1) AND p.archived=?2 AND p.facility_id=?3 ORDER BY p.id desc", nativeQuery = true)
     Page<Person> findPersonWithBiometricsUsingSearchParam(String queryParam, Integer archived, Long facilityId, Pageable pageable);
 
-    @Query(value = "SELECT p.* from patient_person p JOIN (select person_uuid FROM biometric b Group by person_uuid, archived, recapture HAVING count(person_uuid) < 6 AND archived = 0 and recapture = 0) b on p.uuid = b.person_uuid WHERE p.archived=?1 and p.facility_id =?2 ORDER BY p.id desc", nativeQuery = true)
+    @Query(value = "SELECT p.* from patient_person p JOIN (select person_uuid FROM biometric b Group by person_uuid HAVING count(person_uuid) < 6) b on p.uuid = b.person_uuid WHERE p.archived=?1 and p.facility_id =?2 ORDER BY p.id desc", nativeQuery = true)
     Page<Person> findPersonWithOutBiometrics(Integer archived, Long facilityId, Pageable pageable);
 
-    @Query(value = "SELECT * FROM patient_person p JOIN (select person_uuid FROM biometric b Group by person_uuid, archived, recapture HAVING count(person_uuid) < 6 AND archived = 0 and recapture = 0) b on p.uuid = b.person_uuid  WHERE (p.first_name ilike ?1 OR p.surname ilike ?1 OR p.other_name ilike ?1 OR p.full_name ilike ?1 OR p.hospital_number ilike ?1) AND p.archived=?2 AND p.facility_id=?3 ORDER BY p.id desc", nativeQuery = true)
+    @Query(value = "SELECT * FROM patient_person p JOIN (select person_uuid FROM biometric b Group by person_uuid HAVING count(person_uuid) < 6) b on p.uuid = b.person_uuid  WHERE (p.first_name ilike ?1 OR p.surname ilike ?1 OR p.other_name ilike ?1 OR p.full_name ilike ?1 OR p.hospital_number ilike ?1) AND p.archived=?2 AND p.facility_id=?3 ORDER BY p.id desc", nativeQuery = true)
     Page<Person> findPersonWithOutBiometricsUsingSearchParam(String queryParam, Integer archived, Long facilityId, Pageable pageable);
 
     @Query(value = "SELECT * FROM patient_person WHERE uuid NOT IN (SELECT person_uuid FROM biometric) and archived=?1 and facility_id =?2 ORDER BY id desc", nativeQuery = true)
@@ -279,6 +279,15 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
 
 
 
+    @Query(value = "SELECT CASE WHEN sex = 'Female' THEN 'Female' WHEN sex = 'Male' THEN 'Male' ELSE 'Others' END AS name, COUNT(*) AS count FROM patient_person GROUP BY sex", nativeQuery = true)
+    List<Object[]> countRegistrationsBySex();
+
+    @Query(value = "SELECT EXTRACT(YEAR FROM date_of_registration) AS year, " +
+            "SUM(CASE WHEN sex = 'Male' THEN 1 ELSE 0 END) AS male, " +
+            "SUM(CASE WHEN sex = 'Female' THEN 1 ELSE 0 END) AS female " +
+            "FROM patient_person " +
+            "GROUP BY EXTRACT(YEAR FROM date_of_registration)", nativeQuery = true)
+    List<Object[]> countRegistrationsByYearAndSex();
 
 }
 
