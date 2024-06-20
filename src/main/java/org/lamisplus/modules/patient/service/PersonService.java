@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.HashMap;
 
 @Service
 @RequiredArgsConstructor
@@ -713,6 +715,81 @@ public class PersonService {
 
     public Optional<Person> findPersonByUuid(String uuid){
         return personRepository.findByUuid(uuid);
+    }
+
+    public PersonMetaDataDto getAllPatientByLga(List<String> lgaIds, int pageNo, int pageSize) {
+        Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by("id").descending());
+        Long currentOrganisationUnitId = getCurrentOrganisationUnitId();
+        Page<Person> persons;
+        if (lgaIds.size() < 1) {
+            log.info("LGA IDs not supplied");
+            return null;
+        } else {
+            persons = personRepository.findPersonByLga(0, currentOrganisationUnitId, lgaIds, paging);
+        }
+
+        PageDTO pageDTO = this.generatePagination(persons);
+        return getPersonMetdaDataDtoObject(pageDTO, persons);
+    }
+
+    public PersonMetaDataDto getAllPatientByUser(String userId, int pageNo, int pageSize) {
+        Pageable paging = PageRequest.of(pageNo, pageSize);
+        Page<Person> persons;
+        persons = personRepository.findPersonByUser(userId, paging);
+
+        PageDTO pageDTO = this.generatePagination(persons);
+        return getPersonMetdaDataDtoObject(pageDTO, persons);
+    }
+
+    PersonMetaDataDto getPersonMetdaDataDtoObject(PageDTO pageDTO, Page persons){
+        PersonMetaDataDto personMetaDataDto = new PersonMetaDataDto();
+        personMetaDataDto.setTotalRecords(pageDTO.getTotalRecords());
+        personMetaDataDto.setPageSize(pageDTO.getPageSize());
+        personMetaDataDto.setTotalPages(pageDTO.getTotalPages());
+        personMetaDataDto.setCurrentPage(pageDTO.getPageNumber());
+        personMetaDataDto.setRecords(persons.getContent());
+        return personMetaDataDto;
+    }
+
+    Long getCurrentOrganisationUnitId(){
+        Optional<User> currentUser = this.userService.getUserWithRoles();
+        Long currentOrganisationUnitId = 0L;
+        if (currentUser.isPresent()) {
+            User user = (User) currentUser.get();
+            currentOrganisationUnitId = user.getCurrentOrganisationUnitId();
+
+        }
+
+        return currentOrganisationUnitId;
+    }
+
+    public List<Map<String, Object>> countRegistrationsBySex() {
+        List<Object[]> result = personRepository.countRegistrationsBySex();
+        List<Map<String, Object>> formattedResult = new ArrayList<>();
+
+        for (Object[] row : result) {
+            Map<String, Object> entry = new HashMap<>();
+            entry.put("name", row[0]);
+            entry.put("y", row[1]);
+            formattedResult.add(entry);
+        }
+
+        return formattedResult;
+    }
+
+    public List<Map<String, Object>> countRegistrationsByYearAndSex() {
+        List<Object[]> result = personRepository.countRegistrationsByYearAndSex();
+        List<Map<String, Object>> formattedResult = new ArrayList<>();
+
+        for (Object[] row : result) {
+            Map<String, Object> entry = new HashMap<>();
+            entry.put("year", row[0]);
+            entry.put("male", row[1]);
+            entry.put("female", row[2]);
+            formattedResult.add(entry);
+        }
+
+        return formattedResult;
     }
 
 }

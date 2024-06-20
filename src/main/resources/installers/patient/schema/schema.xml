@@ -141,4 +141,17 @@
             );
         </sql>
     </changeSet>
+
+    <changeSet failOnError="false" author="Joshua Gabriel" id="patientQuery-001">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="patient_person" columnName="latitude" />
+                <columnExists tableName="patient_person" columnName="longitude" />
+            </not>
+        </preConditions>
+        <sql>
+            ALTER TABLE patient_person ADD COLUMN latitude varchar(255);
+            ALTER TABLE patient_person ADD COLUMN longitude varchar(255);
+        </sql>
+    </changeSet>
 </databaseChangeLog>
