@@ -288,7 +288,6 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
             "FROM patient_person " +
             "GROUP BY EXTRACT(YEAR FROM date_of_registration)", nativeQuery = true)
     List<Object[]> countRegistrationsByYearAndSex();
-
 }
 
 
