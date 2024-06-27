@@ -241,29 +241,45 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
             "select pp.*,case_manager_info.*\n" +
             "from patient_person pp\n" +
             "join (select distinct cmp.person_uuid,cm.id,cm.first_name,cm.last_name,cm.user_id,cm.designation\n" +
-            "\t  from case_manager cm join case_manager_patients cmp on cm.id=cmp.case_manager_id) case_manager_info\n" +
+            "  from case_manager cm join case_manager_patients cmp on cm.id=cmp.case_manager_id) case_manager_info\n" +
             "on pp.uuid=case_manager_info.person_uuid)\n" +
-            "\n" +
-            "select pcm.*,labtests.*,patient_latest_vL_results.*,dsd_results.*,\n" +
+            "\t\n" +
+            "select pcm.*,labtests.*,patient_latest_vL_results.*,dsd_results.*,pharmacy_results.last_drug_pickup_date,pharmacy_results.next_appointment,\n" +
             "jsonb_build_object('lab_test_name', lab_test_name, 'group_name', group_name, 'result_reported',result_reported,\n" +
-            "'last_vl_date', last_vl_date, 'max_dsd_date',max_dsd_date) AS mobile_extra\n" +
-            "\n" +
+            "'last_vl_date', last_vl_date, 'max_dsd_date',max_dsd_date,\n" +
+            "'last_drug_pickup_date',last_drug_pickup_date,'next_appointment_date',next_appointment) AS mobile_extra\n" +
             "from patients_case_manager pcm\n" +
             "left join(\n" +
-            "select distinct lt.patient_uuid, llt.lab_test_name,lltg.group_name \n" +
-            "from laboratory_test lt\n" +
-            "join laboratory_labtest llt on llt.id=lt.lab_test_id\n" +
-            "join laboratory_labtestgroup lltg on lltg.id=llt.labtestgroup_id \n" +
-            "\tand lt.lab_test_group_id=lltg.id) labtests on pcm.person_uuid=labtests.patient_uuid\n" +
+            "select distinct lt.patient_uuid,lt.last_test_date, llt.lab_test_name,lltg.group_name \n" +
+            "from (select distinct lt.patient_uuid,lt.lab_test_id,lt.lab_test_group_id,mtd.last_test_date\n" +
+            "\t\tfrom laboratory_test lt \n" +
+            "\t\tjoin (select patient_uuid,max(date_created) last_test_date\n" +
+            "\t\t\t\tfrom laboratory_test group by 1) mtd\n" +
+            "\t\ton lt.patient_uuid=mtd.patient_uuid and lt.date_created=mtd.last_test_date\n" +
+            "\t\twhere lt.date_created is not null) lt\n" +
+            "left join (select * from laboratory_labtest where lab_test_name ilike '%Viral Load%') llt on llt.id=lt.lab_test_id\n" +
+            "left join laboratory_labtestgroup lltg on lltg.id=llt.labtestgroup_id and lt.lab_test_group_id=lltg.id\n" +
+            "order by lt.patient_uuid,lt.last_test_date desc\n" +
+            ") labtests \n" +
+            "on pcm.person_uuid=labtests.patient_uuid\n" +
             "\n" +
             "left join (\n" +
             "select distinct lr.patient_uuid,lr.result_reported,mvld.last_vl_date\n" +
             "from laboratory_result lr \n" +
             "join (select patient_uuid,max(date_result_reported) last_vl_date\n" +
-            "from laboratory_result group by 1) mvld\n" +
+            "\t\tfrom laboratory_result group by 1) mvld\n" +
             "on lr.patient_uuid=mvld.patient_uuid and lr.date_result_reported=mvld.last_vl_date\n" +
             "where lr.date_result_reported is not null) patient_latest_vL_results\n" +
             "on pcm.person_uuid=patient_latest_vL_results.patient_uuid\n" +
+            "\n" +
+            "left join (\n" +
+            "select distinct hap.person_uuid,ldpd.last_drug_pickup_date,hap.next_appointment\n" +
+            "from hiv_art_pharmacy hap \n" +
+            "join (select person_uuid,max(visit_date) last_drug_pickup_date\n" +
+            "\t\tfrom hiv_art_pharmacy  group by 1) ldpd\n" +
+            "on hap.person_uuid=ldpd.person_uuid and hap.visit_date=ldpd.last_drug_pickup_date\n" +
+            "where hap.visit_date is not null\n" +
+            ") pharmacy_results on pcm.person_uuid=pharmacy_results.person_uuid\n" +
             "\n" +
             "left join (select dde.person_uuid dsd_person_uuid,mdd.max_dsd_date\n" +
             "from dsd_devolvement dde\n" +
