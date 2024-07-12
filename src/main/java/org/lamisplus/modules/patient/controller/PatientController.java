@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -202,6 +203,17 @@ public class PatientController {
 
         PersonMetaDataDto personMetaDataDto = personService.getAllPatientWithoutRecapture(searchParam, pageNo, pageSize);
         return new ResponseEntity<>(personMetaDataDto, new HttpHeaders(), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/count-by-sex")
+    public ResponseEntity<List<Map<String, Object>>> getCountRegistrationsBySex() {
+        List<Map<String, Object>> result = personService.countRegistrationsBySex();
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+    @GetMapping(value = "/count-by-year-and-sex")
+    public ResponseEntity<List<Map<String, Object>>> getCountRegistrationsByYearAndSex() {
+        List<Map<String, Object>> result = personService.countRegistrationsByYearAndSex();
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
 }
