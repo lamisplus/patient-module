@@ -284,7 +284,7 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
             "from dsd_devolvement group by person_uuid) mdd   \n" +
             "on dde.person_uuid=mdd.person_uuid and dde.date_devolved=mdd.max_dsd_date   \n" +
             "where dde.date_devolved is not null) dsd_results on pp.uuid=dsd_results.dsd_person_uuid   \n" +
-            "where cm.user_id='1' and pp.archived=0", nativeQuery = true)
+            "where cm.user_id=?1 and pp.archived=0", nativeQuery = true)
     Page<Person> findPersonByUser(String userId, Pageable pageable);
 
 
