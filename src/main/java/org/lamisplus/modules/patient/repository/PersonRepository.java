@@ -237,59 +237,156 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
                     ") addr_filter ON true", nativeQuery = true)
     Page<Person> findPersonByLga(Integer archived, Long facilityId, List<String> lgaIds, Pageable pageable);
 
-    @Query(value = "select distinct pp.*,labtests.*,patient_latest_vL_results.*,dsd_results.*,pharmacy_results.last_drug_pickup_date,pharmacy_results.next_appointment,   \n" +
-            "jsonb_build_object('lab_test_name', lab_test_name, 'group_name', group_name, 'result_reported',result_reported,   \n" +
-            "'last_vl_date', last_vl_date, 'max_dsd_date',max_dsd_date,   \n" +
-            "'last_drug_pickup_date',last_drug_pickup_date,'next_appointment_date',next_appointment) AS mobile_extra   \n" +
-            "from patient_person pp  \n" +
-            "left join (select distinct pp.*,case_manager_info.* from patient_person pp   \n" +
-            "join (select distinct cmp.person_uuid,cm.id,cm.first_name,cm.last_name,cm.user_id,cm.designation   \n" +
-            "from case_manager cm join case_manager_patients cmp on cm.id=cmp.case_manager_id) case_manager_info   \n" +
-            "on pp.uuid=case_manager_info.person_uuid) cm on cm.person_uuid=pp.uuid  \n" +
-            "left join case_manager_patients pcm ON pcm.person_uuid=pp.uuid  \n" +
-            "left join(   \n" +
-            "select distinct on (lt.patient_uuid) lt.patient_uuid,lt.last_test_date, llt.lab_test_name,lltg.group_name    \n" +
-            "from (select distinct lt.patient_uuid,lt.lab_test_id,lt.lab_test_group_id,mtd.last_test_date   \n" +
-            "from laboratory_test lt    \n" +
-            "join (select patient_uuid,max(date_created) last_test_date   \n" +
-            "from laboratory_test group by patient_uuid) mtd   \n" +
-            "on lt.patient_uuid=mtd.patient_uuid and lt.date_created=mtd.last_test_date   \n" +
-            "where lt.date_created is not null) lt   \n" +
-            "left join (select * from laboratory_labtest where lab_test_name ilike '%Viral Load%') llt on llt.id=lt.lab_test_id   \n" +
-            "left join laboratory_labtestgroup lltg on lltg.id=llt.labtestgroup_id and lt.lab_test_group_id=lltg.id   \n" +
-            "order by lt.patient_uuid,lt.last_test_date desc   \n" +
-            ") labtests on pp.uuid=labtests.patient_uuid   \n" +
-            "\n" +
-            "left join (   \n" +
-            "select distinct on (lr.patient_uuid)lr.patient_uuid,lr.result_reported,mvld.last_vl_date   \n" +
-            "from laboratory_result lr    \n" +
-            "join (select patient_uuid,max(date_result_reported) last_vl_date   \n" +
-            "from laboratory_result group by patient_uuid) mvld   \n" +
-            "on lr.patient_uuid=mvld.patient_uuid and lr.date_result_reported=mvld.last_vl_date   \n" +
-            "where lr.date_result_reported is not null) patient_latest_vL_results   \n" +
-            "on pp.uuid=patient_latest_vL_results.patient_uuid   \n" +
-            "\n" +
-            "left join (   \n" +
-            "select distinct on (hap.person_uuid)hap.person_uuid,ldpd.last_drug_pickup_date,hap.next_appointment   \n" +
-            "from hiv_art_pharmacy hap    \n" +
-            "join (select person_uuid,max(visit_date) last_drug_pickup_date   \n" +
-            "from hiv_art_pharmacy group by person_uuid) ldpd   \n" +
-            "on hap.person_uuid=ldpd.person_uuid and hap.visit_date=ldpd.last_drug_pickup_date   \n" +
-            "where hap.visit_date is not null and hap.archived=0  \n" +
-            ") pharmacy_results on pp.uuid=pharmacy_results.person_uuid   \n" +
-            "\n" +
-            "left join (select dde.person_uuid dsd_person_uuid,mdd.max_dsd_date   \n" +
-            "from dsd_devolvement dde   \n" +
-            "join (select person_uuid,max(date_devolved) max_dsd_date   \n" +
-            "from dsd_devolvement group by person_uuid) mdd   \n" +
-            "on dde.person_uuid=mdd.person_uuid and dde.date_devolved=mdd.max_dsd_date   \n" +
-            "where dde.date_devolved is not null) dsd_results on pp.uuid=dsd_results.dsd_person_uuid   \n" +
-            "where cm.user_id=?1 and pp.archived=0", nativeQuery = true)
-    Page<Person> findPersonByUser(String userId, Pageable pageable);
-
-
-
-
+    @Query(value = "select \n" +
+            "  distinct pp.id as id, \n" +
+            "  pp.uuid as personUuid, \n" +
+            "  pp.deceased as deceased, \n" +
+            "  pp.deceased_date_time as deceasedDateTime, \n" +
+            "  pp.sex as sex, \n" +
+            "  pp.date_of_birth as dateOfBirth, \n" +
+            "  pp.date_of_registration as dateOfRegistration, \n" +
+            "  pp.archived as archived, \n" +
+            "  pp.nin_number as ninNumber, \n" +
+            "  pp.emr_id as emrId, \n" +
+            "  pp.first_name as firstName, \n" +
+            "  pp.surname as surname, \n" +
+            "  pp.other_name as otherName, \n" +
+            "  pp.hospital_number as hospitalNumber, \n" +
+            "  lab_test_name as labTestName,\n" +
+            "  group_name as groupName,\n" +
+            "  result_reported as resultReported,\n" +
+            "  last_vl_date as lastVlDate,\n" +
+            "  max_dsd_date as maxDsdDate,\n" +
+            "  last_drug_pickup_date as lastDrugPickupDate,\n" +
+            "  next_appointment as nextAppointment\n" +
+            "from \n" +
+            "  patient_person pp \n" +
+            "  left join (\n" +
+            "    select \n" +
+            "      distinct pp.*, \n" +
+            "      case_manager_info.* \n" +
+            "    from \n" +
+            "      patient_person pp \n" +
+            "      join (\n" +
+            "        select \n" +
+            "          distinct cmp.person_uuid, \n" +
+            "          cm.id, \n" +
+            "          cm.first_name, \n" +
+            "          cm.last_name, \n" +
+            "          cm.user_id, \n" +
+            "          cm.designation \n" +
+            "        from \n" +
+            "          case_manager cm \n" +
+            "          join case_manager_patients cmp on cm.id = cmp.case_manager_id\n" +
+            "      ) case_manager_info on pp.uuid = case_manager_info.person_uuid\n" +
+            "  ) cm on cm.person_uuid = pp.uuid \n" +
+            "  left join case_manager_patients pcm ON pcm.person_uuid = pp.uuid \n" +
+            "  left join(\n" +
+            "    select \n" +
+            "      distinct on (lt.patient_uuid) lt.patient_uuid, \n" +
+            "      lt.last_test_date, \n" +
+            "      llt.lab_test_name, \n" +
+            "      lltg.group_name \n" +
+            "    from \n" +
+            "      (\n" +
+            "        select \n" +
+            "          distinct lt.patient_uuid, \n" +
+            "          lt.lab_test_id, \n" +
+            "          lt.lab_test_group_id, \n" +
+            "          mtd.last_test_date \n" +
+            "        from \n" +
+            "          laboratory_test lt \n" +
+            "          join (\n" +
+            "            select \n" +
+            "              patient_uuid, \n" +
+            "              max(date_created) last_test_date \n" +
+            "            from \n" +
+            "              laboratory_test \n" +
+            "            group by \n" +
+            "              patient_uuid\n" +
+            "          ) mtd on lt.patient_uuid = mtd.patient_uuid \n" +
+            "          and lt.date_created = mtd.last_test_date \n" +
+            "        where \n" +
+            "          lt.date_created is not null\n" +
+            "      ) lt \n" +
+            "      left join (\n" +
+            "        select \n" +
+            "          * \n" +
+            "        from \n" +
+            "          laboratory_labtest \n" +
+            "        where \n" +
+            "          lab_test_name ilike '%Viral Load%'\n" +
+            "      ) llt on llt.id = lt.lab_test_id \n" +
+            "      left join laboratory_labtestgroup lltg on lltg.id = llt.labtestgroup_id \n" +
+            "      and lt.lab_test_group_id = lltg.id \n" +
+            "    order by \n" +
+            "      lt.patient_uuid, \n" +
+            "      lt.last_test_date desc\n" +
+            "  ) labtests on pp.uuid = labtests.patient_uuid \n" +
+            "  left join (\n" +
+            "    select \n" +
+            "      distinct on (lr.patient_uuid) lr.patient_uuid, \n" +
+            "      lr.result_reported, \n" +
+            "      mvld.last_vl_date \n" +
+            "    from \n" +
+            "      laboratory_result lr \n" +
+            "      join (\n" +
+            "        select \n" +
+            "          patient_uuid, \n" +
+            "          max(date_result_reported) last_vl_date \n" +
+            "        from \n" +
+            "          laboratory_result \n" +
+            "        group by \n" +
+            "          patient_uuid\n" +
+            "      ) mvld on lr.patient_uuid = mvld.patient_uuid \n" +
+            "      and lr.date_result_reported = mvld.last_vl_date \n" +
+            "    where \n" +
+            "      lr.date_result_reported is not null\n" +
+            "  ) patient_latest_vL_results on pp.uuid = patient_latest_vL_results.patient_uuid \n" +
+            "  left join (\n" +
+            "    select \n" +
+            "      distinct on (hap.person_uuid) hap.person_uuid, \n" +
+            "      ldpd.last_drug_pickup_date, \n" +
+            "      hap.next_appointment \n" +
+            "    from \n" +
+            "      hiv_art_pharmacy hap \n" +
+            "      join (\n" +
+            "        select \n" +
+            "          person_uuid, \n" +
+            "          max(visit_date) last_drug_pickup_date \n" +
+            "        from \n" +
+            "          hiv_art_pharmacy \n" +
+            "        group by \n" +
+            "          person_uuid\n" +
+            "      ) ldpd on hap.person_uuid = ldpd.person_uuid \n" +
+            "      and hap.visit_date = ldpd.last_drug_pickup_date \n" +
+            "    where \n" +
+            "      hap.visit_date is not null \n" +
+            "      and hap.archived = 0\n" +
+            "  ) pharmacy_results on pp.uuid = pharmacy_results.person_uuid \n" +
+            "  left join (\n" +
+            "    select \n" +
+            "      dde.person_uuid dsd_person_uuid, \n" +
+            "      mdd.max_dsd_date \n" +
+            "    from \n" +
+            "      dsd_devolvement dde \n" +
+            "      join (\n" +
+            "        select \n" +
+            "          person_uuid, \n" +
+            "          max(date_devolved) max_dsd_date \n" +
+            "        from \n" +
+            "          dsd_devolvement \n" +
+            "        group by \n" +
+            "          person_uuid\n" +
+            "      ) mdd on dde.person_uuid = mdd.person_uuid \n" +
+            "      and dde.date_devolved = mdd.max_dsd_date \n" +
+            "    where \n" +
+            "      dde.date_devolved is not null\n" +
+            "  ) dsd_results on pp.uuid = dsd_results.dsd_person_uuid \n" +
+            "where \n" +
+            "  cm.user_id = ?1 \n" +
+            "  and pp.archived = 0\n", nativeQuery = true)
+    List<Object[]> findPersonByUser(String userId);
 
     @Query(value = "SELECT CASE WHEN sex = 'Female' THEN 'Female' WHEN sex = 'Male' THEN 'Male' ELSE 'Others' END AS name, COUNT(*) AS count FROM patient_person GROUP BY sex", nativeQuery = true)
     List<Object[]> countRegistrationsBySex();

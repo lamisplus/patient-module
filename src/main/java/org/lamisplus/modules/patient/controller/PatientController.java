@@ -2,9 +2,7 @@ package org.lamisplus.modules.patient.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.lamisplus.modules.patient.domain.dto.PersonDto;
-import org.lamisplus.modules.patient.domain.dto.PersonMetaDataDto;
-import org.lamisplus.modules.patient.domain.dto.PersonResponseDto;
+import org.lamisplus.modules.patient.domain.dto.*;
 import org.lamisplus.modules.patient.domain.entity.PatientCheckPostService;
 import org.lamisplus.modules.patient.domain.entity.Person;
 import org.lamisplus.modules.patient.repository.PatientCheckPostServiceRepository;
@@ -216,13 +214,11 @@ public class PatientController {
     }
 
     @GetMapping(value = "/getall-patients-by-user")
-    public ResponseEntity<PersonMetaDataDto> getAllPatientsByUser(
-            @RequestParam String userId,
-            @RequestParam(defaultValue = "0") Integer pageNo,
-            @RequestParam(defaultValue = "10") Integer pageSize) {
-
-        PersonMetaDataDto personMetaDataDto = personService.getAllPatientByUser(userId, pageNo, pageSize);
-        return new ResponseEntity<>(personMetaDataDto, new HttpHeaders(), HttpStatus.OK);
+    public ResponseEntity<List<PersonExtraDto>> getAllPatientsByUser(
+            @RequestParam String userId) {
+        List<PersonExtraDto> result;
+        result = personService.getAllPatientByUser(userId);
+        return new ResponseEntity<>(result, new HttpHeaders(), HttpStatus.OK);
     }
 
     @GetMapping(value = "/count-by-sex")
