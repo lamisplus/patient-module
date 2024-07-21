@@ -303,7 +303,7 @@ public class PersonService {
         personResponseDto.setArchived(person.getArchived());
         personResponseDto.setUuid(person.getUuid());
         personResponseDto.setBiometricStatus(getPatientBiometricStatus(person.getUuid()));
-        
+        personResponseDto.setFacilityId(person.getFacilityId());
         return personResponseDto;
     }
 
