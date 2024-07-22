@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.joda.time.DateTime;
 import org.lamisplus.modules.base.controller.apierror.EntityNotFoundException;
 import org.lamisplus.modules.base.domain.entities.ApplicationCodeSet;
 import org.lamisplus.modules.base.domain.entities.OrganisationUnit;
@@ -26,6 +27,7 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -748,7 +750,7 @@ public class PersonService {
         dto.setId((Number) tuple[0]);
         dto.setPersonUuid((String) tuple[1]);
         dto.setDeceased((Boolean) tuple[2]);
-        dto.setDeceasedDateTime((LocalDateTime) tuple[3]);
+        dto.setDeceasedDateTime(convertToLocalDateTime(tuple[3]));
         dto.setSex((String) tuple[4]);
         dto.setDateOfBirth(convertToLocalDate(tuple[5]));
         dto.setDateOfRegistration(convertToLocalDate(tuple[6]));
@@ -762,7 +764,7 @@ public class PersonService {
         dto.setLabTestName((String) tuple[14]);
         dto.setGroupName((String) tuple[15]);
         dto.setResultReported((String) tuple[16]);
-        dto.setLastVlDate((LocalDateTime) tuple[17]);
+        dto.setLastVlDate(convertToLocalDateTime(tuple[17]));
         dto.setMaxDsdDate(convertToLocalDate(tuple[18]));
         dto.setLastDrugPickupDate(convertToLocalDate(tuple[19]));
         dto.setNextAppointment(convertToLocalDate(tuple[20]));
@@ -774,9 +776,18 @@ public class PersonService {
         if (date instanceof Date) {
             return ((Date) date).toLocalDate();
         } else if (date instanceof java.sql.Timestamp) {
-            return ((java.sql.Timestamp) date).toLocalDateTime().toLocalDate();
+            return ((Timestamp) date).toLocalDateTime().toLocalDate();
         } else if (date instanceof java.util.Date) {
             return ((java.util.Date) date).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        }
+        return null;
+    }
+
+    private LocalDateTime convertToLocalDateTime(Object date) {
+        if (date instanceof Timestamp) {
+            return ((Timestamp) date).toLocalDateTime();
+        } else if (date instanceof Date) {
+            return ((Date) date).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
         }
         return null;
     }
