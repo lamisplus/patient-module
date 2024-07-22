@@ -128,12 +128,13 @@ public class PersonService {
         return person.isPresent();
     }
 
-    public List<PersonResponseDto> getCheckedInPersonsByServiceCodeAndVisitId(String serviceCode) {
-        List<Encounter> patientEncounters = encounterRepository.findAllByServiceCodeAndStatus(serviceCode, "PENDING");
-        return patientEncounters.stream()
-                .map(Encounter::getPerson)
-                .map(this::getDtoFromPerson)
-                .collect(Collectors.toList());
+    public List<EncounterDto> getCheckedInPersonsByServiceCodeAndVisitId(String serviceCode) {
+        List<EncounterDto> patientEncounters = encounterRepository.findAllByServiceCodeAndStatus(serviceCode, "PENDING");
+        return patientEncounters;
+//                patientEncounters.stream()
+//                .map(Encounter::getPerson)
+//                .map(this::getDtoFromPerson)
+//                .collect(Collectors.toList());
     }
 
     public PersonResponseDto getPersonById(Long id) {
