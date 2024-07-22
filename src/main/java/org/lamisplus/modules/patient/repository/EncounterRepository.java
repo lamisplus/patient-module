@@ -16,7 +16,7 @@ public interface EncounterRepository extends JpaRepository<Encounter, Long> {
 
 //    List<Encounter> findAllByServiceCodeAndStatus(String serviceCode, String status);
 
-    @Query(value = "SELECT CONCAT(first_name, ' ', surname) AS fullName, hospital_number AS hospitalNumber, sex, EXTRACT(YEAR from AGE(NOW(),  date_of_birth)) as age, pe.service_code AS serviceCode, pe.status AS status, CASE WHEN b.person_uuid IS NOT NULL AND b.person_uuid != '' THEN 'Yes' ELSE 'No' END AS biometric   FROM patient_person pp\n" +
+    @Query(value = "SELECT CONCAT(first_name, ' ', surname) AS fullname, hospital_number AS hospitalNumber, sex, EXTRACT(YEAR from AGE(NOW(),  date_of_birth)) as age, (CASE WHEN b.person_uuid IS NOT NULL AND b.person_uuid != '' THEN 'Yes' ELSE 'No' END) AS biometric FROM patient_person pp\n" +
             "LEFT JOIN (\n" +
             "SELECT person_uuid from biometric LIMIT 1\n" +
             ") b ON b.person_uuid = pp.uuid\n" +
@@ -27,8 +27,8 @@ public interface EncounterRepository extends JpaRepository<Encounter, Long> {
             "from patient_encounter where archived = 0\n" +
             ") sub where rnk = 1\n" +
             ") pe ON pe.person_uuid = pp.uuid\n" +
-            "where pp.archived = 0 AND pe.service_code = '?1' AND pe.status = '?2'", nativeQuery = true)
-    List<EncounterDto> findAllByServiceCodeAndStatus (String serviceCode, String status);
+            "where pp.archived = 0 AND pe.service_code = '?1' AND pe.status = 'PENDING'", nativeQuery = true)
+    List<EncounterDto> findAllByServiceCodeAndStatus (String serviceCode);
 
     Optional<Encounter> getEncounterByVisitAndStatusAndServiceCode(Visit visit, String status, String serviceCode);
 

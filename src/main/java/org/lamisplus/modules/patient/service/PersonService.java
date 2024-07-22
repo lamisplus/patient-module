@@ -129,7 +129,7 @@ public class PersonService {
     }
 
     public List<EncounterDto> getCheckedInPersonsByServiceCodeAndVisitId(String serviceCode) {
-        List<EncounterDto> patientEncounters = encounterRepository.findAllByServiceCodeAndStatus(serviceCode, "PENDING");
+        List<EncounterDto> patientEncounters = encounterRepository.findAllByServiceCodeAndStatus(serviceCode);
         return patientEncounters;
 //                patientEncounters.stream()
 //                .map(Encounter::getPerson)

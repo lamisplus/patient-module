@@ -79,7 +79,6 @@ public class PatientController {
     public ResponseEntity<List<EncounterDto>> getCheckedInPatientByService(@PathVariable("serviceCode") String serviceCode) {
         return ResponseEntity.ok(personService.getCheckedInPersonsByServiceCodeAndVisitId(serviceCode));
     }
-
     @PostMapping("/exist/hospital-number")
     public ResponseEntity<Boolean> hospitalNumberExists(@RequestBody String hospitalNumber) throws InterruptedException, ExecutionException {
         CompletableFuture<Boolean> hospitalNumberExist = validationService.hospitalNumberExist(hospitalNumber);
