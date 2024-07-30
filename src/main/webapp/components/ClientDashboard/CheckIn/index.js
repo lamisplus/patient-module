@@ -19,7 +19,7 @@ import { useForm } from "react-hook-form";
 import { format } from "date-fns";
 import { makeStyles } from "@material-ui/core/styles";
 import moment from "moment";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import RecallPatient from "../../RecallPatient";
 
 const useStyles = makeStyles((theme) => ({
@@ -102,7 +102,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 let newDate = new Date();
 function Index(props) {
-
   const [patientDetails, setPatientDetails] = useState(null);
   const [pimsEnrollment, setPimsEnrollment] = useState([]);
   const [enablePPI, setEnablePPI] = useState(true);
@@ -385,7 +384,8 @@ function Index(props) {
             </MatButton>
           </Link>
 
-          {permissions.includes("patient_check_in") ||
+          {permissions.includes("view_patient") ||
+          permissions.includes("patient_check_in") ||
           permissions.includes("all_permission") ? (
             <>
               {checkinStatus === false ? (
@@ -409,7 +409,9 @@ function Index(props) {
           ) : (
             ""
           )}
-          {checkinStatus === true ? (
+          {(permissions.includes("view_patient") ||
+            permissions.includes("all_permission")) &&
+          checkinStatus === true ? (
             <Button
               variant="contained"
               style={{
@@ -427,17 +429,21 @@ function Index(props) {
             ""
           )}
 
-          <Link >
-              <MatButton
-                  className=" float-right mr-1"
-                  variant="contained"
-                  floated="left"
-                  startIcon={<FontAwesomeIcon icon="fa-solid fa-fingerprint" />}
-                  style={{backgroundColor:"rgb(153, 46, 98)", color:'#fff', height:'35px'}}
-                  onClick={toggleRecall}
-              >
-                  <span style={{ textTransform: "capitalize" }}>Identify</span>
-              </MatButton>
+          <Link>
+            <MatButton
+              className=" float-right mr-1"
+              variant="contained"
+              floated="left"
+              startIcon={<FontAwesomeIcon icon="fa-solid fa-fingerprint" />}
+              style={{
+                backgroundColor: "rgb(153, 46, 98)",
+                color: "#fff",
+                height: "35px",
+              }}
+              onClick={toggleRecall}
+            >
+              <span style={{ textTransform: "capitalize" }}>Identify</span>
+            </MatButton>
           </Link>
         </div>
       </div>
@@ -690,7 +696,6 @@ function Index(props) {
         personUuid={patientObj.uuid}
       />
     </>
-    
   );
 }
 
