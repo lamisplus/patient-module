@@ -56,5 +56,7 @@ public interface EncounterRepository extends JpaRepository<Encounter, Long> {
 
     List<Encounter> findByPersonAndStatus (Person person, String status);
 
-
+    @Query(value = "SELECT * FROM patient_encounter pe \n" +
+            "WHERE pe.visit_id = ?1 AND pe.status = 'PENDING'", nativeQuery = true)
+    List<Encounter> findEncountersByUuid(String uuid);
 }

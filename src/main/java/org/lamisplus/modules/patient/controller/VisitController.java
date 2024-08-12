@@ -43,6 +43,12 @@ public class VisitController {
         return ResponseEntity.accepted ().build ();
     }
 
+    @PutMapping("/checkoutVisit")
+    public ResponseEntity<String> checkoutVisitsByVisitId(@RequestBody ServiceRequest serviceRequest) {
+        visitService.checkOutVisitsByVisitId (serviceRequest.getVisitId(), serviceRequest.getServiceCode());
+        return ResponseEntity.accepted ().build ();
+    }
+
     @PostMapping("/checkin")
     public ResponseEntity<VisitDto> checkInVisitByPersonId(@RequestBody CheckInDto checkInDto) {
         return ResponseEntity.ok (visitService.checkInPerson (checkInDto));

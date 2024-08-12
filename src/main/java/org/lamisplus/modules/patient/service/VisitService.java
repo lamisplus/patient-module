@@ -89,6 +89,15 @@ public class VisitService {
         visitRepository.save(visit);
     }
 
+    public void checkOutVisitsByVisitId(Long visitId, String serviceCode) {
+        Visit visit = getExistVisit(visitId);
+        List<Encounter> encounters = encounterRepository.findEncountersByUuid(visit.getUuid());
+        encounters.stream().filter(encounter -> encounter.getServiceCode().equals(serviceCode)).forEach(this::checkoutFromAllService);
+        visit.setVisitEndDate(LocalDateTime.now());
+        visitRepository.save(visit);
+    }
+
+
     private void checkoutFromAllService(Encounter encounter) {
         if (encounter.getStatus().equals("PENDING")) {
             encounter.setStatus("COMPLETED");
