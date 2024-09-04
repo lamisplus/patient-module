@@ -70,6 +70,9 @@ public class PersonService {
         person.setHospitalNumber(hospitalNumber);
         person.setUuid(UUID.randomUUID().toString());
         person.setFullName(this.getFullName(personDto.getFirstName(), personDto.getOtherName(), personDto.getSurname()));
+        person.setSource((personDto.getSource() != null && !personDto.getSource().trim().isEmpty()) ? personDto.getSource()  : "Web" );
+        person.setLatitude(personDto.getLatitude());
+        person.setLongitude(personDto.getLongitude());
         return getDtoFromPerson(personRepository.save(person));
     }
 
@@ -306,6 +309,10 @@ public class PersonService {
         personResponseDto.setUuid(person.getUuid());
         personResponseDto.setBiometricStatus(getPatientBiometricStatus(person.getUuid()));
         personResponseDto.setFacilityId(person.getFacilityId());
+        personResponseDto.setLatitude(person.getLatitude());
+        personResponseDto.setLongitude(person.getLongitude());
+        personResponseDto.setSource(person.getSource());
+//        personResponseDto.setSource((person.getSource() != null && !person.getSource().trim().isEmpty()) ? person.getSource()  : "Web" );
         return personResponseDto;
     }
 
