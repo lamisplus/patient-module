@@ -733,7 +733,7 @@ public class PersonService {
     public PersonMetaDataDto getAllPatientByLga(List<String> lgaIds, int pageNo, int pageSize) {
         Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by("id").descending());
         Long currentOrganisationUnitId = getCurrentOrganisationUnitId();
-        Page<Person> persons;
+        Page<PersonDtoProjection> persons;
         if (lgaIds.size() < 1) {
             log.info("LGA IDs not supplied");
             return null;
