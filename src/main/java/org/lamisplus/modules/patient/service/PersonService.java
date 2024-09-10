@@ -730,13 +730,11 @@ public class PersonService {
         Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by("id").descending());
         Long currentOrganisationUnitId = getCurrentOrganisationUnitId();
         Page<PersonDtoProjection> persons;
-        Page<PersonDtoProjection> personOnly;
         if (lgaIds.size() < 1) {
             log.info("LGA IDs not supplied");
             return null;
         } else {
             persons = personRepository.findPersonByLga(0, currentOrganisationUnitId, lgaIds, paging);
-            personOnly = personRepository.findPersonByLgaOnly(0,currentOrganisationUnitId,lgaIds,paging);
         }
 
         PageDTO pageDTO = this.generatePagination(persons);
@@ -784,23 +782,21 @@ public class PersonService {
                 .age(p.getAge())
                 .dateOfBirth(p.getDateOfBirth())
                 .sex(p.getGender())
-//                .enrollmentId(p.getEnrollmentId())
                 .hospitalNumber(p.getHospitalNumber())
                 .firstName(p.getFirstName())
                 .facilityId(p.getFacility())
                 .personUuid(p.getPersonUuid())
-//                .targetGroupId(p.getTargetGroupId())
                 .otherName(p.getOtherName())
                 .surname(p.getSurname())
                 .id(p.getId())
                 .isDobEstimated(p.getIsDobEstimated())
                 .isEnrolled(p.getIsEnrolled())
-//                .createBy(p.getCreateBy())
                 .uniqueId(p.getUniqueId())
                 .dateOfRegistration(p.getDateOfRegistration())
                 .mobileExtra(p.getMobileExtra())
-                .biometricStatus(p.getBiometricStatus())
+//                .biometricStatus(p.getBiometricStatus())
                 .build();
+        patientDTO.setBiometricStatus(p.getBiometricStatus() != null);
 
         return patientDTO;
     }
