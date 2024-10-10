@@ -439,6 +439,8 @@ const RegisterPatient = (props) => {
     if (basicInfo.age !== "" && basicInfo.age >= 60) {
       toggle();
     }
+    setErrors({...errors, age: ""})
+
   };
   const handleDateOfBirthChange = (e) => {
     if (e.target.value === "Actual") {
@@ -462,9 +464,11 @@ const RegisterPatient = (props) => {
       }
     }
     setBasicInfo({ ...basicInfo, age: ageNumber });
+    setErrors({...errors, age: ""})
   };
 
   const handleInputChangeBasic = (e) => {
+    setErrors({...errors, [e.target.name]: ""})
     setBasicInfo({ ...basicInfo, [e.target.name]: e.target.value });
 
     if (e.target.name === "firstName" && e.target.value !== "") {
@@ -611,6 +615,8 @@ const RegisterPatient = (props) => {
     temp.streetAddress = basicInfo.streetAddress ? "" : "Address is required.";
     //temp.phoneNumber = basicInfo.phoneNumber ? "" : "Phone Number  is required."
     temp.countryId = basicInfo.countryId ? "" : "Country is required.";
+    temp.age = basicInfo.age ? "" : "Age is required.";
+
     temp.stateId = basicInfo.stateId ? "" : "State is required.";
     temp.district = basicInfo.district ? "" : "Province/LGA is required.";
     temp.employmentStatusId = basicInfo.employmentStatusId
@@ -1148,6 +1154,13 @@ const RegisterPatient = (props) => {
                             }}
                           />
                         </FormGroup>
+                        {errors.age !== "" ? (
+                            <span className={classes.error}>
+                              {errors.age}
+                            </span>
+                          ) : (
+                            ""
+                          )}
                         {basicInfo.age !== "" && basicInfo.age >= 80 ? (
                           <span className={classes.error}>
                             Are you sure of the age
