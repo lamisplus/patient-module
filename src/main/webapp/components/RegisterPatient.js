@@ -1138,7 +1138,7 @@ const RegisterPatient = (props) => {
 
                       <div className="form-group mb-3 col-md-3">
                         <FormGroup>
-                          <Label>Age</Label>
+                          <Label>Age  <span style={{ color: "red" }}> *</span></Label>
                           <input
                             type="text"
                             name="age"
