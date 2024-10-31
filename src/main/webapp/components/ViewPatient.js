@@ -1182,7 +1182,7 @@ const ViewPatient = (props) => {
 
                       <div className="form-group mb-3 col-md-4">
                         <FormGroup>
-                          <Label>Age</Label>
+                          <Label>Age  <span style={{ color: "red" }}> *</span></Label>
                           <input
                             className="form-control"
                             type="number"
