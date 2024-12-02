@@ -17,15 +17,10 @@ import java.util.List;
 public class VisitController {
     private final VisitService visitService;
 
-
-
-
-
     @PostMapping
     public ResponseEntity<Visit> createVisit(@RequestBody VisitRequest visitDto) {
         return ResponseEntity.ok (visitService.createVisit (visitDto));
     }
-
 
     @GetMapping
     public ResponseEntity<List<VisitDto>> getAllVisit() {

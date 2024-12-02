@@ -267,7 +267,7 @@ public class PersonService {
 
 
     public PersonResponseDto getDtoFromPerson(Person person) {
-       // Optional<Visit> visit = visitRepository.findVisitByPersonAndVisitStartDateNotNullAndVisitEndDateIsNull(person);
+        // Optional<Visit> visit = visitRepository.findVisitByPersonAndVisitStartDateNotNullAndVisitEndDateIsNull(person);
         PersonResponseDto personResponseDto = new PersonResponseDto();
 //       if (visit.isPresent()) {
 //           personResponseDto.setVisitId(visit.get().getId());
@@ -296,7 +296,7 @@ public class PersonService {
         personResponseDto.setArchived(person.getArchived());
         personResponseDto.setUuid(person.getUuid());
         personResponseDto.setBiometricStatus(getPatientBiometricStatus(person.getUuid()));
-        
+
         return personResponseDto;
     }
 
@@ -616,7 +616,7 @@ public class PersonService {
             persons = personRepository.findPersonWithOutBiometrics2(queryParam, 0, currentOrganisationUnitId, paging);
         } else {
             persons = personRepository.findPersonWithOutBiometrics(0, currentOrganisationUnitId, paging);
-           // System.out.println("Testng the number of records "+persons.getNumberOfElements());
+            // System.out.println("Testng the number of records "+persons.getNumberOfElements());
 
         }
 //        List<PersonResponseDto> personResponseDtoList = new ArrayList<>();
@@ -710,5 +710,10 @@ public class PersonService {
         return personMetaDataDto;
 
     }
+
+    public Optional<Person> findPersonByUuid(String uuid){
+        return personRepository.findByUuid(uuid);
+    }
+
 
 }
