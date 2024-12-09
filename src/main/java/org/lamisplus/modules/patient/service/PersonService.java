@@ -24,6 +24,7 @@ import org.lamisplus.modules.patient.repository.EncounterRepository;
 import org.lamisplus.modules.patient.repository.PersonRepository;
 import org.lamisplus.modules.patient.repository.VisitRepository;
 import org.springframework.data.domain.*;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
@@ -39,10 +40,14 @@ import java.util.stream.Collectors;
 import java.util.Map;
 import java.util.HashMap;
 
+import static org.lamisplus.modules.patient.controller.PatientController.REPORT_GENERATION_PROGRESS_TOPIC;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class PersonService {
+
+    private final SimpMessageSendingOperations messagingTemplate;
 
     static final String PERSON_NOT_FOUND_MESSAGE = "No person is  found with id  ";
     private final PersonRepository personRepository;
@@ -132,6 +137,7 @@ public class PersonService {
     }
 
     public List<PersonResponseDto> getCheckedInPersonsByServiceCodeAndVisitId(String serviceCode) {
+        messagingTemplate.convertAndSend(REPORT_GENERATION_PROGRESS_TOPIC, "Starting Patient line list report");
         List<Encounter> patientEncounters = encounterRepository.findAllByServiceCodeAndStatus(serviceCode, "PENDING");
         return patientEncounters.stream()
                 .map(Encounter::getPerson)
