@@ -457,7 +457,7 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
             "WHERE p.archived = 0\n" +
             "AND pe.service_code = ?1\n" +
             "AND pe.status = 'PENDING'\n" +
-            "ORDER BY p.id DESC", nativeQuery = true)
+            "ORDER BY p.id ASC", nativeQuery = true)
     List<PersonProjection> findAllCheckedInPersonsDetails(String serviceCode);
 }
 
