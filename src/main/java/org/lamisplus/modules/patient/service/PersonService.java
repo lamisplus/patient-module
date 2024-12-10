@@ -52,6 +52,8 @@ public class PersonService {
 
     private final VisitRepository visitRepository;
 
+
+
     private final EncounterRepository encounterRepository;
     private final UserService userService;
 
@@ -128,13 +130,11 @@ public class PersonService {
         return person.isPresent();
     }
 
-    public List<PersonResponseDto> getCheckedInPersonsByServiceCodeAndVisitId(String serviceCode) {
-        List<Encounter> patientEncounters = encounterRepository.findAllByServiceCodeAndStatus(serviceCode, "PENDING");
-        return patientEncounters.stream()
-                .map(Encounter::getPerson)
-                .map(this::getDtoFromPerson)
-                .collect(Collectors.toList());
+
+    public List<PersonProjection> getCheckedInPersonsByServiceCodeAndVisitId(String serviceCode) {
+        return personRepository.findAllCheckedInPersonsDetails(serviceCode);
     }
+
 
     public PersonResponseDto getPersonById(Long id) {
         Person person = personRepository

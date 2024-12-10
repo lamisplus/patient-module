@@ -90,20 +90,12 @@ public class Person extends PatientAuditEntity implements Persistable<Long>  , S
     @Column(name = "reason")
     private String reason;
 
-//    @Transient
-////    @Type(type = "jsonb-node")
-////    @Column(columnDefinition = "jsonb", name =
-//    @Type(type = "jsonb-node")
-//    @Column(columnDefinition = "jsonb")
-//    private JsonNode mobileExtra;
 
     @Column(name = "latitude")
     private String latitude;
     @Column(name = "longitude")
     private String longitude;
-//
-//    @Column(name = "case_manager_id")
-//    private Long caseManagerId;
+
 
 
 
