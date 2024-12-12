@@ -21,6 +21,8 @@ import { makeStyles } from "@material-ui/core/styles";
 import moment from "moment";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import RecallPatient from "../../RecallPatient";
+import ProgressComponent from "../../ProgressComponent";
+
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -317,6 +319,7 @@ function Index(props) {
         .then((response) => {
           console.log("checkIn", response);
           toast.success("Patient Check-In successful");
+          <ProgressComponent />
           setCheckinStatus(true);
           onCancelCheckIn();
           loadPatientVisits();
@@ -345,6 +348,7 @@ function Index(props) {
       })
       .then((response) => {
         toast.success("Record save successful");
+        <ProgressComponent />
         setCheckinStatus(false);
         onCancelCheckOut();
         loadPatientVisits();
@@ -364,6 +368,7 @@ function Index(props) {
   }, [loadServices, loadPatientVisits]);
   return (
     <>
+              <ProgressComponent />
       <div className="row">
         <div className="mb-3 col-md-3">&nbsp;</div>
         <div className="mb-3 col-md-3">&nbsp;</div>

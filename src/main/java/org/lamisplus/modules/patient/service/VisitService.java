@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class VisitService {
 
-    public static final String REPORT_GENERATION_PROGRESS_TOPIC = "/topic/checking-in-out-process";
+    public static final String PATIENT_CHECK_PROGRESS_TOPIC = "/topic/checking-in-out-process";
 
     private final SimpMessageSendingOperations messagingTemplate;
     private final PersonRepository personRepository;
@@ -87,10 +87,13 @@ public class VisitService {
     }
 
     public void checkOutVisitById(Long visitId) {
+        messagingTemplate.convertAndSend(PATIENT_CHECK_PROGRESS_TOPIC, "Got into Patient Checked out Serviced");
         Visit visit = getExistVisit(visitId);
         List<Encounter> encounters = encounterRepository.getEncounterByVisit(visit);
+        messagingTemplate.convertAndSend(PATIENT_CHECK_PROGRESS_TOPIC, "Got into Patient Checked out Serviced 1");
         encounters.forEach(this::checkoutFromAllService);
         visit.setVisitEndDate(LocalDateTime.now());
+        messagingTemplate.convertAndSend(PATIENT_CHECK_PROGRESS_TOPIC, "Got into Patient Checked out Serviced Done");
         visitRepository.save(visit);
     }
 
@@ -128,27 +131,26 @@ public class VisitService {
 
     public VisitDto checkInPerson(CheckInDto checkInDto) {
         Long personId = checkInDto.getVisitDto().getPersonId();
-
         // Notify the start of the process
-        messagingTemplate.convertAndSend(REPORT_GENERATION_PROGRESS_TOPIC, "Starting Patient line list report for personId: " + personId);
+        messagingTemplate.convertAndSend(PATIENT_CHECK_PROGRESS_TOPIC, "Starting Patient line list report for personId: " + personId);
 
         // Fetch the person details
         Person person = personRepository.findById(personId)
                 .orElseThrow(() -> {
                     String errorMessage = "No patient found with id " + personId;
-                    messagingTemplate.convertAndSend(REPORT_GENERATION_PROGRESS_TOPIC, errorMessage);
+                    messagingTemplate.convertAndSend(PATIENT_CHECK_PROGRESS_TOPIC, errorMessage);
                     return new EntityNotFoundException(VisitService.class, "errorMessage", errorMessage);
                 });
 
         // Notify after fetching the person details
-        messagingTemplate.convertAndSend(REPORT_GENERATION_PROGRESS_TOPIC, "Fetched patient details for personId: " + personId);
+        messagingTemplate.convertAndSend(PATIENT_CHECK_PROGRESS_TOPIC, "Fetched patient details for personId: " + personId);
 
         // Create and fetch visit
         Visit visit1 = createVisit(checkInDto.getVisitDto());
         Visit visit = getExistVisit(visit1.getId());
 
         // Notify visit creation
-        messagingTemplate.convertAndSend(REPORT_GENERATION_PROGRESS_TOPIC, "Visit created for personId: " + personId);
+        messagingTemplate.convertAndSend(PATIENT_CHECK_PROGRESS_TOPIC, "Visit created for personId: " + personId);
 
         // Process each service ID
         checkInDto.getServiceIds().forEach(serviceId -> {
@@ -158,20 +160,20 @@ public class VisitService {
                 PatientCheckPostService patientCheckPostService1 = patientCheckPostService.get();
 
                 // Notify service processing
-                messagingTemplate.convertAndSend(REPORT_GENERATION_PROGRESS_TOPIC,
+                messagingTemplate.convertAndSend(PATIENT_CHECK_PROGRESS_TOPIC,
                         "Processing service with moduleServiceCode: " + patientCheckPostService1.getModuleServiceCode() + " for personId: " + personId);
 
                 // Create encounter
                 createEncounter(person, visit, patientCheckPostService1.getModuleServiceCode());
             } else {
                 // Notify about missing service
-                messagingTemplate.convertAndSend(REPORT_GENERATION_PROGRESS_TOPIC,
+                messagingTemplate.convertAndSend(PATIENT_CHECK_PROGRESS_TOPIC,
                         "Service ID not found: " + serviceId + " for personId: " + personId);
             }
         });
 
         // Notify the end of the process
-        messagingTemplate.convertAndSend(REPORT_GENERATION_PROGRESS_TOPIC, "Completed Patient line list report for personId: " + personId);
+        messagingTemplate.convertAndSend(PATIENT_CHECK_PROGRESS_TOPIC, "Completed Patient line list report for personId: " + personId);
 
         return convertEntityToDto(visit);
     }
