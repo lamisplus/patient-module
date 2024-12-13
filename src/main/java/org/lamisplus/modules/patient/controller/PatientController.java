@@ -13,6 +13,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -26,6 +27,9 @@ import java.util.Map;
 @RequiredArgsConstructor
 @RequestMapping("api/v1/patient")
 public class PatientController {
+
+    public static final String REPORT_GENERATION_PROGRESS_TOPIC = "/topic/checking-in-out-process";
+    private final SimpMessageSendingOperations messagingTemplate;
 
     private final PersonService personService;
 

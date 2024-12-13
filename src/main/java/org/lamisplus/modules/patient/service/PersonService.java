@@ -24,6 +24,7 @@ import org.lamisplus.modules.patient.repository.EncounterRepository;
 import org.lamisplus.modules.patient.repository.PersonRepository;
 import org.lamisplus.modules.patient.repository.VisitRepository;
 import org.springframework.data.domain.*;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
@@ -39,10 +40,14 @@ import java.util.stream.Collectors;
 import java.util.Map;
 import java.util.HashMap;
 
+import static org.lamisplus.modules.patient.controller.PatientController.REPORT_GENERATION_PROGRESS_TOPIC;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class PersonService {
+
+    private final SimpMessageSendingOperations messagingTemplate;
 
     static final String PERSON_NOT_FOUND_MESSAGE = "No person is  found with id  ";
     private final PersonRepository personRepository;
@@ -72,6 +77,9 @@ public class PersonService {
         person.setHospitalNumber(hospitalNumber);
         person.setUuid(UUID.randomUUID().toString());
         person.setFullName(this.getFullName(personDto.getFirstName(), personDto.getOtherName(), personDto.getSurname()));
+        person.setSource((personDto.getSource() != null && !personDto.getSource().trim().isEmpty()) ? personDto.getSource()  : "Web" );
+        person.setLatitude(personDto.getLatitude());
+        person.setLongitude(personDto.getLongitude());
         return getDtoFromPerson(personRepository.save(person));
     }
 
@@ -306,6 +314,10 @@ public class PersonService {
         personResponseDto.setUuid(person.getUuid());
         personResponseDto.setBiometricStatus(getPatientBiometricStatus(person.getUuid()));
         personResponseDto.setFacilityId(person.getFacilityId());
+        personResponseDto.setLatitude(person.getLatitude());
+        personResponseDto.setLongitude(person.getLongitude());
+        personResponseDto.setSource(person.getSource());
+//        personResponseDto.setSource((person.getSource() != null && !person.getSource().trim().isEmpty()) ? person.getSource()  : "Web" );
         return personResponseDto;
     }
 

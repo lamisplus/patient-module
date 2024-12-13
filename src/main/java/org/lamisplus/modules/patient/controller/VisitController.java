@@ -6,6 +6,9 @@ import org.lamisplus.modules.patient.domain.dto.*;
 import org.lamisplus.modules.patient.domain.entity.Visit;
 import org.lamisplus.modules.patient.service.VisitService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,6 +19,9 @@ import java.util.List;
 @RequestMapping("api/v1/patient/visit")
 public class VisitController {
     private final VisitService visitService;
+
+    public static final String PATIENT_CHECK_PROGRESS_TOPIC = "/topic/checking-in-out-process";
+    private final SimpMessageSendingOperations messagingTemplate;
 
     @PostMapping
     public ResponseEntity<Visit> createVisit(@RequestBody VisitRequest visitDto) {
@@ -39,12 +45,14 @@ public class VisitController {
 
     @PutMapping("/checkout/{visitId}")
     public ResponseEntity<String> checkoutVisitByVisitId(@PathVariable("visitId") Long visitId) {
+        messagingTemplate.convertAndSend(PATIENT_CHECK_PROGRESS_TOPIC, "Got into Patient Checked Out");
         visitService.checkOutVisitById (visitId);
         return ResponseEntity.accepted ().build ();
     }
 
     @PostMapping("/checkin")
     public ResponseEntity<VisitDto> checkInVisitByPersonId(@RequestBody CheckInDto checkInDto) {
+        messagingTemplate.convertAndSend(PATIENT_CHECK_PROGRESS_TOPIC, "Got into Patient Checked In");
         return ResponseEntity.ok (visitService.checkInPerson (checkInDto));
     }
 
@@ -60,4 +68,8 @@ public class VisitController {
     }
 
 
+    @SendTo(PATIENT_CHECK_PROGRESS_TOPIC)
+    public String broadcastMessage(@Payload String message) {
+        return message;
+    }
 }

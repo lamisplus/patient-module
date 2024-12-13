@@ -19,6 +19,7 @@ import org.lamisplus.modules.patient.repository.PersonRepository;
 import org.lamisplus.modules.patient.repository.VisitRepository;
 import org.lamisplus.modules.patient.utility.LocalDateConverter;
 import org.springframework.beans.BeanUtils;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.Convert;
@@ -36,6 +37,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class VisitService {
+
+    public static final String PATIENT_CHECK_PROGRESS_TOPIC = "/topic/checking-in-out-process";
+
+    private final SimpMessageSendingOperations messagingTemplate;
     private final PersonRepository personRepository;
     private final VisitRepository visitRepository;
 
@@ -82,10 +87,13 @@ public class VisitService {
     }
 
     public void checkOutVisitById(Long visitId) {
+        messagingTemplate.convertAndSend(PATIENT_CHECK_PROGRESS_TOPIC, "Got into Patient Checked out Serviced");
         Visit visit = getExistVisit(visitId);
         List<Encounter> encounters = encounterRepository.getEncounterByVisit(visit);
+        messagingTemplate.convertAndSend(PATIENT_CHECK_PROGRESS_TOPIC, "Got into Patient Checked out Serviced 1");
         encounters.forEach(this::checkoutFromAllService);
         visit.setVisitEndDate(LocalDateTime.now());
+        messagingTemplate.convertAndSend(PATIENT_CHECK_PROGRESS_TOPIC, "Got into Patient Checked out Serviced Done");
         visitRepository.save(visit);
     }
 
@@ -123,24 +131,72 @@ public class VisitService {
 
     public VisitDto checkInPerson(CheckInDto checkInDto) {
         Long personId = checkInDto.getVisitDto().getPersonId();
-        Person person = personRepository
-                .findById(personId)
-                .orElseThrow(() -> new EntityNotFoundException(VisitService.class, "errorMessage", "No patient found with id " + checkInDto.getVisitDto().getPersonId()));
+        // Notify the start of the process
+        messagingTemplate.convertAndSend(PATIENT_CHECK_PROGRESS_TOPIC, "Starting Patient line list report for personId: " + personId);
+
+        // Fetch the person details
+        Person person = personRepository.findById(personId)
+                .orElseThrow(() -> {
+                    String errorMessage = "No patient found with id " + personId;
+                    messagingTemplate.convertAndSend(PATIENT_CHECK_PROGRESS_TOPIC, errorMessage);
+                    return new EntityNotFoundException(VisitService.class, "errorMessage", errorMessage);
+                });
+
+        // Notify after fetching the person details
+        messagingTemplate.convertAndSend(PATIENT_CHECK_PROGRESS_TOPIC, "Fetched patient details for personId: " + personId);
+
+        // Create and fetch visit
         Visit visit1 = createVisit(checkInDto.getVisitDto());
         Visit visit = getExistVisit(visit1.getId());
-        checkInDto.getServiceIds().forEach(checkInDto1 -> {
-                    Optional<PatientCheckPostService> patientCheckPostService =
-                            this.patientCheckPostServiceRepository.findById(checkInDto1);
-                    if (patientCheckPostService.isPresent()) {
-                        PatientCheckPostService patientCheckPostService1 = patientCheckPostService.get();
-                        createEncounter(person, visit, patientCheckPostService1.getModuleServiceCode());
-                    }
-                }
 
-        );
+        // Notify visit creation
+        messagingTemplate.convertAndSend(PATIENT_CHECK_PROGRESS_TOPIC, "Visit created for personId: " + personId);
+
+        // Process each service ID
+        checkInDto.getServiceIds().forEach(serviceId -> {
+            Optional<PatientCheckPostService> patientCheckPostService = this.patientCheckPostServiceRepository.findById(serviceId);
+
+            if (patientCheckPostService.isPresent()) {
+                PatientCheckPostService patientCheckPostService1 = patientCheckPostService.get();
+
+                // Notify service processing
+                messagingTemplate.convertAndSend(PATIENT_CHECK_PROGRESS_TOPIC,
+                        "Processing service with moduleServiceCode: " + patientCheckPostService1.getModuleServiceCode() + " for personId: " + personId);
+
+                // Create encounter
+                createEncounter(person, visit, patientCheckPostService1.getModuleServiceCode());
+            } else {
+                // Notify about missing service
+                messagingTemplate.convertAndSend(PATIENT_CHECK_PROGRESS_TOPIC,
+                        "Service ID not found: " + serviceId + " for personId: " + personId);
+            }
+        });
+
+        // Notify the end of the process
+        messagingTemplate.convertAndSend(PATIENT_CHECK_PROGRESS_TOPIC, "Completed Patient line list report for personId: " + personId);
 
         return convertEntityToDto(visit);
     }
+//    public VisitDto checkInPerson(CheckInDto checkInDto) {
+//        Long personId = checkInDto.getVisitDto().getPersonId();
+//        Person person = personRepository
+//                .findById(personId)
+//                .orElseThrow(() -> new EntityNotFoundException(VisitService.class, "errorMessage", "No patient found with id " + checkInDto.getVisitDto().getPersonId()));
+//        Visit visit1 = createVisit(checkInDto.getVisitDto());
+//        Visit visit = getExistVisit(visit1.getId());
+//        checkInDto.getServiceIds().forEach(checkInDto1 -> {
+//                    Optional<PatientCheckPostService> patientCheckPostService =
+//                            this.patientCheckPostServiceRepository.findById(checkInDto1);
+//                    if (patientCheckPostService.isPresent()) {
+//                        PatientCheckPostService patientCheckPostService1 = patientCheckPostService.get();
+//                        createEncounter(person, visit, patientCheckPostService1.getModuleServiceCode());
+//                    }
+//                }
+//
+//        );
+//
+//        return convertEntityToDto(visit);
+//    }
 
     private void createEncounter(Person person, Visit visit, String serviceCode) {
         Encounter encounter = new Encounter();
