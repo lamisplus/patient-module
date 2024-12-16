@@ -45,14 +45,12 @@ public class VisitController {
 
     @PutMapping("/checkout/{visitId}")
     public ResponseEntity<String> checkoutVisitByVisitId(@PathVariable("visitId") Long visitId) {
-        messagingTemplate.convertAndSend(PATIENT_CHECK_PROGRESS_TOPIC, "Got into Patient Checked Out");
         visitService.checkOutVisitById (visitId);
         return ResponseEntity.accepted ().build ();
     }
 
     @PostMapping("/checkin")
     public ResponseEntity<VisitDto> checkInVisitByPersonId(@RequestBody CheckInDto checkInDto) {
-        messagingTemplate.convertAndSend(PATIENT_CHECK_PROGRESS_TOPIC, "Got into Patient Checked In");
         return ResponseEntity.ok (visitService.checkInPerson (checkInDto));
     }
 

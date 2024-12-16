@@ -87,14 +87,13 @@ public class VisitService {
     }
 
     public void checkOutVisitById(Long visitId) {
-        messagingTemplate.convertAndSend(PATIENT_CHECK_PROGRESS_TOPIC, "Got into Patient Checked out Serviced");
         Visit visit = getExistVisit(visitId);
         List<Encounter> encounters = encounterRepository.getEncounterByVisit(visit);
-        messagingTemplate.convertAndSend(PATIENT_CHECK_PROGRESS_TOPIC, "Got into Patient Checked out Serviced 1");
         encounters.forEach(this::checkoutFromAllService);
         visit.setVisitEndDate(LocalDateTime.now());
-        messagingTemplate.convertAndSend(PATIENT_CHECK_PROGRESS_TOPIC, "Got into Patient Checked out Serviced Done");
         visitRepository.save(visit);
+        messagingTemplate.convertAndSend(PATIENT_CHECK_PROGRESS_TOPIC, "Client checked out of service");
+
     }
 
     private void checkoutFromAllService(Encounter encounter) {
@@ -132,7 +131,7 @@ public class VisitService {
     public VisitDto checkInPerson(CheckInDto checkInDto) {
         Long personId = checkInDto.getVisitDto().getPersonId();
         // Notify the start of the process
-        messagingTemplate.convertAndSend(PATIENT_CHECK_PROGRESS_TOPIC, "Starting Patient line list report for personId: " + personId);
+//        messagingTemplate.convertAndSend(PATIENT_CHECK_PROGRESS_TOPIC, "Starting Patient line list report for personId: " + personId);
 
         // Fetch the person details
         Person person = personRepository.findById(personId)
@@ -143,7 +142,7 @@ public class VisitService {
                 });
 
         // Notify after fetching the person details
-        messagingTemplate.convertAndSend(PATIENT_CHECK_PROGRESS_TOPIC, "Fetched patient details for personId: " + personId);
+//        messagingTemplate.convertAndSend(PATIENT_CHECK_PROGRESS_TOPIC, "Fetched patient details for personId: " + personId);
 
         // Create and fetch visit
         Visit visit1 = createVisit(checkInDto.getVisitDto());
@@ -160,8 +159,8 @@ public class VisitService {
                 PatientCheckPostService patientCheckPostService1 = patientCheckPostService.get();
 
                 // Notify service processing
-                messagingTemplate.convertAndSend(PATIENT_CHECK_PROGRESS_TOPIC,
-                        "Processing service with moduleServiceCode: " + patientCheckPostService1.getModuleServiceCode() + " for personId: " + personId);
+//                messagingTemplate.convertAndSend(PATIENT_CHECK_PROGRESS_TOPIC,
+//                        "Processing service with moduleServiceCode: " + patientCheckPostService1.getModuleServiceCode() + " for personId: " + personId);
 
                 // Create encounter
                 createEncounter(person, visit, patientCheckPostService1.getModuleServiceCode());
@@ -173,7 +172,7 @@ public class VisitService {
         });
 
         // Notify the end of the process
-        messagingTemplate.convertAndSend(PATIENT_CHECK_PROGRESS_TOPIC, "Completed Patient line list report for personId: " + personId);
+        messagingTemplate.convertAndSend(PATIENT_CHECK_PROGRESS_TOPIC, "Client Checked: " + person.getHospitalNumber());
 
         return convertEntityToDto(visit);
     }
