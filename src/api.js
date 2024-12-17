@@ -1,5 +1,7 @@
 export const token = new URLSearchParams(window.location.search).get("jwt");
 export const url = "/api/v1/";
+export const wsUrl = "/websocket";
+// export const wsUrl = 'http://localhost:8789/websocket'
 
 
 // export const url = "http://localhost:8789/api/v1/";
