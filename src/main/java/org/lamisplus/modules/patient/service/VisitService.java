@@ -141,15 +141,12 @@ public class VisitService {
                     return new EntityNotFoundException(VisitService.class, "errorMessage", errorMessage);
                 });
 
-        // Notify after fetching the person details
-//        messagingTemplate.convertAndSend(PATIENT_CHECK_PROGRESS_TOPIC, "Fetched patient details for personId: " + personId);
-
         // Create and fetch visit
         Visit visit1 = createVisit(checkInDto.getVisitDto());
         Visit visit = getExistVisit(visit1.getId());
 
         // Notify visit creation
-        messagingTemplate.convertAndSend(PATIENT_CHECK_PROGRESS_TOPIC, "Visit created for personId: " + personId);
+//        messagingTemplate.convertAndSend(PATIENT_CHECK_PROGRESS_TOPIC, "Visit created for personId: " + personId);
 
         // Process each service ID
         checkInDto.getServiceIds().forEach(serviceId -> {
@@ -158,21 +155,18 @@ public class VisitService {
             if (patientCheckPostService.isPresent()) {
                 PatientCheckPostService patientCheckPostService1 = patientCheckPostService.get();
 
-                // Notify service processing
-//                messagingTemplate.convertAndSend(PATIENT_CHECK_PROGRESS_TOPIC,
-//                        "Processing service with moduleServiceCode: " + patientCheckPostService1.getModuleServiceCode() + " for personId: " + personId);
-
                 // Create encounter
                 createEncounter(person, visit, patientCheckPostService1.getModuleServiceCode());
+
+                messagingTemplate.convertAndSend(PATIENT_CHECK_PROGRESS_TOPIC, "Client Checked: " + person.getHospitalNumber() + " into " + patientCheckPostService1.getModuleServiceName());
+
             } else {
                 // Notify about missing service
                 messagingTemplate.convertAndSend(PATIENT_CHECK_PROGRESS_TOPIC,
                         "Service ID not found: " + serviceId + " for personId: " + personId);
             }
-        });
 
-        // Notify the end of the process
-        messagingTemplate.convertAndSend(PATIENT_CHECK_PROGRESS_TOPIC, "Client Checked: " + person.getHospitalNumber());
+        });
 
         return convertEntityToDto(visit);
     }
