@@ -27,4 +27,7 @@ public interface PersonProjection {
     Long getVisitId();
     Boolean getClinicalEvaluation();
     Boolean getMentalHealth();
+    Boolean getIsOnAnc();
+    Boolean getIsOnPmtct();
+    Boolean getIsOnPrep();
 }

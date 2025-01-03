@@ -412,7 +412,7 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
             "        CASE WHEN p.other_name IS NULL OR p.other_name = '' THEN '' ELSE ' ' || p.other_name END,\n" +
             "        ' ', \n" +
             "        p.surname\n" +
-            "    ) AS fullname," +
+            "    ) AS fullname,\n" +
             "    p.hospital_number AS hospitalnumber,\n" +
             "    CAST(EXTRACT(YEAR FROM AGE(NOW(), p.date_of_birth)) AS INTEGER) AS age,\n" +
             "    INITCAP(p.sex) AS sex,\n" +
@@ -429,12 +429,18 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
             "    CAST(CASE WHEN b.biometric_type IS NULL THEN FALSE ELSE TRUE END AS BOOLEAN) AS biometricstatus,\n" +
             "    v.id AS visitid,\n" +
             "    CAST(CASE WHEN ce.type IS NOT NULL THEN TRUE ELSE FALSE END AS BOOLEAN) AS clinicalevaluation,\n" +
-            "    CAST(CASE WHEN mh.type IS NOT NULL THEN TRUE ELSE FALSE END AS BOOLEAN) AS mentalhealth\n" +
+            "    CAST(CASE WHEN mh.type IS NOT NULL THEN TRUE ELSE FALSE END AS BOOLEAN) AS mentalhealth,\n" +
+            "    CAST(CASE WHEN pa.person_uuid IS NOT NULL THEN TRUE ELSE FALSE END AS BOOLEAN) AS isOnAnc,\n" +
+            "    CAST(CASE WHEN pmt.person_uuid IS NOT NULL THEN TRUE ELSE FALSE END AS BOOLEAN) AS isOnPmtct,\n" +
+            "    CAST(CASE WHEN prep.person_uuid IS NOT NULL THEN TRUE ELSE FALSE END AS BOOLEAN) AS isOnPrep\n" +
             "FROM patient_person p\n" +
             "INNER JOIN patient_encounter pe ON pe.person_uuid = p.uuid\n" +
             "INNER JOIN patient_visit v ON v.uuid = pe.visit_id\n" +
             "LEFT JOIN biometric b ON b.person_uuid = p.uuid\n" +
             "LEFT JOIN hiv_enrollment e ON p.uuid = e.person_uuid\n" +
+            "LEFT JOIN pmtct_anc pa ON p.uuid = pa.person_uuid AND pa.archived = 0\n" +
+            "LEFT JOIN pmtct_enrollment pmt ON p.uuid = pmt.person_uuid AND pmt.archived = 0\n" +
+            "LEFT JOIN prep_enrollment prep ON p.uuid = prep.person_uuid AND prep.archived = 0\n" +
             "LEFT JOIN (\n" +
             "    SELECT TRUE AS commenced, hac.person_uuid\n" +
             "    FROM hiv_art_clinical hac\n" +
