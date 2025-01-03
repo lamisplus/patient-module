@@ -15,6 +15,7 @@ import org.lamisplus.modules.patient.repository.EncounterRepository;
 import org.lamisplus.modules.patient.repository.PersonRepository;
 import org.lamisplus.modules.patient.repository.VisitRepository;
 import org.springframework.beans.BeanUtils;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,6 +29,11 @@ public class EncounterService {
     private final VisitRepository visitRepository;
     private final EncounterRepository encounterRepository;
     private final PersonRepository personRepository;
+    private final SimpMessageSendingOperations messagingTemplate;
+
+
+    public static final String PATIENT_CHECK_PROGRESS_TOPIC = "/topic/checking-in-out-process";
+
 
     private final UserService userService;
     public List<EncounterResponseDto> registerEncounter(EncounterRequestDto encounterRequestDto) {
@@ -42,6 +48,7 @@ public class EncounterService {
                             encounterRepository.getEncounterByVisitAndStatusAndServiceCode(visit, encounterRequestDto.getStatus(), serviceCode);
                     if (!existingEncounter.isPresent()) {
                         Encounter encounter = processedAndSaveEncounter(encounterRequestDto, serviceCode);
+                        messagingTemplate.convertAndSend(PATIENT_CHECK_PROGRESS_TOPIC, "Client Checked: " + encounterRequestDto.getPersonId() + " into " + serviceCode);
                         encounter.setVisit(visit);
                         encounterRequestDtos.add(convertEntityToResponseDto(encounterRepository.save(encounter)));
                     }
