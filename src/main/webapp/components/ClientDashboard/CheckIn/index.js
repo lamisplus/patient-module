@@ -216,12 +216,12 @@ function Index(props) {
   }
 
   const onChangeDate = (date) => {
-    console.log(date.target.value);
+   
     const newDate = moment(new Date(date.target.value)).format(
       "yyyy-MM-dd hh:mm"
     );
     setCheckInDate(newDate);
-    console.log(newDate);
+    
   };
   const handleCheckIn = () => {
     setModal(true);
@@ -317,7 +317,7 @@ function Index(props) {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((response) => {
-          console.log("checkIn", response);
+         
           toast.success("Patient Check-In successful");
           <ProgressComponent />
           setCheckinStatus(true);
@@ -325,7 +325,7 @@ function Index(props) {
           loadPatientVisits();
         })
         .catch((error) => {
-          console.log(error);
+          console.error(error);
           toast.error("Something went wrong");
           onCancelCheckIn();
         });
@@ -354,7 +354,7 @@ function Index(props) {
         loadPatientVisits();
       })
       .catch((error) => {
-        console.log(error);
+        console.error(error);
         toast.error("Something went wrong");
         onCancelCheckOut();
       });

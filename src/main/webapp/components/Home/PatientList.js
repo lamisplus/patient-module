@@ -152,7 +152,7 @@ const PatientList = (props) => {
 
   const handleDelete = () => {
     const patientId = localStorage.getItem("patientID");
-    console.log(patientId, reason.reason);
+    console.error(patientId, reason.reason);
     axios
       .delete(`${baseUrl}patient/${patientId}/${reason.reason}`, {
         headers: { Authorization: `Bearer ${token}` },

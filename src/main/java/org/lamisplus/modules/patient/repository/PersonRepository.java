@@ -432,7 +432,9 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
             "    CAST(CASE WHEN mh.type IS NOT NULL THEN TRUE ELSE FALSE END AS BOOLEAN) AS mentalhealth,\n" +
             "    CAST(CASE WHEN pa.person_uuid IS NOT NULL THEN TRUE ELSE FALSE END AS BOOLEAN) AS isOnAnc,\n" +
             "    CAST(CASE WHEN pmt.person_uuid IS NOT NULL THEN TRUE ELSE FALSE END AS BOOLEAN) AS isOnPmtct,\n" +
-            "    CAST(CASE WHEN prep.person_uuid IS NOT NULL THEN TRUE ELSE FALSE END AS BOOLEAN) AS isOnPrep\n" +
+            "    CAST(CASE WHEN prep.person_uuid IS NOT NULL THEN TRUE ELSE FALSE END AS BOOLEAN) AS isOnPrep,\n" +
+            "    pmt.hiv_status AS hivStatus,\n" +
+            "    pa.static_hiv_status AS staticHivStatus\n" +
             "FROM patient_person p\n" +
             "INNER JOIN patient_encounter pe ON pe.person_uuid = p.uuid\n" +
             "INNER JOIN patient_visit v ON v.uuid = pe.visit_id\n" +

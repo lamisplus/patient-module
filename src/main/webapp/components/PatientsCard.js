@@ -49,7 +49,7 @@ const styles = (theme) => ({
 });
 
 function PatientsCard(props) {
-  console.log(props);
+
   const { classes } = props;
   const patientObj = props.patientObj ? props.patientObj : {};
   const permissions = props.permissions ? props.permissions : [];
@@ -80,7 +80,7 @@ function PatientsCard(props) {
               setDevices(response.data);
             })
             .catch((error) => {
-              console.log(error);
+              console.error(error);
             });
         }
       })
@@ -113,7 +113,7 @@ function PatientsCard(props) {
   };
 
   const getPhone = (contactPoint) => {
-    console.log("contact", contactPoint);
+    console.error("contact", contactPoint);
     const phoneContact = contactPoint?.contactPoint?.find(
       (obj) => obj.type == "phone"
     );

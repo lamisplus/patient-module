@@ -6,18 +6,18 @@ function ProgressComponent() {
     const [message, setMessage] = useState("");
 
     const onConnected = () => {
-        console.log("Connected!!");
+        console.error("Connected!!");
     };
 
     const onMessageReceived = (msg) => {
-        console.log("Message received: ", msg);
+       
         if (msg) {
             setMessage(msg);
         }
     };
 
     const onDisconnected = () => {
-        console.log("Disconnected!");
+        console.error("Disconnected!");
     };
 
     return (

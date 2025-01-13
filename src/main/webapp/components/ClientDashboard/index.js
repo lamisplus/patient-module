@@ -132,7 +132,7 @@ function Index(props) {
         }
       })
       .catch((error) => {
-        console.log(error);
+        console.error(error);
       });
   };
 

@@ -268,10 +268,10 @@ function PatientDashboard(props) {
     }
 
     const onChangeDate = (date) => {
-        console.log(date.target.value)
+        
         const newDate = moment(new Date(date.target.value)).format("yyyy-MM-dd hh:mm");
         setCheckInDate(newDate);
-        console.log(newDate);
+      
     };
 
 
@@ -480,7 +480,7 @@ function PatientDashboard(props) {
                     loadPatientVisits()
                 })
                 .catch(error => {
-                    console.log(error)
+                    console.error(error)
                     toast.error("Something went wrong");
                     onCancelCheckIn()
                 });
@@ -506,7 +506,7 @@ function PatientDashboard(props) {
                 loadPatientVisits()
             })
             .catch(error => {
-                console.log(error)
+                console.error(error)
                 toast.error("Something went wrong");
                 onCancelCheckOut()
             });

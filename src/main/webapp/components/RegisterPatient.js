@@ -207,7 +207,7 @@ const RegisterPatient = (props) => {
       );
       const patient = response.data;
 
-      console.log("get patient", patient?.contact?.contact);
+
 
       setAllContacts(patient?.contact?.contact);
       setPatientFacilityId(patient.facilityId);
@@ -579,7 +579,7 @@ const RegisterPatient = (props) => {
     setAllContacts([...allContacts]);
   };
   const handleEditRelative = (relative, index) => {
-    console.log(relative);
+
     setRelatives(relative);
     setShowRelative(true);
     allContacts.splice(index, 1);

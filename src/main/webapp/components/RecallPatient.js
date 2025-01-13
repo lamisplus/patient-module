@@ -124,7 +124,7 @@ const RecallPatient = (props) => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
-        console.log(response.data);
+       
         setFacilities(response.data.applicationUserOrganisationUnits);
       })
       .catch((error) => {
@@ -167,7 +167,7 @@ const RecallPatient = (props) => {
               setbiometricDevices(response.data);
             })
             .catch((error) => {
-              console.log(error);
+              console.error(error);
             });
         }
       })
@@ -223,7 +223,7 @@ const RecallPatient = (props) => {
         props.setPatientDetails(response.data);
       })
       .catch((error) => {
-        console.log(error);
+        console.error(error);
       });
   };
 
@@ -286,7 +286,7 @@ const RecallPatient = (props) => {
                 })
                 .catch((error) => {
                   setSuccessPims(false);
-                  console.log(error);
+                  console.error(error);
                 });
             } else {
               if (
@@ -321,7 +321,7 @@ const RecallPatient = (props) => {
   };
 
   const handleChange = (e) => {
-    console.log(e);
+    console.error(e);
     setCheckedVal(!checkedVal);
   };
 
