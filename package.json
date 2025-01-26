@@ -119,7 +119,7 @@
     "yup": "^0.32.8"
   },
   "scripts": {
-    "start": "react-scripts --openssl-legacy-provider --max_old_space_size=4096 start",
+    "start": "react-scripts --max_old_space_size=4096 start",
     "jsreport": "jsreport-start",
     "build": "react-scripts  --max_old_space_size=4096 build && xcopy /s /y build src\\main\\resources\\views\\static\\patient",
     "serve": "serve -s build",
